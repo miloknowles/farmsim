@@ -1,2 +1,3 @@
-# farmsim_unity
+# FarmSim
+
 Simulated macroalgae farm in Unity.
