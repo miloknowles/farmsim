@@ -42,6 +42,7 @@ public class AUV : MonoBehaviour {
 
     ros.AddPublisher(typeof(DepthPublisher));
     ros.AddPublisher(typeof(GroundtruthDepthPublisher));
+    ros.AddPublisher(typeof(PoseStampedPublisher));
 
     ros.AddPublisher(typeof(ImuPublisher));
     ros.AddPublisher(typeof(HeadingPublisher));
@@ -55,7 +56,7 @@ public class AUV : MonoBehaviour {
 
   void Update()
   {
-    StartCoroutine(PublishCameraImages());
+    StartCoroutine(PublishCameraSyncedMessages());
     StartCoroutine(SendDepth());
     StartCoroutine(PublishImu());
     StartCoroutine(SendHeading());
@@ -94,7 +95,8 @@ public class AUV : MonoBehaviour {
     camera.Render();
 
     // Make a new (empty) image and read the camera image into it.
-    Texture2D image = new Texture2D(camera.targetTexture.width, camera.targetTexture.height, TextureFormat.RGB24, false);
+    Texture2D image = new Texture2D(camera.targetTexture.width, camera.targetTexture.height,
+                                    TextureFormat.RGB24, false);
     image.ReadPixels(new Rect(0, 0, camera.targetTexture.width, camera.targetTexture.height), 0, 0);
     image.Apply();
 
@@ -116,9 +118,9 @@ public class AUV : MonoBehaviour {
   }
 
   /**
-   * Publish images from all of the cameras on the AUV.
+   * Any message that is meant to be synchronized with camera images should be published here.
    */
-  IEnumerator PublishCameraImages()
+  IEnumerator PublishCameraSyncedMessages()
   {
     yield return new WaitForEndOfFrame();
 
@@ -129,26 +131,38 @@ public class AUV : MonoBehaviour {
     PublishCameraImage(
         GetImageFromCamera(camera_forward_left),
         timeMessage,
-        new HeaderMsg(msgPublishCount, timeMessage, "camera_forward_left"),
+        new HeaderMsg(msgPublishCount, timeMessage, "auv_camera_fl"),
         CameraForwardLeftPublisher.GetMessageTopic());
 
     PublishCameraImage(
         GetImageFromCamera(camera_forward_right),
         timeMessage,
-        new HeaderMsg(msgPublishCount, timeMessage, "camera_forward_right"),
+        new HeaderMsg(msgPublishCount, timeMessage, "auv_camera_fr"),
         CameraForwardRightPublisher.GetMessageTopic());
 
     // PublishCameraImage(
     //     GetImageFromCamera(camera_downward_left),
     //     timeMessage,
-    //     new HeaderMsg(msgPublishCount, timeMessage, "camera_downward_left"),
+    //     new HeaderMsg(msgPublishCount, timeMessage, "auv_camera_dl"),
     //     CameraDownwardLeft.GetMessageTopic());
 
     PublishCameraImage(
         GetImageFromCamera(camera_upward_left),
         timeMessage,
-        new HeaderMsg(msgPublishCount, timeMessage, "camera_upward_left"),
+        new HeaderMsg(msgPublishCount, timeMessage, "auv_camera_ul"),
         CameraUpwardLeftPublisher.GetMessageTopic());
+
+    // Publish the pose of the vehicle in the world.
+    Vector3 t_auv_world = imuBody.transform.position;
+    Quaternion q_auv_world = imuBody.transform.rotation;
+
+    QuaternionMsg q_auv_world_msg = new QuaternionMsg(
+        q_auv_world.x, q_auv_world.y, q_auv_world.z, q_auv_world.w);
+    PointMsg t_auv_world_msg = new PointMsg(t_auv_world.x, t_auv_world.y, t_auv_world.z);
+    PoseStampedMsg msg = new PoseStampedMsg(new HeaderMsg(msgPublishCount, timeMessage, "auv_imu"),
+                                            new PoseMsg(t_auv_world_msg, q_auv_world_msg));
+    ros.Publish(PoseStampedPublisher.GetMessageTopic(), msg);
+    ros.Render();
   }
 
   // TODO(milo): Add simulated noise to the depth value.
@@ -162,6 +176,7 @@ public class AUV : MonoBehaviour {
     ros.Publish(GroundtruthDepthPublisher.GetMessageTopic(), depthMessage);
     ros.Render();
   }
+
 
   IEnumerator PublishImu() {
     yield return new WaitForEndOfFrame();
@@ -184,9 +199,10 @@ public class AUV : MonoBehaviour {
 
     var zeroVect3 = new Vector3Msg(0.0, 0.0, 0.0);
     var linearAccelMsg = new Vector3Msg(imuBodyAccel.x, imuBodyAccel.y, imuBodyAccel.z);
-    var imumessage = new ImuMessage(headerMessage, imuData, zeroMatrix3x3, zeroVect3, zeroMatrix3x3, linearAccelMsg, zeroMatrix3x3);
+    var msg = new ImuMessage(headerMessage, imuData, zeroMatrix3x3, zeroVect3, zeroMatrix3x3,
+                                    linearAccelMsg, zeroMatrix3x3);
 
-    ros.Publish(ImuPublisher.GetMessageTopic(), imumessage);
+    ros.Publish(ImuPublisher.GetMessageTopic(), msg);
     ros.Render();
   }
 
