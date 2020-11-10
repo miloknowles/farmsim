@@ -139,13 +139,13 @@ Material:
     - _OcclusionStrength: 1
     - _Parallax: 0.02
     - _ReflDistort: 0.4
-    - _RefrDistort: 0.23
+    - _RefrDistort: 0.427
     - _Shininess: 200
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _SrcBlend: 1
     - _UVSec: 0
-    - _WaveScale: 0.081
+    - _WaveScale: 0.0547
     - _ZWrite: 0
     m_Colors:
     - WaveSpeed: {r: 9, g: 4.5, b: -8, a: -3.5}
