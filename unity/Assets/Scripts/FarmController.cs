@@ -24,6 +24,8 @@ public class FarmController : MonoBehaviour {
   private int selectedRow = 0;
   private char selectedBuoy = 'A';
 
+  private bool coroutineLock = false;
+
   // Start is called before the first frame update
   void Start()
   {
@@ -37,7 +39,7 @@ public class FarmController : MonoBehaviour {
 		if (Input.GetKeyUp("right shift")) {
       float currentY = GetWinchesAtAddress(this.selectedRow, this.selectedBuoy)[0].transform.position.y;
       float nextY = (currentY > this.submergeDepth) ? this.submergeDepth : this.nominalDepth;
-      bool success = SetDepth(this.selectedRow, this.selectedBuoy, nextY);
+      bool success = SetDepth(this.selectedRow, this.selectedBuoy, nextY, true);
 		}
 
     // Switch the buoy that is currently selected with the <> keys.
@@ -71,26 +73,26 @@ public class FarmController : MonoBehaviour {
     Debug.Log($"{this.selectedBuoy}{this.selectedRow}");
   }
 
-  bool AdjustDepth(int row, char buoy, float deltaY)
+  IEnumerator AnimateMotion(List<GameObject> objects, Vector3 start, Vector3 end, float sec)
   {
-    // Ignore request to adjust the depth of buoys that don't exist.
-    if (!AddressValid(row, buoy)) {
-      return false;
+    this.coroutineLock = true;
+
+    float startTime = Time.time;
+    float elap = (Time.time - startTime);
+    while (elap < sec) {
+      elap = (Time.time - startTime);
+      float t = Mathf.Clamp(elap / sec, 0, 1);
+      foreach (GameObject obj in objects) {
+        // Linear interpolation between the two endpoints.
+        obj.transform.position = (1 - t)*start + t*end;
+        yield return t;
+      }
     }
 
-    // Get all overlapping winches at this location (hack, sorry) and move them.
-    List<GameObject> winchesToAdjust = GetWinchesAtAddress(row, buoy);
-    foreach (GameObject w in winchesToAdjust) {
-      Vector3 position = w.transform.position;
-      position.y += deltaY;
-      position.y = Mathf.Clamp(position.y, this.maxDepth, this.minDepth);
-      w.transform.position = position;
-    }
-
-    return true;
+    this.coroutineLock = false;
   }
 
-  bool SetDepth(int row, char buoy, float y)
+  bool SetDepth(int row, char buoy, float y, bool animate = false)
   {
     // Ignore request to adjust the depth of buoys that don't exist.
     if (!AddressValid(row, buoy)) {
@@ -99,10 +101,24 @@ public class FarmController : MonoBehaviour {
 
     // Get all overlapping winches at this location (hack, sorry) and move them.
     List<GameObject> winchesToAdjust = GetWinchesAtAddress(row, buoy);
-    foreach (GameObject w in winchesToAdjust) {
-      Vector3 position = w.transform.position;
-      position.y = Mathf.Clamp(y, this.maxDepth, this.minDepth);
-      w.transform.position = position;
+
+    Vector3 startPosition = winchesToAdjust[0].transform.position;
+    Vector3 endPosition = startPosition;
+    endPosition.y = Mathf.Clamp(y, this.maxDepth, this.minDepth);
+
+    if (animate) {
+      // Don't start the coroutine if one is already running.
+      if (this.coroutineLock) {
+        return false;
+      }
+      IEnumerator coroutine = AnimateMotion(winchesToAdjust, startPosition, endPosition, 5.0f);
+      StartCoroutine(coroutine);
+
+    // Set positions instantaneously.
+    } else {
+      foreach (GameObject w in winchesToAdjust) {
+        w.transform.position = endPosition;
+      }
     }
 
     return true;
