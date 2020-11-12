@@ -4628,10 +4628,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxRow: 1
   maxBuoy: 68
-  minDepth: -1
+  minDepth: -5
   maxDepth: -19
   nominalDepth: -10
-  submergeDepth: -19
+  submergeDepth: -15
 --- !u!1001 &1836533139
 PrefabInstance:
   m_ObjectHideFlags: 0
