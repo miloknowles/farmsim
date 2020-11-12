@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
+
 public class KeyboardMove : MonoBehaviour {
 	public Rigidbody controlledRigidBody;
 
@@ -37,9 +38,9 @@ public class KeyboardMove : MonoBehaviour {
 
 		float yawSign = 0.0f;
 		if (Input.GetKey("a")) {
-			yawSign = 1;
-		} else if (Input.GetKey("d")) {
 			yawSign = -1;
+		} else if (Input.GetKey("d")) {
+			yawSign = 1;
 		}
 
 		float rollSign = 0.0f;
@@ -56,20 +57,19 @@ public class KeyboardMove : MonoBehaviour {
 			pitchSign = 1;
 		}
 
-		float roll = controlledRigidBody.transform.eulerAngles.y;
+		float roll = controlledRigidBody.transform.eulerAngles.z;
 		float pitch = controlledRigidBody.transform.eulerAngles.x;
-		float yaw = controlledRigidBody.transform.eulerAngles.z;
+		float yaw = controlledRigidBody.transform.eulerAngles.y;
 
-		// NOTE(milo): Rigidbody on the capsule uses a weird ("RFD") coordinate system.
-		// Forward: +y, Right: +x, Down: +z
+		// NOTE(milo): Vehicle uses a "RUF" (Right-Up-Forward) coordinate frame.
 		Vector3 forceVector = new Vector3(leftRightSign * swayThrustForce,
-																			forwardBackwardSign * surgeThrustForce,
-																			-1 * upDownSign * heaveThrustForce);
+																			upDownSign * heaveThrustForce,
+																			forwardBackwardSign * surgeThrustForce);
 
 		// Apply force in the controlledRigidBody frame.
 		controlledRigidBody.AddRelativeForce(forceVector);
 
 		// NOTE(milo): Vector3.forward makes a unit Z vector.
-		controlledRigidBody.AddRelativeTorque(new Vector3(pitchSign * pitchTorque, rollSign * rollTorque, yawSign * yawTorque));
+		controlledRigidBody.AddRelativeTorque(new Vector3(pitchSign * pitchTorque, yawSign * yawTorque, rollSign * rollTorque));
 	}
 }

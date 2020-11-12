@@ -6,6 +6,7 @@ public class UnderwaterPhysics : MonoBehaviour
 {
   // The body on which underwater forces should act.
   public Rigidbody body;
+  public MeshFilter meshFilter;
   private float waterDensity = 1027.3f; // kg/m3
 
   // We assume that this body is always underwater, so buoyant forces don't change.
@@ -13,7 +14,7 @@ public class UnderwaterPhysics : MonoBehaviour
 
   void Start()
   {
-    Mesh mesh = GetComponent<MeshFilter>().sharedMesh;
+    Mesh mesh = meshFilter.sharedMesh;
     float volume = ComputeMeshVolume(mesh);
 
     string msg = "The volume of the mesh is " + volume + " m^3.";
