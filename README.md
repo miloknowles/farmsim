@@ -1,19 +1,28 @@
 # FarmSim
 
-Simulated macroalgae farm in Unity.
+Simulated macroalgae farm in Unity3D.
+
+Check out the [design document](https://docs.google.com/document/d/1a0eiJ9ga0okX0kW2TVdClzvAI5Pwo11VVDSLBfVIKrc/edit?usp=sharing) for details on naming, coordinate frames, ROS topics, etc.
+
+## Requirements
+
+This project is currently being developed with:
+- Ubuntu 18.04
+- ROS Melodic
+- Unity 2020.1.6.f1
 
 ## First-Time Setup
-
-This project is currently being developed with Ubuntu 18.04, ROS Melodic, and Unity 2020.1.6.f1.
 
 ```bash
 cd ros/src
 catkin build # Assumes you have catkin-tools installed.
 ```
 
-## Running Unity with ROS
+## Connecting Unity3D to ROS
+
+We use the (`ROSBridgeLib`)[https://github.com/MathiasCiarlo/ROSBridgeLib] library to connect Unity3D to ROS.
 
 ```bash
-# Launch to rosbridge server.
+# Launch to rosbridge server before playing the Unity simulation.
 roslaunch rosbridge_server rosbridge_websocket.launch
 ```
