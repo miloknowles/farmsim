@@ -30,6 +30,9 @@ public class AUV : MonoBehaviour {
   private Vector3 lastImuBodyVelocity;
   private Vector3 imuBodyAccel;
 
+  private List<IEnumerator> routines;
+  private int currentRoutine = 0;
+
   void Start()
   {
     ros = new ROSBridgeWebSocketConnection("ws://localhost", 9090);
@@ -52,6 +55,23 @@ public class AUV : MonoBehaviour {
     msgPublishCount = 0;
     lastFrame = DateTime.Now;
     camStart = DateTime.Now;
+
+    this.routines = new List<IEnumerator>{
+      this.AnimateWaypoint(this.gameObject, this.gameObject.transform.position + new Vector3(0, 0, 5), this.gameObject.transform.rotation, 5),
+      this.AnimateWaypoint(this.gameObject, this.gameObject.transform.position + new Vector3(0, 0, -5), this.gameObject.transform.rotation, 5),
+    };
+
+    StartCoroutine(ChainCoroutines(this.routines));
+  }
+
+  /**
+   * Executes a sequence of coroutines. As soon as one finishes, the next one is started.
+   */
+  IEnumerator ChainCoroutines(List<IEnumerator> routines)
+  {
+    foreach (IEnumerator r in routines) {
+      yield return StartCoroutine(r);
+    }
   }
 
   void Update()
@@ -216,4 +236,56 @@ public class AUV : MonoBehaviour {
     ros.Publish(HeadingPublisher.GetMessageTopic(), new Float64Msg(theta));
     ros.Render();
   }
+
+  /**
+   * Animates the vehicle moving between two waypoints.
+   */
+  IEnumerator AnimateMotion(GameObject vehicle,
+                            Vector3 t_start,
+                            Quaternion q_start,
+                            Vector3 t_end,
+                            Quaternion q_end,
+                            float sec)
+  {
+    float startTime = Time.time;
+    float elap = (Time.time - startTime);
+    while (elap < sec) {
+      elap = (Time.time - startTime);
+      float T = Mathf.Clamp(elap / sec, 0, 1); // Compute interpolation amount.
+
+      // Linear interpolation between the two endpoints, slerp between quaternions.
+      vehicle.transform.position = (1 - T)*t_start + T*t_end;
+      vehicle.transform.rotation = Quaternion.Slerp(q_start, q_end, T);
+
+      // Yield progress.
+      yield return T;
+    }
+  }
+
+  /**
+   * Animates the vehicle moving from its current pose to a waypoint pose.
+   */
+   IEnumerator AnimateWaypoint(GameObject vehicle, Vector3 t_end, Quaternion q_end, float sec)
+   {
+    float startTime = Time.time;
+    float elap = (Time.time - startTime);
+
+    // NOTE(milo): Need to grab the start transform HERE so that it's up-to-date when this coroutine
+    // starts. If it was an argument, it would be pinned to whatever location the vehicle was at
+    // upon instantiating the coroutine.
+    Vector3 t_start = vehicle.transform.position;
+    Quaternion q_start = vehicle.transform.rotation;
+
+    while (elap < sec) {
+      elap = (Time.time - startTime);
+      float T = Mathf.Clamp(elap / sec, 0, 1); // Compute interpolation amount.
+
+      // Linear interpolation between the two endpoints, slerp between quaternions.
+      vehicle.transform.position = (1 - T)*t_start + T*t_end;
+      vehicle.transform.rotation = Quaternion.Slerp(q_start, q_end, T);
+
+      // Yield progress.
+      yield return T;
+    }
+   }
 }
