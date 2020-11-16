@@ -278,7 +278,18 @@ public class AUV : MonoBehaviour {
 
     while (elap < sec) {
       elap = (Time.time - startTime);
-      float T = Mathf.Clamp(elap / sec, 0, 1); // Compute interpolation amount.
+
+      // First half of the trajectory (accelerating).
+      float T = 0;
+      if (elap < (sec / 2.0f)) {
+        T = (2.0f / Mathf.Pow(sec, 2.0f)) * Mathf.Pow(elap, 2.0f);
+
+      // Second half of the trajectory (decelerating).
+      } else {
+        T = 1 - (2.0f / Mathf.Pow(sec, 2.0f)) * Mathf.Pow((sec - elap), 2.0f);
+      }
+
+      T = Mathf.Clamp(T, 0, 1); // Compute interpolation amount.
 
       // Linear interpolation between the two endpoints, slerp between quaternions.
       vehicle.transform.position = (1 - T)*t_start + T*t_end;
