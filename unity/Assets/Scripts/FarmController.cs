@@ -166,4 +166,9 @@ public class FarmController : MonoBehaviour {
 
     return winches;
   }
+
+  public Transform GetWinchLocation(int row, char buoy)
+  {
+    return GetWinchesAtAddress(row, buoy)[0].transform;
+  }
 }

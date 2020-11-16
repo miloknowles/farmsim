@@ -25,13 +25,14 @@ public class AUV : MonoBehaviour {
   private RenderTexture rt;
 
   public Rigidbody imuBody;
+  public FarmController farm;
 
   // Used to calculate accleration with finite-differencing.
   private Vector3 lastImuBodyVelocity;
   private Vector3 imuBodyAccel;
 
   private List<IEnumerator> routines;
-  private int currentRoutine = 0;
+  private Quaternion rotationFaceWinch = Quaternion.identity;
 
   void Start()
   {
@@ -56,22 +57,14 @@ public class AUV : MonoBehaviour {
     lastFrame = DateTime.Now;
     camStart = DateTime.Now;
 
+    //============================== DEMO SETUP ================================
     this.routines = new List<IEnumerator>{
-      this.AnimateWaypoint(this.gameObject, this.gameObject.transform.position + new Vector3(0, 0, 5), this.gameObject.transform.rotation, 5),
-      this.AnimateWaypoint(this.gameObject, this.gameObject.transform.position + new Vector3(0, 0, -5), this.gameObject.transform.rotation, 5),
+      this.AnimateWaypoint(this.gameObject, this.farm.GetWinchLocation(0, 'A').position + new Vector3(0, 0, -1.5f), rotationFaceWinch, 10),
+      this.AnimateWaypoint(this.gameObject, this.farm.GetWinchLocation(0, 'B').position + new Vector3(0, 0, -1.5f), rotationFaceWinch, 10),
+      this.AnimateWaypoint(this.gameObject, this.farm.GetWinchLocation(0, 'C').position + new Vector3(0, 0, -1.5f), rotationFaceWinch, 10),
     };
 
     StartCoroutine(ChainCoroutines(this.routines));
-  }
-
-  /**
-   * Executes a sequence of coroutines. As soon as one finishes, the next one is started.
-   */
-  IEnumerator ChainCoroutines(List<IEnumerator> routines)
-  {
-    foreach (IEnumerator r in routines) {
-      yield return StartCoroutine(r);
-    }
   }
 
   void Update()
@@ -299,4 +292,14 @@ public class AUV : MonoBehaviour {
       yield return T;
     }
    }
+
+  /**
+   * Executes a sequence of coroutines. As soon as one finishes, the next one is started.
+   */
+  IEnumerator ChainCoroutines(List<IEnumerator> routines)
+  {
+    foreach (IEnumerator r in routines) {
+      yield return StartCoroutine(r);
+    }
+  }
 }
