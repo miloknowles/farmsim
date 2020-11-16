@@ -25,6 +25,7 @@ public class FarmController : MonoBehaviour {
   private char selectedBuoy = 'A';
 
   private bool coroutineLock = false;
+  public bool winchInProgress = false;
 
   // Start is called before the first frame update
   void Start()
@@ -60,6 +61,16 @@ public class FarmController : MonoBehaviour {
     }
   }
 
+  /**
+   * Toggles the depth of a particular buoy between a submerged/nominal position.
+   */
+  public void ToggleDepth(int row, char buoy)
+  {
+    float currentY = GetWinchesAtAddress(row, buoy)[0].transform.position.y;
+    float nextY = (currentY > this.submergeDepth) ? this.submergeDepth : this.nominalDepth;
+    SetDepth(row, buoy, nextY, true);
+  }
+
   void Highlight(bool on)
   {
     List<GameObject> selectedWinches = GetWinchesAtAddress(this.selectedRow, this.selectedBuoy);
@@ -73,9 +84,10 @@ public class FarmController : MonoBehaviour {
     Debug.Log($"{this.selectedBuoy}{this.selectedRow}");
   }
 
-  IEnumerator AnimateMotion(List<GameObject> objects, Vector3 start, Vector3 end, float sec)
+  public IEnumerator AnimateMotion(List<GameObject> objects, Vector3 start, Vector3 end, float sec)
   {
-    this.coroutineLock = true;
+    // this.coroutineLock = true;
+    this.winchInProgress = true;
 
     float startTime = Time.time;
     float elap = (Time.time - startTime);
@@ -85,11 +97,12 @@ public class FarmController : MonoBehaviour {
       foreach (GameObject obj in objects) {
         // Linear interpolation between the two endpoints.
         obj.transform.position = (1 - t)*start + t*end;
-        yield return t;
       }
+      yield return t;
     }
 
-    this.coroutineLock = false;
+    // this.coroutineLock = false;
+    this.winchInProgress = false;
   }
 
   bool SetDepth(int row, char buoy, float y, bool animate = false)
@@ -108,9 +121,9 @@ public class FarmController : MonoBehaviour {
 
     if (animate) {
       // Don't start the coroutine if one is already running.
-      if (this.coroutineLock) {
-        return false;
-      }
+      // if (this.coroutineLock) {
+      //   return false;
+      // }
       IEnumerator coroutine = AnimateMotion(winchesToAdjust, startPosition, endPosition, 5.0f);
       StartCoroutine(coroutine);
 
@@ -143,7 +156,7 @@ public class FarmController : MonoBehaviour {
     return winch;
   }
 
-  List<GameObject> GetWinchesAtAddress(int row, char buoy)
+  public List<GameObject> GetWinchesAtAddress(int row, char buoy)
   {
     List<GameObject> winches = new List<GameObject>();
 
@@ -165,5 +178,10 @@ public class FarmController : MonoBehaviour {
     }
 
     return winches;
+  }
+
+  public Transform GetWinchLocation(int row, char buoy)
+  {
+    return GetWinchesAtAddress(row, buoy)[0].transform;
   }
 }
