@@ -39,7 +39,7 @@ public class Autotelescope : MonoBehaviour
     }
   }
 
-  void Update()
+  void FixedUpdate()
   {
     // Average of the two endpoints.
     Vector3 midpoint = 0.5f * (endpoint0.transform.position + offset0 + endpoint1.transform.position + offset1);
@@ -48,7 +48,7 @@ public class Autotelescope : MonoBehaviour
     Vector3 unit_01 = Vector3.Normalize(vector_01);
     float length_01 = vector_01.magnitude;
 
-    Quaternion q_align_long = RotateAlignVectors(alignVector, unit_01);
+    Quaternion q_align_long = Simulator.Utils.RotateAlignVectors(alignVector, unit_01);
 
     // Position the attached game object at the center of the two endpoints.
     this.gameObject.transform.position = midpoint;
@@ -56,18 +56,5 @@ public class Autotelescope : MonoBehaviour
 
     // Make the attached telescope scale to fit between the endpoints.
     telescope.transform.localScale = new Vector3(this.originalScaleX, 0.5f*length_01, this.originalScaleZ);
-  }
-
-  // https://stackoverflow.com/questions/1171849/finding-quaternion-representing-the-rotation-from-one-vector-to-another
-  Quaternion RotateAlignVectors(Vector3 v1, Vector3 v2)
-  {
-    Vector3 hat1 = v1.normalized;
-    Vector3 hat2 = v2.normalized;
-
-    Vector3 xyz = Vector3.Cross(hat1, hat2);
-    float w = 1 + Vector3.Dot(hat1, hat2);
-
-    Quaternion q = new Quaternion(xyz.x, xyz.y, xyz.z, w).normalized;
-    return q;
   }
 }

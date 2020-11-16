@@ -33,6 +33,7 @@ public class AUV : MonoBehaviour {
 
   private List<IEnumerator> routines;
   private Quaternion rotationFaceWinch = Quaternion.identity;
+  public bool doRoutine = false;
 
   void Start()
   {
@@ -58,13 +59,17 @@ public class AUV : MonoBehaviour {
     camStart = DateTime.Now;
 
     //============================== DEMO SETUP ================================
-    this.routines = new List<IEnumerator>{
-      this.AnimateWaypoint(this.gameObject, this.farm.GetWinchLocation(0, 'A').position + new Vector3(0, 0, -1.5f), rotationFaceWinch, 10),
-      this.AnimateWaypoint(this.gameObject, this.farm.GetWinchLocation(0, 'B').position + new Vector3(0, 0, -1.5f), rotationFaceWinch, 10),
-      this.AnimateWaypoint(this.gameObject, this.farm.GetWinchLocation(0, 'C').position + new Vector3(0, 0, -1.5f), rotationFaceWinch, 10),
-    };
-
-    StartCoroutine(ChainCoroutines(this.routines));
+    if (this.doRoutine) {
+      this.routines = new List<IEnumerator>{
+        this.AnimateWaypoint(this.gameObject, this.farm.GetWinchLocation(0, 'A').position + new Vector3(0, 0, -2.0f), rotationFaceWinch, 6, 2),
+        this.AnimateFollowWinch(this.gameObject, 0, 'A'),
+        this.AnimateWaypoint(this.gameObject, this.farm.GetWinchLocation(0, 'B').position + new Vector3(0, 0, -2.0f), rotationFaceWinch, 6, 2),
+        this.AnimateFollowWinch(this.gameObject, 0, 'B'),
+        this.AnimateWaypoint(this.gameObject, this.farm.GetWinchLocation(0, 'C').position + new Vector3(0, 0, -2.0f), rotationFaceWinch, 6, 2),
+        this.AnimateFollowWinch(this.gameObject, 0, 'C')
+      };
+      StartCoroutine(ChainCoroutines(this.routines));
+    }
   }
 
   void Update()
@@ -238,13 +243,13 @@ public class AUV : MonoBehaviour {
                             Quaternion q_start,
                             Vector3 t_end,
                             Quaternion q_end,
-                            float sec)
+                            float transit_sec)
   {
     float startTime = Time.time;
     float elap = (Time.time - startTime);
-    while (elap < sec) {
+    while (elap < transit_sec) {
       elap = (Time.time - startTime);
-      float T = Mathf.Clamp(elap / sec, 0, 1); // Compute interpolation amount.
+      float T = Mathf.Clamp(elap / transit_sec, 0, 1); // Compute interpolation amount.
 
       // Linear interpolation between the two endpoints, slerp between quaternions.
       vehicle.transform.position = (1 - T)*t_start + T*t_end;
@@ -258,40 +263,74 @@ public class AUV : MonoBehaviour {
   /**
    * Animates the vehicle moving from its current pose to a waypoint pose.
    */
-   IEnumerator AnimateWaypoint(GameObject vehicle, Vector3 t_end, Quaternion q_end, float sec)
-   {
-    float startTime = Time.time;
-    float elap = (Time.time - startTime);
-
+  IEnumerator AnimateWaypoint(GameObject vehicle, Vector3 t_end, Quaternion q_end, float transit_sec, float rotate_sec)
+  {
     // NOTE(milo): Need to grab the start transform HERE so that it's up-to-date when this coroutine
     // starts. If it was an argument, it would be pinned to whatever location the vehicle was at
     // upon instantiating the coroutine.
     Vector3 t_start = vehicle.transform.position;
     Quaternion q_start = vehicle.transform.rotation;
 
-    while (elap < sec) {
-      elap = (Time.time - startTime);
+    // Align the vehicle with the direction of motion.
+    Quaternion q_transit = Simulator.Utils.RotateAlignVectors(new Vector3(0, 0, 1), t_end - t_start);
+
+    // Rotate in place.
+    float startTime = Time.time;
+    while ((Time.time - startTime) < rotate_sec) {
+      float elap = (Time.time - startTime);
+      float T = Mathf.Clamp(elap / rotate_sec, 0, 1); // Compute interpolation amount.
+      vehicle.transform.position = t_start;
+      vehicle.transform.rotation = Quaternion.Slerp(q_start, q_transit, T);
+
+      yield return T;
+    }
+
+    startTime = Time.time;
+    while ((Time.time - startTime) < transit_sec) {
+      float elap = (Time.time - startTime);
 
       // First half of the trajectory (accelerating).
       float T = 0;
-      if (elap < (sec / 2.0f)) {
-        T = (2.0f / Mathf.Pow(sec, 2.0f)) * Mathf.Pow(elap, 2.0f);
+      if (elap < (transit_sec / 2.0f)) {
+        T = (2.0f / Mathf.Pow(transit_sec, 2.0f)) * Mathf.Pow(elap, 2.0f);
 
       // Second half of the trajectory (decelerating).
       } else {
-        T = 1 - (2.0f / Mathf.Pow(sec, 2.0f)) * Mathf.Pow((sec - elap), 2.0f);
+        T = 1 - (2.0f / Mathf.Pow(transit_sec, 2.0f)) * Mathf.Pow((transit_sec - elap), 2.0f);
       }
 
       T = Mathf.Clamp(T, 0, 1); // Compute interpolation amount.
 
       // Linear interpolation between the two endpoints, slerp between quaternions.
       vehicle.transform.position = (1 - T)*t_start + T*t_end;
-      vehicle.transform.rotation = Quaternion.Slerp(q_start, q_end, T);
+      vehicle.transform.rotation = q_transit;
 
       // Yield progress.
       yield return T;
     }
-   }
+
+    // Rotate to goal orientation.
+    startTime = Time.time;
+    while ((Time.time - startTime) < rotate_sec) {
+      float elap = (Time.time - startTime);
+      float T = Mathf.Clamp(elap / rotate_sec, 0, 1); // Compute interpolation amount.
+      vehicle.transform.position = t_end;
+      vehicle.transform.rotation = Quaternion.Slerp(q_transit, q_end, T);
+      yield return T;
+    }
+  }
+
+  IEnumerator AnimateFollowWinch(GameObject vehicle, int row, char buoy)
+  {
+    GameObject winch_to_follow = this.farm.GetWinchesAtAddress(row, buoy)[0];
+    this.farm.ToggleDepth(row, buoy);
+    float prev_depth = 123;
+    while (this.farm.winchInProgress) {
+      prev_depth = winch_to_follow.transform.position.y;
+      vehicle.transform.position = new Vector3(vehicle.transform.position.x, prev_depth, vehicle.transform.position.z);
+      yield return null;
+    }
+  }
 
   /**
    * Executes a sequence of coroutines. As soon as one finishes, the next one is started.
