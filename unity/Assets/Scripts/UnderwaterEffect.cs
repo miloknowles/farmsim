@@ -42,6 +42,6 @@ public class UnderwaterEffect : MonoBehaviour {
   void SetUnderwater()
   {
     RenderSettings.fogColor = underwaterColor;
-    RenderSettings.fogDensity = 0.01f;
+    RenderSettings.fogDensity = 0.015f;
   }
 }
