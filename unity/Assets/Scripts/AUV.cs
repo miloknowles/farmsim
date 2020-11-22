@@ -74,7 +74,7 @@ public class AUV : MonoBehaviour {
     StartCoroutine(PublishCameraSyncedMessages());
     StartCoroutine(SendDepth());
     StartCoroutine(PublishImu());
-    StartCoroutine(SendHeading());
+    // StartCoroutine(SendHeading());
   }
 
   void FixedUpdate()
@@ -99,7 +99,7 @@ public class AUV : MonoBehaviour {
     // NOTE(milo): Using the ARGB32 format since it's in tutorials, not sure what the best option is
     // here though. It uses 8 bits per RGB channel, which seems standard.
     if (rt == null) {
-      rt = new RenderTexture(640, 480, 16, RenderTextureFormat.ARGB32);
+      rt = new RenderTexture(320, 240, 16, RenderTextureFormat.ARGB32);
       rt.Create();
     }
 
@@ -150,11 +150,11 @@ public class AUV : MonoBehaviour {
           new HeaderMsg(msgPublishCount, timeMessage, "auv_camera_fl"),
           CameraForwardLeftPublisher.GetMessageTopic());
 
-      PublishCameraImage(
-          GetImageFromCamera(camera_forward_right),
-          timeMessage,
-          new HeaderMsg(msgPublishCount, timeMessage, "auv_camera_fr"),
-          CameraForwardRightPublisher.GetMessageTopic());
+      // PublishCameraImage(
+      //     GetImageFromCamera(camera_forward_right),
+      //     timeMessage,
+      //     new HeaderMsg(msgPublishCount, timeMessage, "auv_camera_fr"),
+      //     CameraForwardRightPublisher.GetMessageTopic());
 
       // PublishCameraImage(
       //     GetImageFromCamera(camera_downward_left),
