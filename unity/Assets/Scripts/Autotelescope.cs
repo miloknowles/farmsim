@@ -39,7 +39,7 @@ public class Autotelescope : MonoBehaviour
     }
   }
 
-  void FixedUpdate()
+  void Update()
   {
     // Average of the two endpoints.
     Vector3 midpoint = 0.5f * (endpoint0.transform.position + offset0 + endpoint1.transform.position + offset1);
