@@ -224,7 +224,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 87268356}
-  - component: {fileID: 87268357}
   m_Layer: 8
   m_Name: Row_0
   m_TagString: Untagged
@@ -251,18 +250,6 @@ Transform:
   m_Father: {fileID: 1763879186}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &87268357
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 87268355}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 54d994ae77c3325cc90bfe21309d618e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &119824460
 GameObject:
   m_ObjectHideFlags: 0
@@ -1076,6 +1063,16 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 87268356}
     m_Modifications:
+    - target: {fileID: 3725427487857037624, guid: 4fb10973a346d932fa4aa22f12f9e06b,
+        type: 3}
+      propertyPath: waveController
+      value: 
+      objectReference: {fileID: 1601239207}
+    - target: {fileID: 3725427487857037624, guid: 4fb10973a346d932fa4aa22f12f9e06b,
+        type: 3}
+      propertyPath: dampingFactor
+      value: 0.2
+      objectReference: {fileID: 0}
     - target: {fileID: 5665746657624151825, guid: 4fb10973a346d932fa4aa22f12f9e06b,
         type: 3}
       propertyPath: m_Name
@@ -1473,7 +1470,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 529855412}
-  - component: {fileID: 529855413}
   m_Layer: 8
   m_Name: Row_1
   m_TagString: Untagged
@@ -1500,18 +1496,6 @@ Transform:
   m_Father: {fileID: 1763879186}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &529855413
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 529855411}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 54d994ae77c3325cc90bfe21309d618e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &559047914
 GameObject:
   m_ObjectHideFlags: 0
@@ -2052,6 +2036,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 529855412}
     m_Modifications:
+    - target: {fileID: 3725427487857037624, guid: 4fb10973a346d932fa4aa22f12f9e06b,
+        type: 3}
+      propertyPath: dampingFactor
+      value: 0.2
+      objectReference: {fileID: 0}
     - target: {fileID: 5665746657624151825, guid: 4fb10973a346d932fa4aa22f12f9e06b,
         type: 3}
       propertyPath: m_Name
@@ -2433,6 +2422,16 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1763879186}
     m_Modifications:
+    - target: {fileID: 295830362149507677, guid: af9796d7999d674c7beecfafb8107b06,
+        type: 3}
+      propertyPath: waveController
+      value: 
+      objectReference: {fileID: 1601239207}
+    - target: {fileID: 295830362149507677, guid: af9796d7999d674c7beecfafb8107b06,
+        type: 3}
+      propertyPath: dampingFactor
+      value: 0.2
+      objectReference: {fileID: 0}
     - target: {fileID: 1649373209457251328, guid: af9796d7999d674c7beecfafb8107b06,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -2492,6 +2491,76 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: MGrid_C0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2897069486207053526, guid: af9796d7999d674c7beecfafb8107b06,
+        type: 3}
+      propertyPath: waveController
+      value: 
+      objectReference: {fileID: 1601239207}
+    - target: {fileID: 2897069486207053526, guid: af9796d7999d674c7beecfafb8107b06,
+        type: 3}
+      propertyPath: dampingFactor
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4595852072909922038, guid: af9796d7999d674c7beecfafb8107b06,
+        type: 3}
+      propertyPath: waveController
+      value: 
+      objectReference: {fileID: 1601239207}
+    - target: {fileID: 4595852072909922038, guid: af9796d7999d674c7beecfafb8107b06,
+        type: 3}
+      propertyPath: dampingFactor
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6670897033339052220, guid: af9796d7999d674c7beecfafb8107b06,
+        type: 3}
+      propertyPath: waveController
+      value: 
+      objectReference: {fileID: 1601239207}
+    - target: {fileID: 6670897033339052220, guid: af9796d7999d674c7beecfafb8107b06,
+        type: 3}
+      propertyPath: dampingFactor
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7489548823513000348, guid: af9796d7999d674c7beecfafb8107b06,
+        type: 3}
+      propertyPath: waveController
+      value: 
+      objectReference: {fileID: 1601239207}
+    - target: {fileID: 7489548823513000348, guid: af9796d7999d674c7beecfafb8107b06,
+        type: 3}
+      propertyPath: dampingFactor
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7871908438193486598, guid: af9796d7999d674c7beecfafb8107b06,
+        type: 3}
+      propertyPath: waveController
+      value: 
+      objectReference: {fileID: 1601239207}
+    - target: {fileID: 7871908438193486598, guid: af9796d7999d674c7beecfafb8107b06,
+        type: 3}
+      propertyPath: dampingFactor
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8867213768522151282, guid: af9796d7999d674c7beecfafb8107b06,
+        type: 3}
+      propertyPath: waveController
+      value: 
+      objectReference: {fileID: 1601239207}
+    - target: {fileID: 8867213768522151282, guid: af9796d7999d674c7beecfafb8107b06,
+        type: 3}
+      propertyPath: dampingFactor
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 9052503998073134205, guid: af9796d7999d674c7beecfafb8107b06,
+        type: 3}
+      propertyPath: waveController
+      value: 
+      objectReference: {fileID: 1601239207}
+    - target: {fileID: 9052503998073134205, guid: af9796d7999d674c7beecfafb8107b06,
+        type: 3}
+      propertyPath: dampingFactor
+      value: 0.2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: af9796d7999d674c7beecfafb8107b06, type: 3}
@@ -3598,8 +3667,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 1
-  height: 0.5
-  noiseWalk: 0.5
+  height: 0.2
+  noiseWalk: 0.2
   noiseStrength: 0.1
 --- !u!1 &1625476257
 GameObject:
@@ -3863,6 +3932,16 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 87268356}
     m_Modifications:
+    - target: {fileID: 3725427487857037624, guid: 4fb10973a346d932fa4aa22f12f9e06b,
+        type: 3}
+      propertyPath: waveController
+      value: 
+      objectReference: {fileID: 1601239207}
+    - target: {fileID: 3725427487857037624, guid: 4fb10973a346d932fa4aa22f12f9e06b,
+        type: 3}
+      propertyPath: dampingFactor
+      value: 0.2
+      objectReference: {fileID: 0}
     - target: {fileID: 5665746657624151825, guid: 4fb10973a346d932fa4aa22f12f9e06b,
         type: 3}
       propertyPath: m_Name
@@ -4104,6 +4183,16 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1763879186}
     m_Modifications:
+    - target: {fileID: 295830362149507677, guid: af9796d7999d674c7beecfafb8107b06,
+        type: 3}
+      propertyPath: waveController
+      value: 
+      objectReference: {fileID: 1601239207}
+    - target: {fileID: 295830362149507677, guid: af9796d7999d674c7beecfafb8107b06,
+        type: 3}
+      propertyPath: dampingFactor
+      value: 0.2
+      objectReference: {fileID: 0}
     - target: {fileID: 1649373207920920157, guid: af9796d7999d674c7beecfafb8107b06,
         type: 3}
       propertyPath: m_Materials.Array.data[0]
@@ -4169,6 +4258,76 @@ PrefabInstance:
       propertyPath: m_Name
       value: MGrid_A0
       objectReference: {fileID: 0}
+    - target: {fileID: 2897069486207053526, guid: af9796d7999d674c7beecfafb8107b06,
+        type: 3}
+      propertyPath: waveController
+      value: 
+      objectReference: {fileID: 1601239207}
+    - target: {fileID: 2897069486207053526, guid: af9796d7999d674c7beecfafb8107b06,
+        type: 3}
+      propertyPath: dampingFactor
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4595852072909922038, guid: af9796d7999d674c7beecfafb8107b06,
+        type: 3}
+      propertyPath: waveController
+      value: 
+      objectReference: {fileID: 1601239207}
+    - target: {fileID: 4595852072909922038, guid: af9796d7999d674c7beecfafb8107b06,
+        type: 3}
+      propertyPath: dampingFactor
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6670897033339052220, guid: af9796d7999d674c7beecfafb8107b06,
+        type: 3}
+      propertyPath: waveController
+      value: 
+      objectReference: {fileID: 1601239207}
+    - target: {fileID: 6670897033339052220, guid: af9796d7999d674c7beecfafb8107b06,
+        type: 3}
+      propertyPath: dampingFactor
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7489548823513000348, guid: af9796d7999d674c7beecfafb8107b06,
+        type: 3}
+      propertyPath: waveController
+      value: 
+      objectReference: {fileID: 1601239207}
+    - target: {fileID: 7489548823513000348, guid: af9796d7999d674c7beecfafb8107b06,
+        type: 3}
+      propertyPath: dampingFactor
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7871908438193486598, guid: af9796d7999d674c7beecfafb8107b06,
+        type: 3}
+      propertyPath: waveController
+      value: 
+      objectReference: {fileID: 1601239207}
+    - target: {fileID: 7871908438193486598, guid: af9796d7999d674c7beecfafb8107b06,
+        type: 3}
+      propertyPath: dampingFactor
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8867213768522151282, guid: af9796d7999d674c7beecfafb8107b06,
+        type: 3}
+      propertyPath: waveController
+      value: 
+      objectReference: {fileID: 1601239207}
+    - target: {fileID: 8867213768522151282, guid: af9796d7999d674c7beecfafb8107b06,
+        type: 3}
+      propertyPath: dampingFactor
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 9052503998073134205, guid: af9796d7999d674c7beecfafb8107b06,
+        type: 3}
+      propertyPath: waveController
+      value: 
+      objectReference: {fileID: 1601239207}
+    - target: {fileID: 9052503998073134205, guid: af9796d7999d674c7beecfafb8107b06,
+        type: 3}
+      propertyPath: dampingFactor
+      value: 0.2
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: af9796d7999d674c7beecfafb8107b06, type: 3}
 --- !u!4 &1836533140 stripped
@@ -4184,6 +4343,16 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1763879186}
     m_Modifications:
+    - target: {fileID: 295830362149507677, guid: af9796d7999d674c7beecfafb8107b06,
+        type: 3}
+      propertyPath: waveController
+      value: 
+      objectReference: {fileID: 1601239207}
+    - target: {fileID: 295830362149507677, guid: af9796d7999d674c7beecfafb8107b06,
+        type: 3}
+      propertyPath: dampingFactor
+      value: 0.2
+      objectReference: {fileID: 0}
     - target: {fileID: 1649373209457251328, guid: af9796d7999d674c7beecfafb8107b06,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -4243,6 +4412,76 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: MGrid_B0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2897069486207053526, guid: af9796d7999d674c7beecfafb8107b06,
+        type: 3}
+      propertyPath: waveController
+      value: 
+      objectReference: {fileID: 1601239207}
+    - target: {fileID: 2897069486207053526, guid: af9796d7999d674c7beecfafb8107b06,
+        type: 3}
+      propertyPath: dampingFactor
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4595852072909922038, guid: af9796d7999d674c7beecfafb8107b06,
+        type: 3}
+      propertyPath: waveController
+      value: 
+      objectReference: {fileID: 1601239207}
+    - target: {fileID: 4595852072909922038, guid: af9796d7999d674c7beecfafb8107b06,
+        type: 3}
+      propertyPath: dampingFactor
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6670897033339052220, guid: af9796d7999d674c7beecfafb8107b06,
+        type: 3}
+      propertyPath: waveController
+      value: 
+      objectReference: {fileID: 1601239207}
+    - target: {fileID: 6670897033339052220, guid: af9796d7999d674c7beecfafb8107b06,
+        type: 3}
+      propertyPath: dampingFactor
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7489548823513000348, guid: af9796d7999d674c7beecfafb8107b06,
+        type: 3}
+      propertyPath: waveController
+      value: 
+      objectReference: {fileID: 1601239207}
+    - target: {fileID: 7489548823513000348, guid: af9796d7999d674c7beecfafb8107b06,
+        type: 3}
+      propertyPath: dampingFactor
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7871908438193486598, guid: af9796d7999d674c7beecfafb8107b06,
+        type: 3}
+      propertyPath: waveController
+      value: 
+      objectReference: {fileID: 1601239207}
+    - target: {fileID: 7871908438193486598, guid: af9796d7999d674c7beecfafb8107b06,
+        type: 3}
+      propertyPath: dampingFactor
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8867213768522151282, guid: af9796d7999d674c7beecfafb8107b06,
+        type: 3}
+      propertyPath: waveController
+      value: 
+      objectReference: {fileID: 1601239207}
+    - target: {fileID: 8867213768522151282, guid: af9796d7999d674c7beecfafb8107b06,
+        type: 3}
+      propertyPath: dampingFactor
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 9052503998073134205, guid: af9796d7999d674c7beecfafb8107b06,
+        type: 3}
+      propertyPath: waveController
+      value: 
+      objectReference: {fileID: 1601239207}
+    - target: {fileID: 9052503998073134205, guid: af9796d7999d674c7beecfafb8107b06,
+        type: 3}
+      propertyPath: dampingFactor
+      value: 0.2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: af9796d7999d674c7beecfafb8107b06, type: 3}
@@ -4409,6 +4648,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 529855412}
     m_Modifications:
+    - target: {fileID: 3725427487857037624, guid: 4fb10973a346d932fa4aa22f12f9e06b,
+        type: 3}
+      propertyPath: dampingFactor
+      value: 0.2
+      objectReference: {fileID: 0}
     - target: {fileID: 5665746657624151825, guid: 4fb10973a346d932fa4aa22f12f9e06b,
         type: 3}
       propertyPath: m_Name
