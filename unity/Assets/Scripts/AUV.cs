@@ -70,10 +70,7 @@ public class AUV : MonoBehaviour {
       };
       StartCoroutine(ChainCoroutines(this.routines));
     }
-  }
 
-  void Update()
-  {
     StartCoroutine(PublishCameraSyncedMessages());
     StartCoroutine(SendDepth());
     StartCoroutine(PublishImu());
@@ -140,99 +137,107 @@ public class AUV : MonoBehaviour {
    */
   IEnumerator PublishCameraSyncedMessages()
   {
-    yield return new WaitForEndOfFrame();
+    while (true) {
+      yield return new WaitForEndOfFrame();
 
-    var now = DateTime.Now;
-    var timeSinceStart = now - camStart;
-    var timeMessage = new TimeMsg(timeSinceStart.Seconds, timeSinceStart.Milliseconds);
+      var now = DateTime.Now;
+      var timeSinceStart = now - camStart;
+      var timeMessage = new TimeMsg(timeSinceStart.Seconds, timeSinceStart.Milliseconds);
 
-    PublishCameraImage(
-        GetImageFromCamera(camera_forward_left),
-        timeMessage,
-        new HeaderMsg(msgPublishCount, timeMessage, "auv_camera_fl"),
-        CameraForwardLeftPublisher.GetMessageTopic());
+      PublishCameraImage(
+          GetImageFromCamera(camera_forward_left),
+          timeMessage,
+          new HeaderMsg(msgPublishCount, timeMessage, "auv_camera_fl"),
+          CameraForwardLeftPublisher.GetMessageTopic());
 
-    PublishCameraImage(
-        GetImageFromCamera(camera_forward_right),
-        timeMessage,
-        new HeaderMsg(msgPublishCount, timeMessage, "auv_camera_fr"),
-        CameraForwardRightPublisher.GetMessageTopic());
+      PublishCameraImage(
+          GetImageFromCamera(camera_forward_right),
+          timeMessage,
+          new HeaderMsg(msgPublishCount, timeMessage, "auv_camera_fr"),
+          CameraForwardRightPublisher.GetMessageTopic());
 
-    // PublishCameraImage(
-    //     GetImageFromCamera(camera_downward_left),
-    //     timeMessage,
-    //     new HeaderMsg(msgPublishCount, timeMessage, "auv_camera_dl"),
-    //     CameraDownwardLeft.GetMessageTopic());
+      // PublishCameraImage(
+      //     GetImageFromCamera(camera_downward_left),
+      //     timeMessage,
+      //     new HeaderMsg(msgPublishCount, timeMessage, "auv_camera_dl"),
+      //     CameraDownwardLeft.GetMessageTopic());
 
-    PublishCameraImage(
-        GetImageFromCamera(camera_upward_left),
-        timeMessage,
-        new HeaderMsg(msgPublishCount, timeMessage, "auv_camera_ul"),
-        CameraUpwardLeftPublisher.GetMessageTopic());
+      // PublishCameraImage(
+      //     GetImageFromCamera(camera_upward_left),
+      //     timeMessage,
+      //     new HeaderMsg(msgPublishCount, timeMessage, "auv_camera_ul"),
+      //     CameraUpwardLeftPublisher.GetMessageTopic());
 
-    // Publish the pose of the vehicle in the world.
-    Vector3 t_auv_world = imuBody.transform.position;
-    Quaternion q_auv_world = imuBody.transform.rotation;
+      // Publish the pose of the vehicle in the world.
+      Vector3 t_auv_world = imuBody.transform.position;
+      Quaternion q_auv_world = imuBody.transform.rotation;
 
-    QuaternionMsg q_auv_world_msg = new QuaternionMsg(
-        q_auv_world.x, q_auv_world.y, q_auv_world.z, q_auv_world.w);
-    PointMsg t_auv_world_msg = new PointMsg(t_auv_world.x, t_auv_world.y, t_auv_world.z);
-    PoseStampedMsg msg = new PoseStampedMsg(new HeaderMsg(msgPublishCount, timeMessage, "auv_imu"),
-                                            new PoseMsg(t_auv_world_msg, q_auv_world_msg));
-    ros.Publish(PoseStampedPublisher.GetMessageTopic(), msg);
-    ros.Render();
+      QuaternionMsg q_auv_world_msg = new QuaternionMsg(
+          q_auv_world.x, q_auv_world.y, q_auv_world.z, q_auv_world.w);
+      PointMsg t_auv_world_msg = new PointMsg(t_auv_world.x, t_auv_world.y, t_auv_world.z);
+      PoseStampedMsg msg = new PoseStampedMsg(new HeaderMsg(msgPublishCount, timeMessage, "auv_imu"),
+                                              new PoseMsg(t_auv_world_msg, q_auv_world_msg));
+      ros.Publish(PoseStampedPublisher.GetMessageTopic(), msg);
+      ros.Render();
+    }
   }
 
   // TODO(milo): Add simulated noise to the depth value.
   IEnumerator SendDepth() {
-    yield return new WaitForEndOfFrame();
+    while (true) {
+      yield return new WaitForEndOfFrame();
 
-    float depth = imuBody.transform.position.y;
-    var depthMessage = new Float64Msg(depth);
+      float depth = imuBody.transform.position.y;
+      var depthMessage = new Float64Msg(depth);
 
-    ros.Publish(DepthPublisher.GetMessageTopic(), depthMessage);
-    ros.Publish(GroundtruthDepthPublisher.GetMessageTopic(), depthMessage);
-    ros.Render();
+      ros.Publish(DepthPublisher.GetMessageTopic(), depthMessage);
+      ros.Publish(GroundtruthDepthPublisher.GetMessageTopic(), depthMessage);
+      ros.Render();
+    }
   }
 
 
   IEnumerator PublishImu() {
-    yield return new WaitForEndOfFrame();
+    while (true) {
+      yield return new WaitForEndOfFrame();
 
-    var now = DateTime.Now;
-    var timeSinceStart = now - camStart;
-    var timeMessage = new TimeMsg(timeSinceStart.Seconds, timeSinceStart.Milliseconds);
-    var headerMessage = new HeaderMsg(msgPublishCount, timeMessage, "imu");
+      var now = DateTime.Now;
+      var timeSinceStart = now - camStart;
+      var timeMessage = new TimeMsg(timeSinceStart.Seconds, timeSinceStart.Milliseconds);
+      var headerMessage = new HeaderMsg(msgPublishCount, timeMessage, "imu");
 
-    Quaternion vehicleImu;
-    vehicleImu = imuBody.transform.rotation;
-    double xey = vehicleImu.x;
-    double yey = vehicleImu.y;
-    double zey = vehicleImu.z;
-    double wey = vehicleImu.w;
-    var imuData = new QuaternionMsg(xey, yey, zey, wey);
+      Quaternion vehicleImu;
+      vehicleImu = imuBody.transform.rotation;
+      double xey = vehicleImu.x;
+      double yey = vehicleImu.y;
+      double zey = vehicleImu.z;
+      double wey = vehicleImu.w;
+      var imuData = new QuaternionMsg(xey, yey, zey, wey);
 
-    // NOTE(milo): Sending empty covariance matrix for now (denoted with -1 in the 0th position).
-    double[] zeroMatrix3x3 = new double[]{-1, 0, 0, 0, 0, 0, 0, 0, 0};
+      // NOTE(milo): Sending empty covariance matrix for now (denoted with -1 in the 0th position).
+      double[] zeroMatrix3x3 = new double[]{-1, 0, 0, 0, 0, 0, 0, 0, 0};
 
-    var zeroVect3 = new Vector3Msg(0.0, 0.0, 0.0);
-    var linearAccelMsg = new Vector3Msg(imuBodyAccel.x, imuBodyAccel.y, imuBodyAccel.z);
-    var msg = new ImuMessage(headerMessage, imuData, zeroMatrix3x3, zeroVect3, zeroMatrix3x3,
-                                    linearAccelMsg, zeroMatrix3x3);
+      var zeroVect3 = new Vector3Msg(0.0, 0.0, 0.0);
+      var linearAccelMsg = new Vector3Msg(imuBodyAccel.x, imuBodyAccel.y, imuBodyAccel.z);
+      var msg = new ImuMessage(headerMessage, imuData, zeroMatrix3x3, zeroVect3, zeroMatrix3x3,
+                                      linearAccelMsg, zeroMatrix3x3);
 
-    ros.Publish(ImuPublisher.GetMessageTopic(), msg);
-    ros.Render();
+      ros.Publish(ImuPublisher.GetMessageTopic(), msg);
+      ros.Render();
+    }
   }
 
   /**
    * Publish the heading (yaw) of the vehicle.
    */
   IEnumerator SendHeading() {
-    yield return new WaitForEndOfFrame();
+    while (true) {
+      yield return new WaitForEndOfFrame();
 
-    float theta = imuBody.transform.rotation.eulerAngles.z;
-    ros.Publish(HeadingPublisher.GetMessageTopic(), new Float64Msg(theta));
-    ros.Render();
+      float theta = imuBody.transform.rotation.eulerAngles.z;
+      ros.Publish(HeadingPublisher.GetMessageTopic(), new Float64Msg(theta));
+      ros.Render();
+    }
   }
 
   /**
