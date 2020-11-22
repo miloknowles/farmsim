@@ -936,7 +936,7 @@ MonoBehaviour:
   camera_upward_left: {fileID: 499893274}
   imuBody: {fileID: 344260876}
   farm: {fileID: 1763879187}
-  doRoutine: 1
+  doRoutine: 0
 --- !u!114 &420561428
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2000,6 +2000,51 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 741950988}
   m_Mesh: {fileID: 10206, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &750594727
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 750594728}
+  - component: {fileID: 750594729}
+  m_Layer: 0
+  m_Name: WindField
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &750594728
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 750594727}
+  m_LocalRotation: {x: -0, y: 0.13995259, z: -0, w: 0.9901582}
+  m_LocalPosition: {x: 0, y: -10, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 754256996}
+  m_RootOrder: 4
+  m_LocalEulerAnglesHint: {x: 0, y: 16.09, z: 0}
+--- !u!182 &750594729
+WindZone:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 750594727}
+  m_Enabled: 1
+  m_Mode: 0
+  m_Radius: 20
+  m_WindMain: 0.5
+  m_WindTurbulence: 0.2
+  m_WindPulseMagnitude: 0.5
+  m_WindPulseFrequency: 0.05
 --- !u!1001 &751424066
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2122,6 +2167,7 @@ Transform:
   - {fileID: 1568909597}
   - {fileID: 973168483}
   - {fileID: 1763879186}
+  - {fileID: 750594728}
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -3382,7 +3428,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1568909597}
-  - component: {fileID: 1568909598}
   m_Layer: 4
   m_Name: Ocean
   m_TagString: Untagged
@@ -3406,24 +3451,6 @@ Transform:
   m_Father: {fileID: 754256996}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1568909598
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1568909596}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7de7d5ed2b8674cfebccf6282c261922, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  isDynamic: 0
-  scale: 0.1
-  speed: 1
-  waveDistance: 1
-  noiseStrength: 1
-  noiseWalk: 1
 --- !u!1 &1569006268
 GameObject:
   m_ObjectHideFlags: 0
@@ -3552,6 +3579,28 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1594893865}
   m_Mesh: {fileID: 10208, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &1601239206 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 100000, guid: 780611a67e8e941a2b3aa96e5915a793,
+    type: 3}
+  m_PrefabInstance: {fileID: 643434119}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1601239207
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1601239206}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ecc5abbeaeec593229d3328da4296ce0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  speed: 1
+  height: 0.5
+  noiseWalk: 0.5
+  noiseStrength: 0.1
 --- !u!1 &1625476257
 GameObject:
   m_ObjectHideFlags: 0
