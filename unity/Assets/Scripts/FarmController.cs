@@ -24,7 +24,6 @@ public class FarmController : MonoBehaviour {
   private int selectedRow = 0;
   private char selectedBuoy = 'A';
 
-  private bool coroutineLock = false;
   public bool winchInProgress = false;
 
   // Start is called before the first frame update
@@ -86,7 +85,6 @@ public class FarmController : MonoBehaviour {
 
   public IEnumerator AnimateMotion(List<GameObject> objects, Vector3 start, Vector3 end, float sec)
   {
-    // this.coroutineLock = true;
     this.winchInProgress = true;
 
     float startTime = Time.time;
@@ -96,12 +94,17 @@ public class FarmController : MonoBehaviour {
       float t = Mathf.Clamp(elap / sec, 0, 1);
       foreach (GameObject obj in objects) {
         // Linear interpolation between the two endpoints.
-        obj.transform.position = (1 - t)*start + t*end;
+        Vector3 interpolated = (1 - t)*start + t*end;
+
+        if (obj.GetComponent<FollowWaveHeight>() != null) {
+          obj.GetComponent<FollowWaveHeight>().nominalPosition = interpolated;
+        } else {
+          obj.transform.position = interpolated;
+        }
       }
       yield return t;
     }
 
-    // this.coroutineLock = false;
     this.winchInProgress = false;
   }
 
@@ -120,17 +123,18 @@ public class FarmController : MonoBehaviour {
     endPosition.y = Mathf.Clamp(y, this.maxDepth, this.minDepth);
 
     if (animate) {
-      // Don't start the coroutine if one is already running.
-      // if (this.coroutineLock) {
-      //   return false;
-      // }
       IEnumerator coroutine = AnimateMotion(winchesToAdjust, startPosition, endPosition, 5.0f);
       StartCoroutine(coroutine);
 
     // Set positions instantaneously.
     } else {
       foreach (GameObject w in winchesToAdjust) {
-        w.transform.position = endPosition;
+        // If the winch is following wave heights, we need to override its nominal position.
+        if (w.GetComponent<FollowWaveHeight>() != null) {
+          w.GetComponent<FollowWaveHeight>().nominalPosition = endPosition;
+        } else {
+          w.transform.position = endPosition;
+        }
       }
     }
 
