@@ -10,20 +10,23 @@ public class FollowWaveHeight : MonoBehaviour {
   // wave height changes.
   public float dampingFactor = 0.2f;
 
-  private Vector3 originalPosition;
+  // NOTE(milo): Any other script that wants to change the position of the attached object should
+  // change nominalPosition rather than this.transform.position, since this script's Update() method
+  // will override.
+  public Vector3 nominalPosition;
 
   // Start is called before the first frame update
   void Start()
   {
-    this.originalPosition = this.transform.position;
+    this.nominalPosition = this.transform.position;
   }
 
   // Update is called once per frame
   void Update()
   {
     if (this.waveController != null) {
-      Vector3 position = this.originalPosition;
-      position.y += this.dampingFactor * this.waveController.CalculateHeightOffset(this.originalPosition.x, this.originalPosition.z, false);
+      Vector3 position = this.nominalPosition;
+      position.y += this.dampingFactor * this.waveController.CalculateHeightOffset(this.nominalPosition.x, this.nominalPosition.z, false);
       this.transform.position = position;
     }
   }
