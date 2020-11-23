@@ -4370,7 +4370,7 @@ MonoBehaviour:
   _noiseScale: 1
   _noiseFrequency: 15
   _noiseSpeed: 15
-  _depthDistance: 30
+  _depthDistance: 100
 --- !u!20 &1865853617
 Camera:
   m_ObjectHideFlags: 0
@@ -4443,7 +4443,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _material: {fileID: 2100000, guid: 8c2a84fb38bdd9098b93ac1a2b969ccb, type: 2}
   _fogColor: {r: 0, g: 0.764151, b: 0.63956386, a: 0}
-  _depthDistance: 30
+  _depthDistance: 100
 --- !u!1001 &2040059896
 PrefabInstance:
   m_ObjectHideFlags: 0
