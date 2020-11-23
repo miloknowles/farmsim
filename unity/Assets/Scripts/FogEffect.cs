@@ -4,37 +4,22 @@ using UnityEngine;
 
 
 [ExecuteInEditMode, ImageEffectAllowedInSceneView]
-public class UnderwaterEffect : MonoBehaviour {
+public class FogEffect : MonoBehaviour {
     public Material _material;
-
-    [Range(0.001f, 0.1f)]
-    public float _pixelOffset = 0.005f;
-
-    [Range(0.1f, 20f)]
-    public float _noiseScale = 1.0f;
-
-    [Range(0.1f, 20f)]
-    public float _noiseFrequency = 15.0f;
-
-    [Range(0.1f, 30f)]
-    public float _noiseSpeed = 15.0f;
-
+    public Color _fogColor;
     private float _depthStart = 0;
-    public float _depthDistance = 10;
+    public float _depthDistance = 15;
 
     // Start is called before the first frame update
     void Start()
     {
+        GetComponent<Camera>().depthTextureMode = DepthTextureMode.Depth;
     }
 
     // Update is called once per frame
     void Update()
     {
-        // Push parameter updates to the shader.
-        _material.SetFloat("_NoiseFrequency", _noiseFrequency);
-        _material.SetFloat("_NoiseSpeed", _noiseSpeed);
-        _material.SetFloat("_NoiseScale", _noiseScale);
-        _material.SetFloat("_PixelOffset", _pixelOffset);
+        _material.SetColor("_FogColor", _fogColor);
         // _material.SetFloat("_DepthStart", _depthStart);
         _material.SetFloat("_DepthDistance", _depthDistance);
     }
