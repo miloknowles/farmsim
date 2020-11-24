@@ -103,6 +103,8 @@ public class AUV : MonoBehaviour {
       rt.Create();
     }
 
+    RenderTexture originalTexture = camera.targetTexture;
+
     // NOTE(milo): Documentation on camera rendering is a little confusing.
     // We instantiate a RenderTexture above, which is basically just a buffer that cameras render
     // into. Then, we call Render() and read the rendered image into a Texture2D with ReadPixels().
@@ -114,6 +116,8 @@ public class AUV : MonoBehaviour {
                                     TextureFormat.RGB24, false);
     image.ReadPixels(new Rect(0, 0, camera.targetTexture.width, camera.targetTexture.height), 0, 0);
     image.Apply();
+
+    camera.targetTexture = originalTexture;
 
     return image;
   }
@@ -150,11 +154,11 @@ public class AUV : MonoBehaviour {
           new HeaderMsg(msgPublishCount, timeMessage, "auv_camera_fl"),
           CameraForwardLeftPublisher.GetMessageTopic());
 
-      // PublishCameraImage(
-      //     GetImageFromCamera(camera_forward_right),
-      //     timeMessage,
-      //     new HeaderMsg(msgPublishCount, timeMessage, "auv_camera_fr"),
-      //     CameraForwardRightPublisher.GetMessageTopic());
+      PublishCameraImage(
+          GetImageFromCamera(camera_forward_right),
+          timeMessage,
+          new HeaderMsg(msgPublishCount, timeMessage, "auv_camera_fr"),
+          CameraForwardRightPublisher.GetMessageTopic());
 
       // PublishCameraImage(
       //     GetImageFromCamera(camera_downward_left),
