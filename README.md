@@ -20,9 +20,16 @@ catkin build # Assumes you have catkin-tools installed.
 
 ## Connecting Unity3D to ROS
 
-We use the (`ROSBridgeLib`)[https://github.com/MathiasCiarlo/ROSBridgeLib] library to connect Unity3D to ROS.
+We use the [`ROSBridgeLib`](https://github.com/MathiasCiarlo/ROSBridgeLib) library to connect Unity3D to ROS.
 
 ```bash
 # Launch to rosbridge server before playing the Unity simulation.
 roslaunch rosbridge_server rosbridge_websocket.launch
+```
+
+## Troubleshooting
+
+Sometimes you'll get an error on launch about the editor layout. It can be fixed by copying an existing `CurrentLayout-default.dwlt` into the project:
+```bash
+cp ~/SomeOtherProject/Library/CurrentLayout-default.dwlt Library/
 ```
