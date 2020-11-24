@@ -10,7 +10,7 @@ public class FlowFieldParticle : MonoBehaviour {
     void Update()
     {
         // Apply forward movement.
-        this.transform.position += transform.forward * _moveSpeed * Time.deltaTime;
+        this.transform.position += -1.0f * transform.forward * _moveSpeed * Time.deltaTime;
     }
 
     // Rotate the particle towards a vector.
