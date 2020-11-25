@@ -1,6 +1,8 @@
 # FarmSim
 
-Simulated macroalgae farm in Unity3D.
+A simulated macroalgae farm in Unity3D.
+
+![Banner image](/resources/images/banner.png?raw=true)
 
 Check out the [design document](https://docs.google.com/document/d/1a0eiJ9ga0okX0kW2TVdClzvAI5Pwo11VVDSLBfVIKrc/edit?usp=sharing) for details on naming, coordinate frames, ROS topics, etc.
 
@@ -29,7 +31,8 @@ roslaunch rosbridge_server rosbridge_websocket.launch
 
 ## Troubleshooting
 
-Sometimes you'll get an error on launch about the editor layout. It can be fixed by copying an existing `CurrentLayout-default.dwlt` into the project:
+Sometimes you'll get stuck in an error loop on launch about the editor layout. It can be fixed by copying an existing `CurrentLayout-default.dwlt` into the project:
 ```bash
-cp ~/SomeOtherProject/Library/CurrentLayout-default.dwlt Library/
+# Don't modify this file!
+cp ~/resources/CurrentLayout-default.dwlt Library/
 ```
