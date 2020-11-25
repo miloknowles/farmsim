@@ -123,8 +123,16 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _GlossMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: afe65f85cc7dd6ef9a75685580f9a852, type: 3}
+        m_Texture: {fileID: 2800000, guid: 71ddca81d4cce59209a21c9e98720627, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _ShadowOffset:
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _ShadowTex:
@@ -137,11 +145,12 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Floats:
     - _Cull: 2
-    - _Cutoff: 0.237
+    - _Cutoff: 0
     - _ShadowOffsetScale: 1
-    - _ShadowStrength: 0.243
+    - _ShadowStrength: 0
+    - _Shininess: 0.078125
     - _SquashAmount: 1
-    - _TranslucencyViewDependency: 0.7
+    - _TranslucencyViewDependency: 0
     - _WindQuality: 0
     m_Colors:
     - _Color: {r: 0, g: 1, b: 0.042674065, a: 1}
@@ -3361,11 +3370,11 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _BumpMap:
-        m_Texture: {fileID: 2800000, guid: 427cf221b0e5f4b4da9d0821562ddc18, type: 3}
+        m_Texture: {fileID: 2800000, guid: 6de787b941a84ab47aa819718eab2994, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _BumpSpecMap:
-        m_Texture: {fileID: 2800000, guid: e0a7e03ae8982d4cd9bb72f852556c5e, type: 3}
+        m_Texture: {fileID: 2800000, guid: 6de787b941a84ab47aa819718eab2994, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _DetailTex:
@@ -3377,7 +3386,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: afe65f85cc7dd6ef9a75685580f9a852, type: 3}
+        m_Texture: {fileID: 2800000, guid: 71ddca81d4cce59209a21c9e98720627, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _TranslucencyMap:
@@ -3385,12 +3394,12 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
-    - _AO: 2.4
+    - _AO: 0
     - _BaseLight: 0.35
     - _Cull: 2
     - _Cutoff: 0
     - _ShadowStrength: 1
-    - _Shininess: 0.078125
+    - _Shininess: 0.126
     - _SquashAmount: 1
     - _TranslucencyViewDependency: 0.7
     - _WindQuality: 0

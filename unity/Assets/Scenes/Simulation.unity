@@ -6409,6 +6409,11 @@ PrefabInstance:
       propertyPath: dampingFactor
       value: 0.2
       objectReference: {fileID: 0}
+    - target: {fileID: 4654241769892123348, guid: af9796d7999d674c7beecfafb8107b06,
+        type: 3}
+      propertyPath: m_ReceiveShadows
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6670897033339052220, guid: af9796d7999d674c7beecfafb8107b06,
         type: 3}
       propertyPath: waveController
