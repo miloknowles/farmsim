@@ -257,7 +257,7 @@ public class FarmController : MonoBehaviour {
 
         // NOTE(milo): Unity doesn't find these resources with .png at the end!
         string texturePath = $"AprilTags/tagStandard41h12/tag41_12_{aprilIndex:00000}";
-        Texture tex = Resources.Load(texturePath) as Texture;
+        Texture2D tex = Resources.Load(texturePath) as Texture2D;
         GameObject ATCube = winches[0].transform.Find("ATCube_Winch").gameObject;
         ATCube.GetComponent<MeshRenderer>().material.SetTexture("_MainTex", tex);
 
