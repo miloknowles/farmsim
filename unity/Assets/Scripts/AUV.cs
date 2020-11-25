@@ -37,7 +37,7 @@ public class AUV : MonoBehaviour {
 
   void Start()
   {
-    ros = new ROSBridgeWebSocketConnection("ws://localhost", 9090);
+    ros = new ROSBridgeWebSocketConnection("ws://localhost", Config.ROS_BRIDGE_PORT);
 
     // Add a publisher for each of the cameras that we want to support.
     ros.AddPublisher(typeof(CameraForwardLeftPublisher));

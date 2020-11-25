@@ -30,7 +30,6 @@ public class UnderwaterPhysics : MonoBehaviour {
 
   [Range(0.01f, 0.5f)]
   public float dragCoefficient = 0.2f;
-  private float waterDensity = 1027.3f; // kg/m3
 
   // We assume that this body is always underwater, so buoyant forces don't change.
   private Vector3 constantBuoyantForce; // N
@@ -45,7 +44,7 @@ public class UnderwaterPhysics : MonoBehaviour {
     float volume = ComputeMeshVolume(mesh);
     Debug.Log($"[UnderwaterPhysics] The volume of the mesh is {volume} m^3.");
 
-    this.constantBuoyantForce = -1.0f * volume * waterDensity * Physics.gravity;
+    this.constantBuoyantForce = -1.0f * volume * Config.WATER_DENSITY * Physics.gravity;
     this.constantGravityForce = Physics.gravity * body.mass;
     Debug.Log($"[UnderwaterPhysics] Gravity={this.constantGravityForce} N | Buoyancy={this.constantBuoyantForce} N");
 
@@ -90,7 +89,7 @@ public class UnderwaterPhysics : MonoBehaviour {
     if (this.currentMode != CurrentMode.NONE) {
       Vector3 flowVel = this.GetComponent<Rigidbody>().velocity - (this.currentSpeed * this.currentDirection);
       // F = C * rho * V^2
-      Vector3 F = this.dragCoefficient * this.waterDensity * Vector3.Scale(flowVel, flowVel);
+      Vector3 F = this.dragCoefficient * Config.WATER_DENSITY * Vector3.Scale(flowVel, flowVel);
 
       // To avoid drag forces blowing up at high velocity, clamp magnitude.
       body.AddForce(Vector3.ClampMagnitude(F, 100.0f));
