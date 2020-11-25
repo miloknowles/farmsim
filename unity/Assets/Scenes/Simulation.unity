@@ -6351,6 +6351,11 @@ PrefabInstance:
       propertyPath: waveController
       value: 
       objectReference: {fileID: 1601239207}
+    - target: {fileID: 1649373207920920128, guid: af9796d7999d674c7beecfafb8107b06,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1649373207920920157, guid: af9796d7999d674c7beecfafb8107b06,
         type: 3}
       propertyPath: m_Materials.Array.data[0]
@@ -6425,6 +6430,11 @@ PrefabInstance:
         type: 3}
       propertyPath: dampingFactor
       value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3732014575139305869, guid: af9796d7999d674c7beecfafb8107b06,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4595852072909922038, guid: af9796d7999d674c7beecfafb8107b06,
         type: 3}

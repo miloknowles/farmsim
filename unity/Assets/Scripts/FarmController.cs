@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 
 public enum CornerCode
@@ -9,6 +10,51 @@ public enum CornerCode
   TOPLEFT = 1,
   TOPRIGHT = 2,
   BOTTOMRIGHT = 3
+}
+
+
+// 26^2 = 676 locations should be sufficient.
+public struct BuoyCode {
+  private char[] _code;
+
+  // Construct with a string.
+  public BuoyCode(string s) {
+    Assert.IsTrue(s.Length == 1 || s.Length == 2);
+    this._code = s.ToCharArray();
+    Validate(this._code);
+  }
+
+  // Construct with a char array.
+  public BuoyCode(char[] c) {
+    Assert.IsTrue(c.Length == 1 || c.Length == 2);
+    this._code = c;
+    Validate(this._code);
+  }
+
+  // Construct with a single character.
+  public BuoyCode(char c) {
+    this._code = new char[1]{c};
+    Validate(this._code);
+  }
+
+  // Make sure all letters are in the alphabet.
+  private void Validate(char[] array) {
+    foreach (char c in array) {
+      Assert.IsTrue(c >= 'A' && c <= 'Z');
+    }
+  }
+
+  // Inteprets an alphabetic code as a Base-26 number.
+  public int Integer() {
+    int num = 0;
+    int powerOf26 = 1;
+    for (int ord = 0; ord < this._code.Length; ++ord) {
+      int indexOfBit = this._code.Length - ord - 1;
+      num += (int)(this._code[indexOfBit] - 'A') * powerOf26;
+      powerOf26 *= 26;
+    }
+    return num;
+  }
 }
 
 
@@ -30,6 +76,7 @@ public class FarmController : MonoBehaviour {
   void Start()
   {
     Highlight(true);
+    ConfigureAprilTags();
   }
 
   // Update is called once per frame
@@ -108,7 +155,7 @@ public class FarmController : MonoBehaviour {
     this.winchInProgress = false;
   }
 
-  bool SetDepth(int row, char buoy, float y, bool animate = false)
+  public bool SetDepth(int row, char buoy, float y, bool animate = false)
   {
     // Ignore request to adjust the depth of buoys that don't exist.
     if (!AddressValid(row, buoy)) {
@@ -141,7 +188,7 @@ public class FarmController : MonoBehaviour {
     return true;
   }
 
-  bool AddressValid(int row, char buoy)
+  private bool AddressValid(int row, char buoy)
   {
     return ((row >= 0 && row <= this.maxRow) && (buoy >= 'A' && buoy <= this.maxBuoy));
   }
@@ -152,7 +199,7 @@ public class FarmController : MonoBehaviour {
   char NextLetterWrap(char c) { return (c == this.maxBuoy) ? 'A' : NextLetter(c); }
   char PrevLetterWrap(char c) { return (c == 'A') ? this.maxBuoy : PrevLetter(c); }
 
-  GameObject GetWinchGridCellCorner(int row, char buoy, CornerCode corner)
+  private GameObject GetWinchGridCellCorner(int row, char buoy, CornerCode corner)
   {
     Transform cell = this.gameObject.transform.Find($"MGrid_{buoy}{row}");
     int cornerInt = (int)corner;
@@ -187,5 +234,38 @@ public class FarmController : MonoBehaviour {
   public Transform GetWinchLocation(int row, char buoy)
   {
     return GetWinchesAtAddress(row, buoy)[0].transform;
+  }
+
+  private int CharToInt(char c) { return (int)(c - 'A'); }
+
+  private void SetChildrenActive(GameObject o, bool active)
+  {
+    for (int i = 0; i < o.transform.childCount; ++i) {
+      o.transform.GetChild(i).gameObject.SetActive(active);
+    }
+  }
+
+  private void ConfigureAprilTags()
+  {
+    for (int row = 0; row <= this.maxRow; ++row) {
+      for (char buoy = 'A'; buoy <= this.maxBuoy; buoy = NextLetter(buoy)) {
+        List<GameObject> winches = GetWinchesAtAddress(row, buoy);
+
+        // AprilTag ID is in row-major order.
+        int aprilIndex = row*(CharToInt(this.maxBuoy)+1) + CharToInt(buoy);
+        Debug.Log($"Assigning AprilTag id={aprilIndex}");
+
+        // NOTE(milo): Unity doesn't find these resources with .png at the end!
+        string texturePath = $"AprilTags/tagStandard41h12/tag41_12_{aprilIndex:00000}";
+        Texture tex = Resources.Load(texturePath) as Texture;
+        GameObject ATCube = winches[0].transform.Find("ATCube_Winch").gameObject;
+        ATCube.GetComponent<MeshRenderer>().material.SetTexture("_MainTex", tex);
+
+        // Make only one of the winches visible.
+        for (int i = 1; i < winches.Count; ++i) {
+          SetChildrenActive(winches[i], false);
+        }
+      }
+    }
   }
 }
