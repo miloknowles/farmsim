@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Simulator;
 
 
 public class FishController : MonoBehaviour {
@@ -38,7 +39,7 @@ public class FishController : MonoBehaviour {
           Random.Range(this.transform.position.z, this.transform.position.z + this.aquariumSize.z)
       );
 
-      Vector3 randomDir = SampleFishDirection(this.minAzimuth, this.maxAzimuth);
+      Vector3 randomDir = Utils.SampleDirectionShallowAzimuth(this.minAzimuth, this.maxAzimuth);
 
       GameObject fish = (GameObject)Instantiate(fishPrefab);
       fish.transform.position = randomXYZ;
@@ -59,9 +60,9 @@ public class FishController : MonoBehaviour {
   {
     // Teleport any fish that exit the aquarium.
     foreach (GameObject f in this.fishInstances) {
-      float tx = CircularWrap(f.transform.position.x, this.transform.position.x, this.transform.position.x + this.aquariumSize.x);
-      float ty = CircularWrap(f.transform.position.y, this.transform.position.y, this.transform.position.y + this.aquariumSize.y);
-      float tz = CircularWrap(f.transform.position.z, this.transform.position.z, this.transform.position.z + this.aquariumSize.z);
+      float tx = Utils.CircularWrap(f.transform.position.x, this.transform.position.x, this.transform.position.x + this.aquariumSize.x);
+      float ty = Utils.CircularWrap(f.transform.position.y, this.transform.position.y, this.transform.position.y + this.aquariumSize.y);
+      float tz = Utils.CircularWrap(f.transform.position.z, this.transform.position.z, this.transform.position.z + this.aquariumSize.z);
       f.transform.position = new Vector3(tx, ty, tz);
     }
 
@@ -69,7 +70,7 @@ public class FishController : MonoBehaviour {
     if ((Time.time - this.lastFishUpdateTime) > this.fishUpdateInterval) {
       this.lastFishUpdateTime = Time.time;
       int randomIndex = Random.Range(0, this.fishInstances.Count);
-      this.fishDirections[randomIndex] = SampleFishDirection(this.minAzimuth, this.maxAzimuth);
+      this.fishDirections[randomIndex] = Utils.SampleDirectionShallowAzimuth(this.minAzimuth, this.maxAzimuth);
       this.fishSpeeds[randomIndex] = Random.Range(this.fishSwimSpeedMin, this.fishSwimSpeedMax);
     }
 
@@ -77,7 +78,7 @@ public class FishController : MonoBehaviour {
     for (int i = 0; i < this.fishInstances.Count; ++i) {
       GameObject fish = this.fishInstances[i];
       Vector3 direction = this.fishDirections[i];
-      ApplyRotation(fish, direction, this.fishRotateSpeed);
+      Utils.ApplyRotation(fish, direction, this.fishRotateSpeed);
       fish.transform.position += fish.transform.forward * this.fishSpeeds[i] * Time.deltaTime;
     }
   }
@@ -88,35 +89,5 @@ public class FishController : MonoBehaviour {
     Gizmos.color = Color.yellow;
     Vector3 centerOfCube = this.transform.position + 0.5f * this.aquariumSize;
     Gizmos.DrawWireCube(centerOfCube, this.aquariumSize);
-  }
-
-  // If a value goes past a bound, set it to the other bound (i.e like the modulo operation).
-  private float CircularWrap(float value, float minValue, float maxValue)
-  {
-    if (value >= minValue && value <= maxValue) {
-      return value;
-    }
-    return (value > maxValue) ? minValue : maxValue;
-  }
-
-  // Rotate the particle towards a vector.
-  private void ApplyRotation(GameObject obj, Vector3 rotation, float rotateSpeed)
-  {
-    Quaternion targetRotation = Quaternion.LookRotation(rotation.normalized);
-    obj.transform.rotation = Quaternion.RotateTowards(obj.transform.rotation, targetRotation, rotateSpeed * Time.deltaTime);
-  }
-
-  /**
-   * Samples a direction for a fish to travel in. Chooses a uniformly randomly bearing to travel in
-   * but limits the up/down (azimuth) angle of the fish to a shallow range, since fish probably
-   * aren't going to swim straight up or down.
-   */
-  private Vector3 SampleFishDirection(float minAzimuth, float maxAzimuth)
-  {
-    float bearingAngle = Random.Range(0, 2.0f*Mathf.PI);
-    float azimuthAngle = Random.Range(minAzimuth, maxAzimuth);
-    float y = Mathf.Cos(Mathf.Deg2Rad * azimuthAngle);
-    Vector3 direction = new Vector3(Mathf.Cos(bearingAngle), Mathf.Sin(bearingAngle), Mathf.Cos(y));
-    return direction.normalized;
   }
 }
