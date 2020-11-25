@@ -92,8 +92,8 @@ public class UnderwaterPhysics : MonoBehaviour {
       // F = C * rho * V^2
       Vector3 F = this.dragCoefficient * this.waterDensity * Vector3.Scale(flowVel, flowVel);
 
-      // if (this.transform.position.y )
-      body.AddForce(F);
+      // To avoid drag forces blowing up at high velocity, clamp magnitude.
+      body.AddForce(Vector3.ClampMagnitude(F, 100.0f));
     }
 
     // Make sure the vehicle can't escape the water.
