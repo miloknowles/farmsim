@@ -72,9 +72,7 @@ public class AUV : MonoBehaviour {
     }
 
     StartCoroutine(PublishCameraSyncedMessages());
-    StartCoroutine(SendDepth());
     StartCoroutine(PublishImu());
-    // StartCoroutine(SendHeading());
   }
 
   void FixedUpdate()
@@ -142,6 +140,8 @@ public class AUV : MonoBehaviour {
   IEnumerator PublishCameraSyncedMessages()
   {
     while (true) {
+      // yield return new WaitForEndOfFrame();
+      yield return new WaitForSeconds(1.0f / Config.CAMERA_PUBLISH_HZ);
       yield return new WaitForEndOfFrame();
 
       var now = DateTime.Now;
@@ -186,24 +186,10 @@ public class AUV : MonoBehaviour {
     }
   }
 
-  // TODO(milo): Add simulated noise to the depth value.
-  IEnumerator SendDepth() {
-    while (true) {
-      yield return new WaitForEndOfFrame();
-
-      float depth = imuBody.transform.position.y;
-      var depthMessage = new Float64Msg(depth);
-
-      ros.Publish(DepthPublisher.GetMessageTopic(), depthMessage);
-      ros.Publish(GroundtruthDepthPublisher.GetMessageTopic(), depthMessage);
-      ros.Render();
-    }
-  }
-
-
   IEnumerator PublishImu() {
     while (true) {
-      yield return new WaitForEndOfFrame();
+      // yield return new WaitForEndOfFrame();
+      yield return new WaitForSeconds(1.0f / Config.SENSOR_PUBLISH_HZ);
 
       var now = DateTime.Now;
       var timeSinceStart = now - camStart;
@@ -227,20 +213,17 @@ public class AUV : MonoBehaviour {
                                       linearAccelMsg, zeroMatrix3x3);
 
       ros.Publish(ImuPublisher.GetMessageTopic(), msg);
-      ros.Render();
-    }
-  }
 
-  /**
-   * Publish the heading (yaw) of the vehicle.
-   */
-  IEnumerator SendHeading() {
-    while (true) {
-      yield return new WaitForEndOfFrame();
-
+      // Publish the heading (yaw) of the vehicle.
       float theta = imuBody.transform.rotation.eulerAngles.z;
       ros.Publish(HeadingPublisher.GetMessageTopic(), new Float64Msg(theta));
       ros.Render();
+
+      // Publish the current barometer depth.
+      float depth = imuBody.transform.position.y;
+      Float64Msg depthMessage = new Float64Msg(depth);
+      ros.Publish(DepthPublisher.GetMessageTopic(), depthMessage);
+      ros.Publish(GroundtruthDepthPublisher.GetMessageTopic(), depthMessage);
     }
   }
 
