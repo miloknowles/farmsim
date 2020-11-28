@@ -2556,7 +2556,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 420561424}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: dd84921c8fa71f54b9c28723f8468aff, type: 3}
   m_Name: 
@@ -2615,7 +2615,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 23e96628b94d8612ea13b6338dbe83d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  linearDragCoefficient: 0.5
   angularDragCoefficient: 0.7
 --- !u!65 &420561431
 BoxCollider:
@@ -2628,8 +2627,51 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 0.25, y: 0.1, z: 0.41}
+  m_Size: {x: 0.205, y: 0.0801, z: 0.41}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &466578602
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 466578603}
+  - component: {fileID: 466578604}
+  m_Layer: 0
+  m_Name: ROSMessageHolder
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &466578603
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 466578602}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 5
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &466578604
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 466578602}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f98b50e9382dd46d0b3decc79ead3200, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &482875942
 GameObject:
   m_ObjectHideFlags: 0
@@ -10981,7 +11023,7 @@ Transform:
   m_GameObject: {fileID: 1845133840}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.25, y: 0.1, z: 0.41}
+  m_LocalScale: {x: 0.205, y: 0.0801, z: 0.41}
   m_Children: []
   m_Father: {fileID: 420561426}
   m_RootOrder: 8

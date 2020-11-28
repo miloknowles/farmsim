@@ -1,0 +1,35 @@
+[  0%] Built target control_gencfg
+[  0%] Built target _control_generate_messages_check_deps_yawFeedback
+[  0%] Built target _control_generate_messages_check_deps_rollGoal
+[  0%] Built target _control_generate_messages_check_deps_swayFeedback
+[  0%] Built target _control_generate_messages_check_deps_heaveFeedback
+[  0%] Built target std_msgs_generate_messages_cpp
+[  0%] Built target _control_generate_messages_check_deps_swayActionGoal
+[  0%] Built target _control_generate_messages_check_deps_heaveResult
+[  0%] Built target _control_generate_messages_check_deps_rollActionFeedback
+[  0%] Built target _control_generate_messages_check_deps_rollAction
+[  0%] Built target _control_generate_messages_check_deps_pitchResult
+[  0%] Built target _control_generate_messages_check_deps_yawGoal
+[  0%] Built target _control_generate_messages_check_deps_swayResult
+[  0%] Built target actionlib_msgs_generate_messages_cpp
+[  0%] Built target _control_generate_messages_check_deps_heaveActionResult
+[  0%] Built target _control_generate_messages_check_deps_surgeActionGoal
+[  0%] Built target _control_generate_messages_check_deps_pitchActionGoal
+[  0%] Built target _control_generate_messages_check_deps_surgeAction
+[  0%] Built target _control_generate_messages_check_deps_surgeFeedback
+[  0%] Built target _control_generate_messages_check_deps_heaveAction
+[  0%] Built target _control_generate_messages_check_deps_surgeActionResult
+The dependencies of the message/service 'control/TridentThrust' have changed. Please rerun cmake.
+CMakeFiles/_control_generate_messages_check_deps_TridentThrust.dir/build.make:57: recipe for target 'CMakeFiles/_control_generate_messages_check_deps_TridentThrust' failed
+CMakeFiles/Makefile2:1989: recipe for target 'CMakeFiles/_control_generate_messages_check_deps_TridentThrust.dir/all' failed
+make[2]: *** [CMakeFiles/_control_generate_messages_check_deps_TridentThrust] Error 1
+make[1]: *** [CMakeFiles/_control_generate_messages_check_deps_TridentThrust.dir/all] Error 2
+make[1]: *** Waiting for unfinished jobs....
+[  0%] Built target _control_generate_messages_check_deps_heaveActionGoal
+[  0%] Built target _control_generate_messages_check_deps_pitchFeedback
+[  0%] Built target _control_generate_messages_check_deps_swayActionFeedback
+[  0%] Built target _control_generate_messages_check_deps_pitchGoal
+[  0%] Built target _control_generate_messages_check_deps_swayAction
+[  0%] Built target _control_generate_messages_check_deps_heaveActionFeedback
+Makefile:140: recipe for target 'all' failed
+make: *** [all] Error 2
