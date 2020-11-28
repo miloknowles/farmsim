@@ -26,7 +26,11 @@ We use the [`ROSBridgeLib`](https://github.com/MathiasCiarlo/ROSBridgeLib) libra
 
 ```bash
 # Launch to rosbridge server before playing the Unity simulation.
+source ros/devel/setup.bash
 roslaunch rosbridge_server rosbridge_websocket.launch
+
+# Publish a thrust command.
+rostopic pub -r 1 /auv/controls/trident_thrust/ control/TridentThrust '{F_lt: 1.0, F_rt: 1.0, F_ct: -1.0}'
 ```
 
 ## Troubleshooting

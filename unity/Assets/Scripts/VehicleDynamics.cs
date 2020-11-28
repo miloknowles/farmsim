@@ -41,6 +41,7 @@ public class VehicleDynamics : MonoBehaviour {
   void Update()
   {
     this._ros.Render();
+
     // Keys: Up = +1, Down = -1;
 		// float forwardBackwardSign = Input.GetAxis("Vertical");
 
