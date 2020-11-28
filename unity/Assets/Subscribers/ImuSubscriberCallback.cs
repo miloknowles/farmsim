@@ -8,7 +8,7 @@ public class ImuSubscriberCallback : ROSBridgeSubscriber {
 
 	public new static string GetMessageTopic() {
 		return "/imu/data";
-	}  
+	}
 
 	public new static string GetMessageType() {
 		return "sensor_msgs/Imu";

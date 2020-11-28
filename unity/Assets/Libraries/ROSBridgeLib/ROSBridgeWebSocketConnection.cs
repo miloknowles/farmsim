@@ -11,19 +11,19 @@ using UnityEngine;
 /**
  * This class handles the connection with the external ROS world, deserializing
  * json messages into appropriate instances of packets and messages.
- * 
+ *
  * This class also provides a mechanism for having the callback's exectued on the rendering thread.
  * (Remember, Unity has a single rendering thread, so we want to do all of the communications stuff away
- * from that. 
- * 
+ * from that.
+ *
  * The one other clever thing that is done here is that we only keep 1 (the most recent!) copy of each message type
  * that comes along.
- * 
+ *
  * Version History
  * 3.1 - changed methods to start with an upper case letter to be more consistent with c#
  * style.
  * 3.0 - modification from hand crafted version 2.0
- * 
+ *
  * @author Michael Jenkin, Robert Codd-Downey and Andrew Speers
  * @version 3.1
  */
@@ -110,7 +110,7 @@ namespace ROSBridgeLib {
 		}
 
 		/**
-		 * Make a connection to a host/port. 
+		 * Make a connection to a host/port.
 		 * This does not actually start the connection, use Connect to do that.
 		 */
 		public ROSBridgeWebSocketConnection(string host, int port) {
