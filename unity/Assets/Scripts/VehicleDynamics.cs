@@ -38,6 +38,13 @@ public class VehicleDynamics : MonoBehaviour {
     Debug.Log(this._holder);
   }
 
+  void OnApplicationQuit()
+  {
+    if (this._ros != null) {
+      this._ros.Disconnect();
+    }
+  }
+
   void Update()
   {
     this._ros.Render();

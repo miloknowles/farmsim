@@ -1,75 +1,95 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using ROSBridgeLib;
+using ROSBridgeLib.CustomMessages;
 
 
 public class KeyboardMove : MonoBehaviour {
-	public Rigidbody controlledRigidBody;
+	// Choose how to drive the vehicle.
+	public enum ControlMode {
+		OFF = 0,
+		THRUST_COMMANDS = 1,
+		DRIVE_COMMMANDS = 2
+	}
 
-	// Force applied when moving forwards.
-	public float surgeThrustForce = 20000f;
+	public Rigidbody rigidbody;
+	public float keyThrust = 5.0f; 											// Amount of force applied by each key (N).
+	public ControlMode controlMode = ControlMode.OFF;		// Turn key commands off by default.
 
-	// Force applied when moving sideways.
-	public float swayThrustForce = 20000f;
+  private ROSBridgeWebSocketConnection _ros = null;
 
-	// Force applied when moving up and down.
-	public float heaveThrustForce = 20000f;
-
-	// Torque applied when yawing.
-	public float yawTorque = 20000.0f;
-	public float rollTorque = 1000.0f;
-	public float pitchTorque = 10000.0f;
-
-	void Update()
+	void Start()
 	{
-		// Keys: Up = +1, Down = -1;
-		float forwardBackwardSign = Input.GetAxis("Vertical");
+		this._ros = new ROSBridgeWebSocketConnection("ws://localhost", Config.ROS_BRIDGE_PORT);
+		this._ros.AddPublisher(typeof(TridentThrustPublisher));
+    this._ros.Connect();
 
-		// Keys: Right = +1, Left = -1
-		float leftRightSign = Input.GetAxis("Horizontal");
+		StartCoroutine(ListenForKeyCommands());
+	}
 
-		// The "+" key goes towards surface, "-" key goes downward.
-		float upDownSign = 0.0f;
-		if (Input.GetKey("=")) {
-			upDownSign = 1;
-		} else if (Input.GetKey("-")) {
-			upDownSign = -1;
+	void FixedUpdate()
+	{
+		if (this.controlMode == ControlMode.DRIVE_COMMMANDS) {
+			KeyboardDriveCommand();
 		}
+	}
 
-		float yawSign = 0.0f;
-		if (Input.GetKey("a")) {
-			yawSign = -1;
-		} else if (Input.GetKey("d")) {
-			yawSign = 1;
+	void OnApplicationQuit()
+  {
+    if (this._ros != null) {
+      this._ros.Disconnect();
+    }
+  }
+
+	// Run the control loop at a low rate to be more lightweight.
+	IEnumerator ListenForKeyCommands()
+	{
+		while (true) {
+			yield return new WaitForSeconds(0.2f);
+			if (this.controlMode == ControlMode.THRUST_COMMANDS) {
+				KeyboardThrustCommand();
+			}
 		}
+	}
 
-		float rollSign = 0.0f;
-		if (Input.GetKey("q")) {
-			rollSign = 1;
-		} else if (Input.GetKey("e")) {
-			rollSign = -1;
+	/**
+	 * Returns -1 or +1 depending on which of two keys is pressed. 0 if neither.
+	 */
+	private float SignFromKeyPair(KeyCode key_positive, KeyCode key_negative)
+	{
+		if (Input.GetKey(key_positive)) {
+			return 1.0f;
+		} else if (Input.GetKey(key_negative)) {
+			return -1.0f;
 		}
+		return 0.0f;
+	}
 
-		float pitchSign = 0.0f;
-		if (Input.GetKey("s")) {
-			pitchSign = -1;
-		} else if (Input.GetKey("w")) {
-			pitchSign = 1;
-		}
+	/**
+	 * Send thrust commands to motors.
+	 */
+	private void KeyboardThrustCommand()
+	{
+		float Flt = this.keyThrust * SignFromKeyPair(KeyCode.A, KeyCode.Q);
+		float Frt = this.keyThrust * SignFromKeyPair(KeyCode.D, KeyCode.E);
+		float Fct = this.keyThrust * SignFromKeyPair(KeyCode.S, KeyCode.W);
+		TridentThrustMsg msg = new TridentThrustMsg(Flt, Frt, Fct);
+		this._ros.Publish(TridentThrustPublisher.GetMessageTopic(), msg);
+		this._ros.Render();
+	}
 
-		float roll = controlledRigidBody.transform.eulerAngles.z;
-		float pitch = controlledRigidBody.transform.eulerAngles.x;
-		float yaw = controlledRigidBody.transform.eulerAngles.y;
+	private void KeyboardDriveCommand()
+	{
+		float w_pitch = Input.GetAxis("Vertical") * 10.0f;
+		float w_yaw = Input.GetAxis("Horizontal") * 10.0f;
+		float speed = Input.GetKey(KeyCode.Space) ? 8.0f : 0.0f;
 
-		// NOTE(milo): Vehicle uses a "RUF" (Right-Up-Forward) coordinate frame.
-		Vector3 forceVector = new Vector3(leftRightSign * swayThrustForce,
-																			upDownSign * heaveThrustForce,
-																			forwardBackwardSign * surgeThrustForce);
+		this.rigidbody.transform.Translate(0, 0, speed * Time.fixedDeltaTime);
+		this.rigidbody.transform.Rotate(w_pitch * Time.fixedDeltaTime, w_yaw * Time.fixedDeltaTime, 0.0f);
 
-		// Apply force in the controlledRigidBody frame.
-		controlledRigidBody.AddRelativeForce(forceVector);
-
-		// NOTE(milo): Vector3.forward makes a unit Z vector.
-		controlledRigidBody.AddRelativeTorque(new Vector3(pitchSign * pitchTorque, yawSign * yawTorque, rollSign * rollTorque));
+		// Disable roll, since we always want the vehicle level.
+		Vector3 euler = this.rigidbody.transform.eulerAngles;
+		this.rigidbody.transform.eulerAngles = new Vector3(euler.x, euler.y, 0.0f);
 	}
 }

@@ -2575,18 +2575,14 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 420561424}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ea439df9f30cf4e4eaf1babe93b5bc2f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  controlledRigidBody: {fileID: 420561429}
-  surgeThrustForce: 20000
-  swayThrustForce: 20000
-  heaveThrustForce: 20000
-  yawTorque: 2000
-  rollTorque: 2000
-  pitchTorque: 5000
+  rigidbody: {fileID: 420561429}
+  keyThrust: 3
+  controlMode: 1
 --- !u!54 &420561429
 Rigidbody:
   m_ObjectHideFlags: 0
