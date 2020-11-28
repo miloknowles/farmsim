@@ -28,6 +28,13 @@ public class KeyboardMove : MonoBehaviour {
 		StartCoroutine(ListenForKeyCommands());
 	}
 
+	void FixedUpdate()
+	{
+		if (this.controlMode == ControlMode.DRIVE_COMMMANDS) {
+			KeyboardDriveCommand();
+		}
+	}
+
 	void OnApplicationQuit()
   {
     if (this._ros != null) {
@@ -42,8 +49,6 @@ public class KeyboardMove : MonoBehaviour {
 			yield return new WaitForSeconds(0.2f);
 			if (this.controlMode == ControlMode.THRUST_COMMANDS) {
 				KeyboardThrustCommand();
-			} else if (this.controlMode == ControlMode.DRIVE_COMMMANDS) {
-				KeyboardDriveCommand();
 			}
 		}
 	}
@@ -76,6 +81,15 @@ public class KeyboardMove : MonoBehaviour {
 
 	private void KeyboardDriveCommand()
 	{
+		float w_pitch = Input.GetAxis("Vertical") * 10.0f;
+		float w_yaw = Input.GetAxis("Horizontal") * 10.0f;
+		float speed = Input.GetKey(KeyCode.Space) ? 8.0f : 0.0f;
 
+		this.rigidbody.transform.Translate(0, 0, speed * Time.fixedDeltaTime);
+		this.rigidbody.transform.Rotate(w_pitch * Time.fixedDeltaTime, w_yaw * Time.fixedDeltaTime, 0.0f);
+
+		// Disable roll, since we always want the vehicle level.
+		Vector3 euler = this.rigidbody.transform.eulerAngles;
+		this.rigidbody.transform.eulerAngles = new Vector3(euler.x, euler.y, 0.0f);
 	}
 }
