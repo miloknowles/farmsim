@@ -22,7 +22,8 @@ public class TridentThrustCallback : ROSBridgeSubscriber {
 
 	public new static void CallBack(ROSBridgeMsg msg) {
     ROSMessageHolder holder = GameObject.Find("ROSMessageHolder").GetComponent<ROSMessageHolder>();
-    holder.UpdateTridentThrustMsg((TridentThrustMsg)msg);
+    // holder.UpdateTridentThrustMsg((TridentThrustMsg)msg);
 		Debug.Log("callback");
+		holder.UpdateTopic(TridentThrustPublisher.GetMessageTopic(), msg);
 	}
 }

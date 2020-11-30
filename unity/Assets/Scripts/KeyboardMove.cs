@@ -16,15 +16,12 @@ public class KeyboardMove : MonoBehaviour {
 	public Rigidbody rigidbody;
 	public float keyThrust = 5.0f; 											// Amount of force applied by each key (N).
 	public ControlMode controlMode = ControlMode.OFF;		// Turn key commands off by default.
-
-  private ROSBridgeWebSocketConnection _ros = null;
+	private ROSMessageHolder roslink;
 
 	void Start()
 	{
-		this._ros = new ROSBridgeWebSocketConnection("ws://localhost", Config.ROS_BRIDGE_PORT);
-		this._ros.AddPublisher(typeof(TridentThrustPublisher));
-    this._ros.Connect();
-
+		this.roslink = GameObject.Find("ROSMessageHolder").GetComponent<ROSMessageHolder>();
+		this.roslink.ros.AddPublisher(typeof(TridentThrustPublisher));
 		StartCoroutine(ListenForKeyCommands());
 	}
 
@@ -34,13 +31,6 @@ public class KeyboardMove : MonoBehaviour {
 			KeyboardDriveCommand();
 		}
 	}
-
-	void OnApplicationQuit()
-  {
-    if (this._ros != null) {
-      this._ros.Disconnect();
-    }
-  }
 
 	// Run the control loop at a low rate to be more lightweight.
 	IEnumerator ListenForKeyCommands()
@@ -67,7 +57,7 @@ public class KeyboardMove : MonoBehaviour {
 	}
 
 	/**
-	 * Send thrust commands to motors.
+	 * Send thrust commands to motors (through ROS).
 	 */
 	private void KeyboardThrustCommand()
 	{
@@ -75,8 +65,8 @@ public class KeyboardMove : MonoBehaviour {
 		float Frt = this.keyThrust * SignFromKeyPair(KeyCode.D, KeyCode.E);
 		float Fct = this.keyThrust * SignFromKeyPair(KeyCode.S, KeyCode.W);
 		TridentThrustMsg msg = new TridentThrustMsg(Flt, Frt, Fct);
-		this._ros.Publish(TridentThrustPublisher.GetMessageTopic(), msg);
-		this._ros.Render();
+		this.roslink.ros.Publish(TridentThrustPublisher.GetMessageTopic(), msg);
+		this.roslink.ros.Render();
 	}
 
 	private void KeyboardDriveCommand()

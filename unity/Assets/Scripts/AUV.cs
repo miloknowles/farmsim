@@ -12,7 +12,6 @@ using System.IO;
 
 
 public class AUV : MonoBehaviour {
-  private ROSBridgeWebSocketConnection ros = null;
   private int msgPublishCount;
   DateTime lastFrame;
   DateTime camStart;
@@ -35,24 +34,24 @@ public class AUV : MonoBehaviour {
   private Quaternion rotationFaceWinch = Quaternion.identity;
   public bool doRoutine = false;
 
+  private ROSMessageHolder roslink;
+
   void Start()
   {
-    ros = new ROSBridgeWebSocketConnection("ws://localhost", Config.ROS_BRIDGE_PORT);
+    this.roslink = GameObject.Find("ROSMessageHolder").GetComponent<ROSMessageHolder>();
 
     // Add a publisher for each of the cameras that we want to support.
-    ros.AddPublisher(typeof(CameraForwardLeftPublisher));
-    ros.AddPublisher(typeof(CameraForwardRightPublisher));
-    ros.AddPublisher(typeof(CameraDownwardLeftPublisher));
-    ros.AddPublisher(typeof(CameraUpwardLeftPublisher));
+    this.roslink.ros.AddPublisher(typeof(CameraForwardLeftPublisher));
+    this.roslink.ros.AddPublisher(typeof(CameraForwardRightPublisher));
+    this.roslink.ros.AddPublisher(typeof(CameraDownwardLeftPublisher));
+    this.roslink.ros.AddPublisher(typeof(CameraUpwardLeftPublisher));
 
-    ros.AddPublisher(typeof(DepthPublisher));
-    ros.AddPublisher(typeof(GroundtruthDepthPublisher));
-    ros.AddPublisher(typeof(PoseStampedPublisher));
+    this.roslink.ros.AddPublisher(typeof(DepthPublisher));
+    this.roslink.ros.AddPublisher(typeof(GroundtruthDepthPublisher));
+    this.roslink.ros.AddPublisher(typeof(PoseStampedPublisher));
 
-    ros.AddPublisher(typeof(ImuPublisher));
-    ros.AddPublisher(typeof(HeadingPublisher));
-
-    ros.Connect();
+    this.roslink.ros.AddPublisher(typeof(ImuPublisher));
+    this.roslink.ros.AddPublisher(typeof(HeadingPublisher));
 
     msgPublishCount = 0;
     lastFrame = DateTime.Now;
@@ -79,13 +78,6 @@ public class AUV : MonoBehaviour {
   {
     imuBodyAccel = (imuBody.velocity - lastImuBodyVelocity) / Time.fixedDeltaTime;
     lastImuBodyVelocity = imuBody.velocity;
-  }
-
-  void OnApplicationQuit()
-  {
-    if (ros != null) {
-      ros.Disconnect();
-    }
   }
 
   /**
@@ -129,9 +121,9 @@ public class AUV : MonoBehaviour {
     string format = "jpeg";
     var compressedImageMsg = new CompressedImageMsg(headerMessage, format, data);
 
-    ros.Publish(topic, compressedImageMsg);
+    this.roslink.ros.Publish(topic, compressedImageMsg);
     Destroy(im);
-    ros.Render();
+    this.roslink.ros.Render();
   }
 
   /**
@@ -181,8 +173,8 @@ public class AUV : MonoBehaviour {
       PointMsg t_auv_world_msg = new PointMsg(t_auv_world.x, t_auv_world.y, t_auv_world.z);
       PoseStampedMsg msg = new PoseStampedMsg(new HeaderMsg(msgPublishCount, timeMessage, "auv_imu"),
                                               new PoseMsg(t_auv_world_msg, q_auv_world_msg));
-      ros.Publish(PoseStampedPublisher.GetMessageTopic(), msg);
-      ros.Render();
+      this.roslink.ros.Publish(PoseStampedPublisher.GetMessageTopic(), msg);
+      this.roslink.ros.Render();
     }
   }
 
@@ -212,18 +204,18 @@ public class AUV : MonoBehaviour {
       var msg = new ImuMessage(headerMessage, imuData, zeroMatrix3x3, zeroVect3, zeroMatrix3x3,
                                       linearAccelMsg, zeroMatrix3x3);
 
-      ros.Publish(ImuPublisher.GetMessageTopic(), msg);
+      this.roslink.ros.Publish(ImuPublisher.GetMessageTopic(), msg);
 
       // Publish the heading (yaw) of the vehicle.
       float theta = imuBody.transform.rotation.eulerAngles.z;
-      ros.Publish(HeadingPublisher.GetMessageTopic(), new Float64Msg(theta));
-      ros.Render();
+      this.roslink.ros.Publish(HeadingPublisher.GetMessageTopic(), new Float64Msg(theta));
+      this.roslink.ros.Render();
 
       // Publish the current barometer depth.
       float depth = imuBody.transform.position.y;
       Float64Msg depthMessage = new Float64Msg(depth);
-      ros.Publish(DepthPublisher.GetMessageTopic(), depthMessage);
-      ros.Publish(GroundtruthDepthPublisher.GetMessageTopic(), depthMessage);
+      this.roslink.ros.Publish(DepthPublisher.GetMessageTopic(), depthMessage);
+      this.roslink.ros.Publish(GroundtruthDepthPublisher.GetMessageTopic(), depthMessage);
     }
   }
 
