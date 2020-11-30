@@ -20,7 +20,7 @@ public class VehicleDynamics : MonoBehaviour {
   // Lump terms: 1/2 * rho * Cd * A
   private float linearDragCoefficient = 0.5f * 1027.0f * 0.9f * (0.08f * 0.201f * 0.41f);
   public float angularDragCoefficient = 0.7f; // Drag = Cd * w^2
-  public float maxThrust = 10.0f;
+  public float maxThrust = 10.0f; // N
 
   private Vector3 t_lt_body = new Vector3(-0.1f, 0.0f, -0.2f);
   private Vector3 t_rt_body = new Vector3(0.1f, 0.0f, -0.2f);
