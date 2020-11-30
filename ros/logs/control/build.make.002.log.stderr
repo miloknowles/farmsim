@@ -1,5 +1,0 @@
-The dependencies of the message/service 'control/TridentThrust' have changed. Please rerun cmake.
-make[2]: *** [CMakeFiles/_control_generate_messages_check_deps_TridentThrust] Error 1
-make[1]: *** [CMakeFiles/_control_generate_messages_check_deps_TridentThrust.dir/all] Error 2
-make[1]: *** Waiting for unfinished jobs....
-make: *** [all] Error 2

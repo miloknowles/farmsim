@@ -1,5 +1,0 @@
-mission_planner
-/home/milo/blue-meadow/farmsim_unity/ros/devel/.private/mission_planner/cmake.lock /home/milo/blue-meadow/farmsim_unity/ros/devel/./cmake.lock
-/home/milo/blue-meadow/farmsim_unity/ros/devel/.private/mission_planner/share/mission_planner/cmake/mission_plannerConfig.cmake /home/milo/blue-meadow/farmsim_unity/ros/devel/share/mission_planner/cmake/mission_plannerConfig.cmake
-/home/milo/blue-meadow/farmsim_unity/ros/devel/.private/mission_planner/share/mission_planner/cmake/mission_plannerConfig-version.cmake /home/milo/blue-meadow/farmsim_unity/ros/devel/share/mission_planner/cmake/mission_plannerConfig-version.cmake
-/home/milo/blue-meadow/farmsim_unity/ros/devel/.private/mission_planner/lib/pkgconfig/mission_planner.pc /home/milo/blue-meadow/farmsim_unity/ros/devel/lib/pkgconfig/mission_planner.pc

@@ -23,7 +23,7 @@ namespace ROSBridgeLib {
 			}
 
 			public static string getMessageType() {
-				return "control/TridentThrust";
+				return "auv/TridentThrust";
 			}
 
 			public float GetFlt() { return this._F_lt; }
@@ -31,7 +31,7 @@ namespace ROSBridgeLib {
 			public float GetFct() { return this._F_ct; }
 
 			public override string ToString() {
-				return "control/TridentThrust [F_lt=" + this._F_lt +
+				return "auv/TridentThrust [F_lt=" + this._F_lt +
 						", F_rt=" + this._F_rt +
 						", F_ct=" + this._F_ct + "]";
 			}

@@ -13,7 +13,7 @@ public class TridentThrustPublisher : ROSBridgePublisher {
 
 	public static string GetMessageType()
 	{
-		return "control/TridentThrust";
+		return "auv/TridentThrust";
 	}
 
 	public static string ToYAMLString(TridentThrustMsg msg)
