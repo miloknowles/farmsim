@@ -26,7 +26,7 @@ public class CompressedImagePublisher : ROSBridgePublisher {
 public class CameraForwardLeftPublisher : CompressedImagePublisher {
 	public static string GetMessageTopic()
 	{
-		return "/simulator/sensors/camera_fl";
+		return "/simulator/sensors/camera_fl/compressed";
 	}
 }
 
@@ -34,7 +34,7 @@ public class CameraForwardLeftPublisher : CompressedImagePublisher {
 public class CameraForwardRightPublisher : CompressedImagePublisher {
 	public static string GetMessageTopic()
 	{
-		return "/simulator/sensors/camera_fr";
+		return "/simulator/sensors/camera_fr/compressed";
 	}
 }
 
@@ -42,7 +42,7 @@ public class CameraForwardRightPublisher : CompressedImagePublisher {
 public class CameraDownwardLeftPublisher : CompressedImagePublisher {
 	public static string GetMessageTopic()
 	{
-		return "/simulator/sensors/camera_dl";
+		return "/simulator/sensors/camera_dl/compressed";
 	}
 }
 
@@ -50,6 +50,6 @@ public class CameraDownwardLeftPublisher : CompressedImagePublisher {
 public class CameraUpwardLeftPublisher : CompressedImagePublisher {
 	public static string GetMessageTopic()
 	{
-		return "/simulator/sensors/camera_ul";
+		return "/simulator/sensors/camera_ul/compressed";
 	}
 }

@@ -63,6 +63,7 @@ namespace ROSBridgeLib {
 		private string _serviceName = null;
 		private string _serviceValues = null;
 		private List<RenderTask> _taskQ = new List<RenderTask>();
+		private bool _didStartAlready = false;
 
 		private object _queueLock = new object ();
 
@@ -143,6 +144,12 @@ namespace ROSBridgeLib {
 		public void AddPublisher(Type publisher) {
 			IsValidPublisher(publisher);
 			_publishers.Add (publisher);
+
+			// NOTE(milo): If we add a publisher after calling Run(), it won't get advertised. Need to do
+			// it here in that case.
+			if (this._didStartAlready) {
+				_ws.Send(ROSBridgeMsg.Advertise(GetMessageTopic(publisher), GetMessageType(publisher)));
+			}
 		}
 
 		/**
@@ -182,6 +189,9 @@ namespace ROSBridgeLib {
 				_ws.Send(ROSBridgeMsg.Advertise (GetMessageTopic(p), GetMessageType(p)));
 				// Debug.Log ("Sending " + ROSBridgeMsg.Advertise (GetMessageTopic(p), GetMessageType(p)));
 			}
+
+			this._didStartAlready = true;
+
 			while(true) {
 				Thread.Sleep (10000);
 			}
