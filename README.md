@@ -30,7 +30,7 @@ source ros/devel/setup.bash
 roslaunch rosbridge_server rosbridge_websocket.launch
 
 # Publish a thrust command.
-rostopic pub -r 1 /auv/controls/trident_thrust/ control/TridentThrust '{F_lt: 1.0, F_rt: 1.0, F_ct: -1.0}'
+rostopic pub -r 1 /auv/controls/trident_thrust/ auv/TridentThrust '{F_lt: 1.0, F_rt: 1.0, F_ct: -1.0}'
 ```
 
 ## Troubleshooting

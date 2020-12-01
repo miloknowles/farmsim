@@ -52,6 +52,7 @@ public class AUV : MonoBehaviour {
 
     this.roslink.ros.AddPublisher(typeof(ImuPublisher));
     this.roslink.ros.AddPublisher(typeof(HeadingPublisher));
+    this.roslink.ros.AddPublisher(typeof(GroundtruthHeadingPublisher));
 
     msgPublishCount = 0;
     lastFrame = DateTime.Now;
@@ -85,20 +86,14 @@ public class AUV : MonoBehaviour {
    */
   Texture2D GetImageFromCamera(Camera camera)
   {
-    // Create the RenderTexture for the first time if it hasn't been created.
     // NOTE(milo): Using the ARGB32 format since it's in tutorials, not sure what the best option is
     // here though. It uses 8 bits per RGB channel, which seems standard.
-    if (rt == null) {
-      rt = new RenderTexture(320, 240, 16, RenderTextureFormat.ARGB32);
-      rt.Create();
-    }
-
     RenderTexture originalTexture = camera.targetTexture;
 
     // NOTE(milo): Documentation on camera rendering is a little confusing.
     // We instantiate a RenderTexture above, which is basically just a buffer that cameras render
     // into. Then, we call Render() and read the rendered image into a Texture2D with ReadPixels().
-    camera.targetTexture = rt;
+    camera.targetTexture = new RenderTexture(Screen.width, Screen.height, 16, RenderTextureFormat.ARGB32);
     camera.Render();
 
     // Make a new (empty) image and read the camera image into it.
@@ -108,7 +103,6 @@ public class AUV : MonoBehaviour {
     image.Apply();
 
     camera.targetTexture = originalTexture;
-
     return image;
   }
 
@@ -120,7 +114,6 @@ public class AUV : MonoBehaviour {
     byte[] data = im.EncodeToJPG();
     string format = "jpeg";
     var compressedImageMsg = new CompressedImageMsg(headerMessage, format, data);
-
     this.roslink.ros.Publish(topic, compressedImageMsg);
     Destroy(im);
     this.roslink.ros.Render();
@@ -202,13 +195,14 @@ public class AUV : MonoBehaviour {
       var zeroVect3 = new Vector3Msg(0.0, 0.0, 0.0);
       var linearAccelMsg = new Vector3Msg(imuBodyAccel.x, imuBodyAccel.y, imuBodyAccel.z);
       var msg = new ImuMessage(headerMessage, imuData, zeroMatrix3x3, zeroVect3, zeroMatrix3x3,
-                                      linearAccelMsg, zeroMatrix3x3);
+                               linearAccelMsg, zeroMatrix3x3);
 
       this.roslink.ros.Publish(ImuPublisher.GetMessageTopic(), msg);
 
       // Publish the heading (yaw) of the vehicle.
       float theta = imuBody.transform.rotation.eulerAngles.z;
       this.roslink.ros.Publish(HeadingPublisher.GetMessageTopic(), new Float64Msg(theta));
+      this.roslink.ros.Publish(GroundtruthHeadingPublisher.GetMessageTopic(), new Float64Msg(theta));
       this.roslink.ros.Render();
 
       // Publish the current barometer depth.

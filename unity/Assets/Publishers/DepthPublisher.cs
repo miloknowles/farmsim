@@ -6,12 +6,12 @@ using UnityEngine;
 
 
 public class DepthPublisher : ROSBridgePublisher {
-	public static string GetMessageTopic()
+	public static new string GetMessageTopic()
 	{
 		return "/simulator/sensors/depth";
 	}
 
-	public static string GetMessageType()
+	public static new string GetMessageType()
 	{
 		return "std_msgs/Float64";
 	}
@@ -24,8 +24,8 @@ public class DepthPublisher : ROSBridgePublisher {
 
 
 public class GroundtruthDepthPublisher : DepthPublisher {
-	public static string GetMessageTopic()
+	public static new string GetMessageTopic()
 	{
-		return "/simulator/groundtruth/depth_auv_imu";
+		return "/simulator/groundtruth/depth";
 	}
 }

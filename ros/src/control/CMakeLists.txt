@@ -53,7 +53,7 @@ find_package(catkin REQUIRED COMPONENTS
 add_message_files(
    FILES
    thruster.msg
-   TridentThrust.msg
+   # TridentThrust.msg
 )
 
 ## Generate actions in the 'action' folder

@@ -13,7 +13,7 @@ public class TridentThrustCallback : ROSBridgeSubscriber {
 	}
 
 	public new static string GetMessageType() {
-		return "control/TridentThrust";
+		return "auv/TridentThrust";
 	}
 
 	public new static ROSBridgeMsg ParseMessage(JSONNode msg) {

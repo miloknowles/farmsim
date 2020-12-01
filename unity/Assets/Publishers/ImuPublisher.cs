@@ -6,12 +6,12 @@ using UnityEngine;
 
 
 public class ImuPublisher : ROSBridgePublisher {
-	public static string GetMessageTopic()
+	public static new string GetMessageTopic()
 	{
-		return "/imu/data";
+		return "/simulator/sensors/imu";
 	}
 
-	public static string GetMessageType()
+	public static new string GetMessageType()
 	{
 		return "sensor_msgs/Imu";
 	}

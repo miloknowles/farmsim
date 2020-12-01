@@ -6,12 +6,12 @@ using UnityEngine;
 
 
 public class CompressedImagePublisher : ROSBridgePublisher {
-	public static string GetMessageTopic()
+	public static new string GetMessageTopic()
 	{
 		return "/image/compressed";
 	}
 
-	public static string GetMessageType()
+	public static new string GetMessageType()
 	{
 		return "sensor_msgs/CompressedImage";
 	}
@@ -24,32 +24,32 @@ public class CompressedImagePublisher : ROSBridgePublisher {
 
 
 public class CameraForwardLeftPublisher : CompressedImagePublisher {
-	public static string GetMessageTopic()
+	public static new string GetMessageTopic()
 	{
-		return "/simulator/sensors/camera_fl";
+		return "/simulator/sensors/camera_fl/compressed";
 	}
 }
 
 
 public class CameraForwardRightPublisher : CompressedImagePublisher {
-	public static string GetMessageTopic()
+	public static new string GetMessageTopic()
 	{
-		return "/simulator/sensors/camera_fr";
+		return "/simulator/sensors/camera_fr/compressed";
 	}
 }
 
 
 public class CameraDownwardLeftPublisher : CompressedImagePublisher {
-	public static string GetMessageTopic()
+	public static new string GetMessageTopic()
 	{
-		return "/simulator/sensors/camera_dl";
+		return "/simulator/sensors/camera_dl/compressed";
 	}
 }
 
 
 public class CameraUpwardLeftPublisher : CompressedImagePublisher {
-	public static string GetMessageTopic()
+	public static new string GetMessageTopic()
 	{
-		return "/simulator/sensors/camera_ul";
+		return "/simulator/sensors/camera_ul/compressed";
 	}
 }
