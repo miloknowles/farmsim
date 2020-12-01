@@ -71,8 +71,8 @@ public class KeyboardMove : MonoBehaviour {
 
 	private void KeyboardDriveCommand()
 	{
-		float w_pitch = Input.GetAxis("Vertical") * 10.0f;
-		float w_yaw = Input.GetAxis("Horizontal") * 10.0f;
+		float w_pitch = Input.GetAxis("Vertical") * 20.0f;
+		float w_yaw = Input.GetAxis("Horizontal") * 20.0f;
 		float speed = Input.GetKey(KeyCode.Space) ? 8.0f : 0.0f;
 
 		this.rigidBody.transform.Translate(0, 0, speed * Time.fixedDeltaTime);

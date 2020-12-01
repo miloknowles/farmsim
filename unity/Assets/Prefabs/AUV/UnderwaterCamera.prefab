@@ -90,7 +90,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _material: {fileID: 2100000, guid: 8c2a84fb38bdd9098b93ac1a2b969ccb, type: 2}
   _fogColor: {r: 0, g: 0.764151, b: 0.63956386, a: 0}
-  _depthDistance: 50
+  _depthDistance: 30
 --- !u!114 &4653121137522870164
 MonoBehaviour:
   m_ObjectHideFlags: 0
