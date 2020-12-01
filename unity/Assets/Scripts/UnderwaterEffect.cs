@@ -19,7 +19,7 @@ public class UnderwaterEffect : MonoBehaviour {
     [Range(0.1f, 30f)]
     public float _noiseSpeed = 15.0f;
 
-    private float _depthStart = 0;
+    // private float _depthStart = 0;
     public float _depthDistance = 10;
 
     // Start is called before the first frame update

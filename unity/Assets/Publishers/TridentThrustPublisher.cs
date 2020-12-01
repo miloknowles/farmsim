@@ -6,12 +6,12 @@ using UnityEngine;
 
 
 public class TridentThrustPublisher : ROSBridgePublisher {
-	public static string GetMessageTopic()
+	public static new string GetMessageTopic()
 	{
 		return "/auv/controls/trident_thrust";
 	}
 
-	public static string GetMessageType()
+	public static new string GetMessageType()
 	{
 		return "auv/TridentThrust";
 	}

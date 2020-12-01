@@ -13,7 +13,7 @@ public class KeyboardMove : MonoBehaviour {
 		DRIVE_COMMMANDS = 2
 	}
 
-	public Rigidbody rigidbody;
+	public Rigidbody rigidBody;
 	public float keyThrust = 5.0f; 											// Amount of force applied by each key (N).
 	public ControlMode controlMode = ControlMode.OFF;		// Turn key commands off by default.
 	private ROSMessageHolder roslink;
@@ -75,11 +75,11 @@ public class KeyboardMove : MonoBehaviour {
 		float w_yaw = Input.GetAxis("Horizontal") * 10.0f;
 		float speed = Input.GetKey(KeyCode.Space) ? 8.0f : 0.0f;
 
-		this.rigidbody.transform.Translate(0, 0, speed * Time.fixedDeltaTime);
-		this.rigidbody.transform.Rotate(w_pitch * Time.fixedDeltaTime, w_yaw * Time.fixedDeltaTime, 0.0f);
+		this.rigidBody.transform.Translate(0, 0, speed * Time.fixedDeltaTime);
+		this.rigidBody.transform.Rotate(w_pitch * Time.fixedDeltaTime, w_yaw * Time.fixedDeltaTime, 0.0f);
 
 		// Disable roll, since we always want the vehicle level.
-		Vector3 euler = this.rigidbody.transform.eulerAngles;
-		this.rigidbody.transform.eulerAngles = new Vector3(euler.x, euler.y, 0.0f);
+		Vector3 euler = this.rigidBody.transform.eulerAngles;
+		this.rigidBody.transform.eulerAngles = new Vector3(euler.x, euler.y, 0.0f);
 	}
 }

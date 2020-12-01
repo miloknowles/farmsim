@@ -6,12 +6,12 @@ using UnityEngine;
 
 
 public class PoseStampedPublisher : ROSBridgePublisher {
-	public static string GetMessageTopic()
+	public static new string GetMessageTopic()
 	{
 		return "/simulator/groundtruth/pose_auv_imu";
 	}
 
-	public static string GetMessageType()
+	public static new string GetMessageType()
 	{
 		return "geometry_msgs/PoseStamped";
 	}

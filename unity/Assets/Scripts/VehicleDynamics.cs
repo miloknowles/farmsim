@@ -11,7 +11,7 @@ using ROSBridgeLib;
 using ROSCallback = System.Action<ROSBridgeMsg>;
 
 public class VehicleDynamics : MonoBehaviour {
-  private Rigidbody rigidbody;
+  private Rigidbody rigidBody;
   private float _F_lt = 0.0f;  // Force of left thruster.
   private float _F_rt = 0.0f;  // Force of right thruster.
   private float _F_ct = 0.0f;  // Force of center thruster.
@@ -31,7 +31,7 @@ public class VehicleDynamics : MonoBehaviour {
 
   void Start()
   {
-    this.rigidbody = this.GetComponent<Rigidbody>();
+    this.rigidBody = this.GetComponent<Rigidbody>();
 
     this.roslink = GameObject.Find("ROSMessageHolder").GetComponent<ROSMessageHolder>();
     this.roslink.RegisterCallback(TridentThrustCallback.GetMessageTopic(), this.Callback);
@@ -46,8 +46,8 @@ public class VehicleDynamics : MonoBehaviour {
   void FixedUpdate()
   {
     // Get velocity and angular velocity in the body frame.
-    Vector3 v_body = this.transform.InverseTransformDirection(this.rigidbody.velocity);
-    Vector3 w_body = this.transform.InverseTransformDirection(this.rigidbody.angularVelocity);
+    Vector3 v_body = this.transform.InverseTransformDirection(this.rigidBody.velocity);
+    Vector3 w_body = this.transform.InverseTransformDirection(this.rigidBody.angularVelocity);
 
     // Rear motors create forward (+z thrust).
     Vector3 flt = new Vector3(0.0f, 0.0f, this._F_lt);
@@ -63,7 +63,7 @@ public class VehicleDynamics : MonoBehaviour {
     // an acceration that would change the direction of motion. This prevents drag forces from
     // wild positive feedback effects.
     // dv = a * dt = (F / m) * dt < Magnitude(v)
-    F_drag = Vector3.ClampMagnitude(F_drag, v_body.magnitude * this.rigidbody.mass / Time.fixedDeltaTime);
+    F_drag = Vector3.ClampMagnitude(F_drag, v_body.magnitude * this.rigidBody.mass / Time.fixedDeltaTime);
 
     // Compute torques due to motor thrust.
     Vector3 tau_lt = Vector3.Cross(this.t_lt_body, flt);
@@ -75,8 +75,8 @@ public class VehicleDynamics : MonoBehaviour {
     Vector3 tau_angular_drag = -1.0f * w_body.normalized * this.angularDragCoefficient * Mathf.Pow(w_body.magnitude, 2);
 
     // Apply forces and torques to the vehicle in its body frame.
-    this.rigidbody.AddRelativeForce(flt + frt + fct + F_drag);
-    this.rigidbody.AddRelativeTorque(tau_lt + tau_rt + tau_ct + tau_linear_drag + tau_angular_drag);
+    this.rigidBody.AddRelativeForce(flt + frt + fct + F_drag);
+    this.rigidBody.AddRelativeTorque(tau_lt + tau_rt + tau_ct + tau_linear_drag + tau_angular_drag);
   }
 
   public void Callback(ROSBridgeMsg msg)

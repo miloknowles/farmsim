@@ -6,12 +6,12 @@ using UnityEngine;
 
 
 public class HeadingPublisher : ROSBridgePublisher {
-  public static string GetMessageTopic()
+  public static new string GetMessageTopic()
   {
     return "/imu/HeadingTrue_degree";
   }
 
-  public static string GetMessageType()
+  public static new string GetMessageType()
   {
     return "std_msgs/Float64";
   }
