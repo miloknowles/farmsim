@@ -11,6 +11,16 @@ using System.Text;
 using System.IO;
 
 
+namespace Simulator {
+public enum IOMode
+{
+  NO_OUTPUT = 0,
+  PUBLISH_TO_ROS = 1,
+  SAVE_TO_DISK = 2
+}
+}
+
+
 public class AUV : MonoBehaviour {
   private int msgPublishCount;
   DateTime lastFrame;
@@ -35,6 +45,13 @@ public class AUV : MonoBehaviour {
   public bool doRoutine = false;
 
   private ROSMessageHolder roslink;
+  public Simulator.IOMode simulatorIOMode = Simulator.IOMode.NO_OUTPUT;
+  public string outputDatasetName = "default_dataset";
+
+  // NOTE(milo): This needs to be an absolute path!
+  public string outputDatasetRoot = "/home/milo/datasets/Unity3D/farmsim/";
+  private string leftImageSubfolder = "image_0";
+  private string rightImageSubfolder = "image_1";
 
   void Start()
   {
@@ -71,8 +88,12 @@ public class AUV : MonoBehaviour {
       StartCoroutine(ChainCoroutines(this.routines));
     }
 
-    StartCoroutine(PublishCameraSyncedMessages());
-    StartCoroutine(PublishImu());
+    if (this.simulatorIOMode == Simulator.IOMode.PUBLISH_TO_ROS) {
+      StartCoroutine(PublishCameraSyncedMessages());
+      StartCoroutine(PublishImu());
+    } else if (this.simulatorIOMode == Simulator.IOMode.SAVE_TO_DISK) {
+      StartCoroutine(SaveDataset());
+    }
   }
 
   void FixedUpdate()
@@ -93,7 +114,10 @@ public class AUV : MonoBehaviour {
     // NOTE(milo): Documentation on camera rendering is a little confusing.
     // We instantiate a RenderTexture above, which is basically just a buffer that cameras render
     // into. Then, we call Render() and read the rendered image into a Texture2D with ReadPixels().
-    camera.targetTexture = new RenderTexture(Screen.width, Screen.height, 16, RenderTextureFormat.ARGB32);
+    camera.targetTexture = new RenderTexture(
+        SimulationController.AUV_CAMERA_WIDTH,
+        SimulationController.AUV_CAMERA_HEIGHT,
+        16, RenderTextureFormat.ARGB32);
     camera.Render();
 
     // Make a new (empty) image and read the camera image into it.
@@ -145,7 +169,7 @@ public class AUV : MonoBehaviour {
           new HeaderMsg(msgPublishCount, timeMessage, "auv_camera_fr"),
           CameraForwardRightPublisher.GetMessageTopic());
 
-      // PublishCameraImage(
+      // PublishCameraImage(7.90639384423901
       //     GetImageFromCamera(camera_downward_left),
       //     timeMessage,
       //     new HeaderMsg(msgPublishCount, timeMessage, "auv_camera_dl"),
@@ -317,6 +341,49 @@ public class AUV : MonoBehaviour {
   {
     foreach (IEnumerator r in routines) {
       yield return StartCoroutine(r);
+    }
+  }
+
+  IEnumerator SaveDataset()
+  {
+    string datasetFolder = Path.Combine(this.outputDatasetRoot, this.outputDatasetName);
+
+    if (Directory.Exists(datasetFolder)) {
+      Debug.Log("WARNING: Deleting existing dataset folder: " + datasetFolder);
+      Directory.Delete(datasetFolder, true);
+    }
+
+    string leftImageFolder = Path.Combine(datasetFolder, this.leftImageSubfolder);
+    string rightImageFolder = Path.Combine(datasetFolder, this.rightImageSubfolder);
+    Debug.Log(leftImageFolder);
+    Debug.Log(rightImageFolder);
+
+    Directory.CreateDirectory(leftImageFolder);
+    Directory.CreateDirectory(rightImageFolder);
+
+    int frame_id = 0;
+
+    // NOTE(milo): Maximum number of frames to save. Avoids using up all disk space by accident.
+    while (frame_id < 5000) {
+      yield return new WaitForSeconds(1.0f / SimulationController.CAMERA_PUBLISH_HZ);
+      yield return new WaitForEndOfFrame();
+
+      // Writes the time in seconds with 5 decimal places.
+      string sec = Time.fixedTime.ToString("F5");
+      File.AppendAllLines(Path.Combine(datasetFolder, "times.txt"), new[] { sec });
+
+      Texture2D leftImage = GetImageFromCamera(camera_forward_left);
+      Texture2D rightImage = GetImageFromCamera(camera_forward_right);
+
+      byte[] leftPng = leftImage.EncodeToPNG();
+      byte[] rightPng = rightImage.EncodeToPNG();
+
+      string imagePath = $"{frame_id:00000}.png";
+
+      File.WriteAllBytes(Path.Combine(leftImageFolder, imagePath), leftPng);
+      File.WriteAllBytes(Path.Combine(rightImageFolder, imagePath), rightPng);
+
+      ++frame_id;
     }
   }
 }
