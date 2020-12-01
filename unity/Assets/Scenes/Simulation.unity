@@ -584,10 +584,25 @@ PrefabInstance:
       propertyPath: m_RenderingPath
       value: -1
       objectReference: {fileID: 0}
+    - target: {fileID: 4653121137522870165, guid: 59265c06d324f395682cb16b67f1d258,
+        type: 3}
+      propertyPath: m_projectionMatrixMode
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4653121137522870165, guid: 59265c06d324f395682cb16b67f1d258,
+        type: 3}
+      propertyPath: field of view
+      value: 60.000004
+      objectReference: {fileID: 0}
+    - target: {fileID: 4653121137522870165, guid: 59265c06d324f395682cb16b67f1d258,
+        type: 3}
+      propertyPath: m_FocalLength
+      value: 20.784609
+      objectReference: {fileID: 0}
     - target: {fileID: 4653121137522870166, guid: 59265c06d324f395682cb16b67f1d258,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.6
+      value: -0.1
       objectReference: {fileID: 0}
     - target: {fileID: 4653121137522870166, guid: 59265c06d324f395682cb16b67f1d258,
         type: 3}
@@ -597,7 +612,7 @@ PrefabInstance:
     - target: {fileID: 4653121137522870166, guid: 59265c06d324f395682cb16b67f1d258,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 1.2
+      value: 0.25
       objectReference: {fileID: 0}
     - target: {fileID: 4653121137522870166, guid: 59265c06d324f395682cb16b67f1d258,
         type: 3}
@@ -7823,10 +7838,25 @@ PrefabInstance:
       propertyPath: m_RenderingPath
       value: -1
       objectReference: {fileID: 0}
+    - target: {fileID: 4653121137522870165, guid: 59265c06d324f395682cb16b67f1d258,
+        type: 3}
+      propertyPath: m_projectionMatrixMode
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4653121137522870165, guid: 59265c06d324f395682cb16b67f1d258,
+        type: 3}
+      propertyPath: field of view
+      value: 60.000004
+      objectReference: {fileID: 0}
+    - target: {fileID: 4653121137522870165, guid: 59265c06d324f395682cb16b67f1d258,
+        type: 3}
+      propertyPath: m_FocalLength
+      value: 20.784609
+      objectReference: {fileID: 0}
     - target: {fileID: 4653121137522870166, guid: 59265c06d324f395682cb16b67f1d258,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.6
+      value: 0.1
       objectReference: {fileID: 0}
     - target: {fileID: 4653121137522870166, guid: 59265c06d324f395682cb16b67f1d258,
         type: 3}
@@ -7836,7 +7866,7 @@ PrefabInstance:
     - target: {fileID: 4653121137522870166, guid: 59265c06d324f395682cb16b67f1d258,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 1.1999998
+      value: 0.25
       objectReference: {fileID: 0}
     - target: {fileID: 4653121137522870166, guid: 59265c06d324f395682cb16b67f1d258,
         type: 3}
