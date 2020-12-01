@@ -23,8 +23,12 @@ public class FlowFieldSimulator : MonoBehaviour {
 
   void Start()
   {
-    _fastNoise = new FastNoise(); // Instantiate library.
+    Initialize();
+  }
 
+  void Initialize()
+  {
+    _fastNoise = new FastNoise(); // Instantiate library.
     _particles = new List<FlowFieldParticle>();
 
     for (int i = 0; i < _numberOfParticles; ++i) {
@@ -59,6 +63,12 @@ public class FlowFieldSimulator : MonoBehaviour {
   {
     CalculateFlowField();     // Update flow field.
     SimulateParticleMotion(); // Apply flow field.
+
+    // Re-initialize if the desired number of particles has changed.
+    if (this._particles.Count != this._numberOfParticles) {
+      Debug.Log("[NoiseFlowField] Number of particles changed!");
+      Initialize();
+    }
   }
 
   // Is a particle not in collision with others?

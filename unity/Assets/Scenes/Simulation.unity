@@ -7257,7 +7257,7 @@ GameObject:
   - component: {fileID: 724607433}
   - component: {fileID: 724607434}
   m_Layer: 0
-  m_Name: MarineSnow
+  m_Name: AUVMarineSnow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7667,6 +7667,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 754256996}
+  - component: {fileID: 754256997}
   m_Layer: 0
   m_Name: World
   m_TagString: Untagged
@@ -7695,6 +7696,20 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &754256997
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 754256995}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 027a1753f7851b0f59ed1451c22ef96b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  WATER_VISIBILITY_METERS: 30
+  MARINE_SNOW_PARTICLES: 300
 --- !u!1 &760134485
 GameObject:
   m_ObjectHideFlags: 0

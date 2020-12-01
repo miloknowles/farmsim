@@ -8,7 +8,7 @@ public class FogEffect : MonoBehaviour {
     public Material _material;
     public Color _fogColor;
     // private float _depthStart = 0;
-    public float _depthDistance = 15;
+    public float _depthDistance = 30;
 
     // Start is called before the first frame update
     void Start()

@@ -252,7 +252,7 @@ public class FarmController : MonoBehaviour {
         List<GameObject> winches = GetWinchesAtAddress(row, buoy);
 
         // AprilTag ID is in row-major order.
-        int aprilIndex = row*(CharToInt(this.maxBuoy)+1) + CharToInt(buoy) + Config.RESERVED_APRILTAGS;
+        int aprilIndex = row*(CharToInt(this.maxBuoy)+1) + CharToInt(buoy) + SimulationController.RESERVED_APRILTAGS;
         Debug.Log($"Assigning AprilTag id={aprilIndex}");
 
         // NOTE(milo): Unity doesn't find these resources with .png at the end!

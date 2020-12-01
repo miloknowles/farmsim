@@ -126,7 +126,7 @@ public class AUV : MonoBehaviour {
   {
     while (true) {
       // yield return new WaitForEndOfFrame();
-      yield return new WaitForSeconds(1.0f / Config.CAMERA_PUBLISH_HZ);
+      yield return new WaitForSeconds(1.0f / SimulationController.CAMERA_PUBLISH_HZ);
       yield return new WaitForEndOfFrame();
 
       var now = DateTime.Now;
@@ -174,7 +174,7 @@ public class AUV : MonoBehaviour {
   IEnumerator PublishImu() {
     while (true) {
       // yield return new WaitForEndOfFrame();
-      yield return new WaitForSeconds(1.0f / Config.SENSOR_PUBLISH_HZ);
+      yield return new WaitForSeconds(1.0f / SimulationController.SENSOR_PUBLISH_HZ);
 
       var now = DateTime.Now;
       var timeSinceStart = now - camStart;
