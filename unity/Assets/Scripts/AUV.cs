@@ -52,6 +52,7 @@ public class AUV : MonoBehaviour {
 
     this.roslink.ros.AddPublisher(typeof(ImuPublisher));
     this.roslink.ros.AddPublisher(typeof(HeadingPublisher));
+    this.roslink.ros.AddPublisher(typeof(GroundtruthHeadingPublisher));
 
     msgPublishCount = 0;
     lastFrame = DateTime.Now;
@@ -194,13 +195,14 @@ public class AUV : MonoBehaviour {
       var zeroVect3 = new Vector3Msg(0.0, 0.0, 0.0);
       var linearAccelMsg = new Vector3Msg(imuBodyAccel.x, imuBodyAccel.y, imuBodyAccel.z);
       var msg = new ImuMessage(headerMessage, imuData, zeroMatrix3x3, zeroVect3, zeroMatrix3x3,
-                                      linearAccelMsg, zeroMatrix3x3);
+                               linearAccelMsg, zeroMatrix3x3);
 
       this.roslink.ros.Publish(ImuPublisher.GetMessageTopic(), msg);
 
       // Publish the heading (yaw) of the vehicle.
       float theta = imuBody.transform.rotation.eulerAngles.z;
       this.roslink.ros.Publish(HeadingPublisher.GetMessageTopic(), new Float64Msg(theta));
+      this.roslink.ros.Publish(GroundtruthHeadingPublisher.GetMessageTopic(), new Float64Msg(theta));
       this.roslink.ros.Render();
 
       // Publish the current barometer depth.

@@ -22,11 +22,6 @@ public class UnderwaterEffect : MonoBehaviour {
     // private float _depthStart = 0;
     public float _depthDistance = 10;
 
-    // Start is called before the first frame update
-    void Start()
-    {
-    }
-
     // Update is called once per frame
     void Update()
     {

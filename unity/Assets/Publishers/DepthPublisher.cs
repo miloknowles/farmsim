@@ -26,6 +26,6 @@ public class DepthPublisher : ROSBridgePublisher {
 public class GroundtruthDepthPublisher : DepthPublisher {
 	public static new string GetMessageTopic()
 	{
-		return "/simulator/groundtruth/depth_auv_imu";
+		return "/simulator/groundtruth/depth";
 	}
 }
