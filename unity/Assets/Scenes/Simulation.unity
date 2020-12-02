@@ -2533,7 +2533,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rigidBody: {fileID: 420561429}
   keyThrust: 5
-  controlMode: 1
+  controlMode: 2
 --- !u!54 &420561429
 Rigidbody:
   m_ObjectHideFlags: 0

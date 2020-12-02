@@ -53,8 +53,15 @@ public class AUV : MonoBehaviour {
   private string leftImageSubfolder = "image_0";
   private string rightImageSubfolder = "image_1";
 
+  private RenderTexture _preallocRT;
+
   void Start()
   {
+    this._preallocRT = new RenderTexture(
+        SimulationController.AUV_CAMERA_WIDTH,
+        SimulationController.AUV_CAMERA_HEIGHT,
+        16, RenderTextureFormat.ARGB32);
+
     this.roslink = GameObject.Find("ROSMessageHolder").GetComponent<ROSMessageHolder>();
 
     // Add a publisher for each of the cameras that we want to support.
@@ -107,26 +114,36 @@ public class AUV : MonoBehaviour {
    */
   Texture2D GetImageFromCamera(Camera camera)
   {
-    // NOTE(milo): Using the ARGB32 format since it's in tutorials, not sure what the best option is
-    // here though. It uses 8 bits per RGB channel, which seems standard.
+    RenderTexture currentActiveRT = RenderTexture.active; // Placeholder for active render texture.
+
     RenderTexture originalTexture = camera.targetTexture;
 
+    // NOTE(milo): Using the ARGB32 format since it's in tutorials, not sure what the best option is
+    // here though. It uses 8 bits per RGB channel, which seems standard.
     // NOTE(milo): Documentation on camera rendering is a little confusing.
     // We instantiate a RenderTexture above, which is basically just a buffer that cameras render
     // into. Then, we call Render() and read the rendered image into a Texture2D with ReadPixels().
-    camera.targetTexture = new RenderTexture(
-        SimulationController.AUV_CAMERA_WIDTH,
-        SimulationController.AUV_CAMERA_HEIGHT,
-        16, RenderTextureFormat.ARGB32);
+    // camera.targetTexture = new RenderTexture(
+    //     SimulationController.AUV_CAMERA_WIDTH,
+    //     SimulationController.AUV_CAMERA_HEIGHT,
+    //     16, RenderTextureFormat.ARGB32);
+    camera.targetTexture = this._preallocRT;
+
     camera.Render();
+    RenderTexture.active = camera.targetTexture;
 
     // Make a new (empty) image and read the camera image into it.
     Texture2D image = new Texture2D(camera.targetTexture.width, camera.targetTexture.height,
                                     TextureFormat.RGB24, false);
+
+    // This will read pixels from the ACTIVE render texture.
     image.ReadPixels(new Rect(0, 0, camera.targetTexture.width, camera.targetTexture.height), 0, 0);
     image.Apply();
 
     camera.targetTexture = originalTexture;
+
+    RenderTexture.active = currentActiveRT; // Reset the active render texture.
+
     return image;
   }
 
@@ -365,11 +382,11 @@ public class AUV : MonoBehaviour {
 
     // NOTE(milo): Maximum number of frames to save. Avoids using up all disk space by accident.
     while (frame_id < 5000) {
-      yield return new WaitForSeconds(1.0f / SimulationController.CAMERA_PUBLISH_HZ);
+      // yield return new WaitForSeconds(1.0f / SimulationController.CAMERA_PUBLISH_HZ);
       yield return new WaitForEndOfFrame();
 
       // Writes the time in seconds with 5 decimal places.
-      string sec = Time.fixedTime.ToString("F5");
+      string sec = Time.fixedTime.ToString("F6");
       File.AppendAllLines(Path.Combine(datasetFolder, "times.txt"), new[] { sec });
 
       Texture2D leftImage = GetImageFromCamera(camera_forward_left);
@@ -378,7 +395,7 @@ public class AUV : MonoBehaviour {
       byte[] leftPng = leftImage.EncodeToPNG();
       byte[] rightPng = rightImage.EncodeToPNG();
 
-      string imagePath = $"{frame_id:00000}.png";
+      string imagePath = $"{frame_id:000000}.png";
 
       File.WriteAllBytes(Path.Combine(leftImageFolder, imagePath), leftPng);
       File.WriteAllBytes(Path.Combine(rightImageFolder, imagePath), rightPng);
