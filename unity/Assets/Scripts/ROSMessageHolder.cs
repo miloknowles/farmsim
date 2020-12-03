@@ -23,7 +23,7 @@ public class ROSMessageHolder : MonoBehaviour {
   // Awake is called before Start(). This ensures that ROS is ready before other scripts start up.
   void Awake()
   {
-    this.ros = new ROSBridgeWebSocketConnection("ws://localhost", Config.ROS_BRIDGE_PORT);
+    this.ros = new ROSBridgeWebSocketConnection("ws://localhost", SimulationController.ROS_BRIDGE_PORT);
   }
 
   void Start()

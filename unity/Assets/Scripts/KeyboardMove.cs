@@ -73,7 +73,7 @@ public class KeyboardMove : MonoBehaviour {
 	{
 		float w_pitch = Input.GetAxis("Vertical") * 20.0f;
 		float w_yaw = Input.GetAxis("Horizontal") * 20.0f;
-		float speed = Input.GetKey(KeyCode.Space) ? 8.0f : 0.0f;
+		float speed = Input.GetKey(KeyCode.Space) ? 5.0f : 0.0f;
 
 		this.rigidBody.transform.Translate(0, 0, speed * Time.fixedDeltaTime);
 		this.rigidBody.transform.Rotate(w_pitch * Time.fixedDeltaTime, w_yaw * Time.fixedDeltaTime, 0.0f);
