@@ -387,7 +387,24 @@ public class AUV : MonoBehaviour {
 
       // Writes the time in seconds with 5 decimal places.
       string sec = Time.fixedTime.ToString("F6");
-      File.AppendAllLines(Path.Combine(datasetFolder, "times.txt"), new[] { sec });
+      File.AppendAllLines(Path.Combine(datasetFolder, "times.txt"), new string[] { sec });
+
+      Transform T_world_cam = this.camera_forward_left.transform;
+      Quaternion q_world_cam = T_world_cam.rotation;
+      Vector3 t_world_cam = T_world_cam.position;
+      List<string> pose_line = new List<string>{
+        sec,
+        q_world_cam.w.ToString(),
+        q_world_cam.x.ToString(),
+        q_world_cam.y.ToString(),
+        q_world_cam.z.ToString(),
+        t_world_cam.x.ToString(),
+        t_world_cam.y.ToString(),
+        t_world_cam.z.ToString(),
+        "\n"
+      };
+
+      File.AppendAllText(Path.Combine(datasetFolder, "poses_0.txt"), string.Join(" ", pose_line));
 
       Texture2D leftImage = GetImageFromCamera(camera_forward_left);
       Texture2D rightImage = GetImageFromCamera(camera_forward_right);
