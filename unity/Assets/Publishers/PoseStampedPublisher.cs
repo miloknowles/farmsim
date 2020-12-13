@@ -8,7 +8,7 @@ using UnityEngine;
 public class PoseStampedPublisher : ROSBridgePublisher {
 	public static new string GetMessageTopic()
 	{
-		return "/simulator/groundtruth/pose_auv_imu";
+		return "/simulator/groundtruth/pose_imu";
 	}
 
 	public static new string GetMessageType()
