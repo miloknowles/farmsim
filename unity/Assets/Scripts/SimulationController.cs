@@ -13,8 +13,8 @@ public class SimulationController : MonoBehaviour {
   public static int AUV_CAMERA_HEIGHT = 480;
 
   // Environmental parameters.
-  public float WATER_VISIBILITY_METERS = 30.0f;
-  public int MARINE_SNOW_PARTICLES = 300;
+  public float WATER_VISIBILITY_METERS = 20.0f;
+  public int MARINE_SNOW_PARTICLES = 500;
 
   private FlowFieldSimulator _marineSnow;
   private FogEffect[] _fogEffectScripts;
