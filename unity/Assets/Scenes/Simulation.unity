@@ -1315,7 +1315,7 @@ MonoBehaviour:
   imuBody: {fileID: 420561429}
   farm: {fileID: 1763879187}
   doRoutine: 0
-  simulatorIOMode: 2
+  simulatorIOMode: 1
   outputDatasetName: default_dataset
   outputDatasetRoot: /home/milo/datasets/Unity3D/farmsim/
 --- !u!114 &420561428
@@ -3646,7 +3646,7 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 35eb2c550b08018c99f61b84db0f8b30,
         type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 35eb2c550b08018c99f61b84db0f8b30,
         type: 3}
@@ -5975,7 +5975,7 @@ MonoBehaviour:
   _cellSize: 1
   _offset: {x: 0, y: 0, z: 0}
   _offsetSpeed: {x: 1, y: 4, z: -2}
-  _numberOfParticles: 300
+  _numberOfParticles: 500
   _particleScale: 0.01
   _particlePrefab: {fileID: 6003994997900738337, guid: 1bf81d93d9f603dcfa5535cc959cd116,
     type: 3}
@@ -6390,8 +6390,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 027a1753f7851b0f59ed1451c22ef96b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  WATER_VISIBILITY_METERS: 30
-  MARINE_SNOW_PARTICLES: 300
+  WATER_VISIBILITY_METERS: 20
+  MARINE_SNOW_PARTICLES: 500
 --- !u!1 &760134485
 GameObject:
   m_ObjectHideFlags: 0

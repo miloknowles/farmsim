@@ -1,25 +1,30 @@
 using System;
-using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text;
+using System.IO;
+
+using UnityEngine;
+
 using ROSBridgeLib.std_msgs;
 using ROSBridgeLib.sensor_msgs;
 using ROSBridgeLib.geometry_msgs;
 using ROSBridgeLib.CustomMessages;
 using ROSBridgeLib;
-using System.Text;
-using System.IO;
+
+using Simulator;
 
 
 namespace Simulator {
+
 public enum IOMode
 {
   NO_OUTPUT = 0,
   PUBLISH_TO_ROS = 1,
   SAVE_TO_DISK = 2
 }
-}
 
+}
 
 public class AUV : MonoBehaviour {
   private int msgPublishCount;
@@ -39,6 +44,7 @@ public class AUV : MonoBehaviour {
   // Used to calculate accleration with finite-differencing.
   private Vector3 lastImuBodyVelocity;
   private Vector3 imuBodyAccel;
+  private float depthSensorSigma = 0.1f;       // Standard deviation of depth noise.
 
   private List<IEnumerator> routines;
   private Quaternion rotationFaceWinch = Quaternion.identity;
@@ -99,7 +105,7 @@ public class AUV : MonoBehaviour {
       StartCoroutine(PublishCameraSyncedMessages());
       StartCoroutine(PublishImu());
     } else if (this.simulatorIOMode == Simulator.IOMode.SAVE_TO_DISK) {
-      StartCoroutine(SaveDataset());
+      StartCoroutine(SaveStereoImageDataset());
     }
   }
 
@@ -246,11 +252,12 @@ public class AUV : MonoBehaviour {
       this.roslink.ros.Publish(GroundtruthHeadingPublisher.GetMessageTopic(), new Float64Msg(theta));
       this.roslink.ros.Render();
 
-      // Publish the current barometer depth.
+      // Publish the current barometer depth (groundtruth and depth with simulated noise).
       float depth = imuBody.transform.position.y;
-      Float64Msg depthMessage = new Float64Msg(depth);
+      Float64Msg gtDepthMessage = new Float64Msg(depth);
+      Float64Msg depthMessage = new Float64Msg(depth + Utils.Gaussian(0, this.depthSensorSigma));
       this.roslink.ros.Publish(DepthPublisher.GetMessageTopic(), depthMessage);
-      this.roslink.ros.Publish(GroundtruthDepthPublisher.GetMessageTopic(), depthMessage);
+      this.roslink.ros.Publish(GroundtruthDepthPublisher.GetMessageTopic(), gtDepthMessage);
     }
   }
 
@@ -361,7 +368,7 @@ public class AUV : MonoBehaviour {
     }
   }
 
-  IEnumerator SaveDataset()
+  IEnumerator SaveStereoImageDataset()
   {
     string datasetFolder = Path.Combine(this.outputDatasetRoot, this.outputDatasetName);
 
