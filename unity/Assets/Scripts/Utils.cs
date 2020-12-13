@@ -49,6 +49,17 @@ class Utils {
     Vector3 direction = new Vector3(Mathf.Cos(bearingAngle), y, Mathf.Sin(bearingAngle));
     return direction.normalized;
   }
-}
 
+  // Generate a sample from a Gaussian distribution using the Box-Muller transform.
+  // https://en.wikipedia.org/wiki/Box%E2%80%93Muller_transform
+  public static float Gaussian(float mu, float sigma)
+  {
+    float u1 = 1.0f - Random.Range(0.0f, 1.0f);
+    float u2 = 1.0f - Random.Range(0.0f, 1.0f);
+    float standardNormal = Mathf.Sqrt(-2.0f * Mathf.Log(u1)) * Mathf.Sin(2.0f * Mathf.PI * u2);
+
+    return mu + sigma*standardNormal;
+  }
+
+}
 }

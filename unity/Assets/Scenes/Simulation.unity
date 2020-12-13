@@ -1315,7 +1315,7 @@ MonoBehaviour:
   imuBody: {fileID: 420561429}
   farm: {fileID: 1763879187}
   doRoutine: 0
-  simulatorIOMode: 2
+  simulatorIOMode: 1
   outputDatasetName: default_dataset
   outputDatasetRoot: /home/milo/datasets/Unity3D/farmsim/
 --- !u!114 &420561428
@@ -3646,7 +3646,7 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 35eb2c550b08018c99f61b84db0f8b30,
         type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 35eb2c550b08018c99f61b84db0f8b30,
         type: 3}
