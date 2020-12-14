@@ -1281,7 +1281,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 420561424}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -9.82, y: -14.94, z: -4.78}
+  m_LocalPosition: {x: -10.18, y: -10.93, z: -5.96}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 518964988}
@@ -1315,7 +1315,7 @@ MonoBehaviour:
   imuBody: {fileID: 420561429}
   farm: {fileID: 1763879187}
   doRoutine: 0
-  simulatorIOMode: 1
+  simulatorIOMode: 2
   outputDatasetName: default_dataset
   outputDatasetRoot: /home/milo/datasets/Unity3D/farmsim/
 --- !u!114 &420561428
