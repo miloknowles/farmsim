@@ -111,7 +111,8 @@ public class AUV : MonoBehaviour {
 
   void FixedUpdate()
   {
-    imuBodyAccel = (imuBody.velocity - lastImuBodyVelocity) / Time.fixedDeltaTime;
+    Vector3 velocity_rh = new Vector3(imuBody.velocity.x, -imuBody.velocity.y, imuBody.velocity.z);
+    imuBodyAccel = (velocity_rh - lastImuBodyVelocity) / Time.fixedDeltaTime;
     lastImuBodyVelocity = imuBody.velocity;
   }
 
@@ -129,10 +130,6 @@ public class AUV : MonoBehaviour {
     // NOTE(milo): Documentation on camera rendering is a little confusing.
     // We instantiate a RenderTexture above, which is basically just a buffer that cameras render
     // into. Then, we call Render() and read the rendered image into a Texture2D with ReadPixels().
-    // camera.targetTexture = new RenderTexture(
-    //     SimulationController.AUV_CAMERA_WIDTH,
-    //     SimulationController.AUV_CAMERA_HEIGHT,
-    //     16, RenderTextureFormat.ARGB32);
     camera.targetTexture = this._preallocRT;
 
     camera.Render();
@@ -192,7 +189,7 @@ public class AUV : MonoBehaviour {
           new HeaderMsg(msgPublishCount, timeMessage, "auv_camera_fr"),
           CameraForwardRightPublisher.GetMessageTopic());
 
-      // PublishCameraImage(7.90639384423901
+      // PublishCameraImage(
       //     GetImageFromCamera(camera_downward_left),
       //     timeMessage,
       //     new HeaderMsg(msgPublishCount, timeMessage, "auv_camera_dl"),
@@ -204,15 +201,17 @@ public class AUV : MonoBehaviour {
       //     new HeaderMsg(msgPublishCount, timeMessage, "auv_camera_ul"),
       //     CameraUpwardLeftPublisher.GetMessageTopic());
 
-      // Publish the pose of the vehicle in the world.
-      Vector3 t_auv_world = imuBody.transform.position;
-      Quaternion q_auv_world = imuBody.transform.rotation;
+      // Publish the pose of the vehicle in the world (right-handed!).
+      Transform T_world_imu = imuBody.transform;
+      Vector3 t_world_imu;
+      Quaternion q_world_imu;
+      Utils.ToRightHandedTransform(T_world_imu, out t_world_imu, out q_world_imu);
 
-      QuaternionMsg q_auv_world_msg = new QuaternionMsg(
-          q_auv_world.x, q_auv_world.y, q_auv_world.z, q_auv_world.w);
-      PointMsg t_auv_world_msg = new PointMsg(t_auv_world.x, t_auv_world.y, t_auv_world.z);
-      PoseStampedMsg msg = new PoseStampedMsg(new HeaderMsg(msgPublishCount, timeMessage, "auv_imu"),
-                                              new PoseMsg(t_auv_world_msg, q_auv_world_msg));
+      QuaternionMsg q_world_imu_msg = new QuaternionMsg(
+          q_world_imu.x, q_world_imu.y, q_world_imu.z, q_world_imu.w);
+      PointMsg t_world_imu_msg = new PointMsg(t_world_imu.x, t_world_imu.y, t_world_imu.z);
+      PoseStampedMsg msg = new PoseStampedMsg(new HeaderMsg(msgPublishCount, timeMessage, "imu"),
+                                              new PoseMsg(t_world_imu_msg, q_world_imu_msg));
       this.roslink.ros.Publish(PoseStampedPublisher.GetMessageTopic(), msg);
       this.roslink.ros.Render();
     }
@@ -228,36 +227,35 @@ public class AUV : MonoBehaviour {
       var timeMessage = new TimeMsg(timeSinceStart.Seconds, timeSinceStart.Milliseconds);
       var headerMessage = new HeaderMsg(msgPublishCount, timeMessage, "imu");
 
-      Quaternion vehicleImu;
-      vehicleImu = imuBody.transform.rotation;
-      double xey = vehicleImu.x;
-      double yey = vehicleImu.y;
-      double zey = vehicleImu.z;
-      double wey = vehicleImu.w;
-      var imuData = new QuaternionMsg(xey, yey, zey, wey);
+      Vector3 t_world_imu;
+      Quaternion q_world_imu;
+      Utils.ToRightHandedTransform(imuBody.transform, out t_world_imu, out q_world_imu);
+      QuaternionMsg q_world_imu_msg = new QuaternionMsg(q_world_imu.x, q_world_imu.y, q_world_imu.z, q_world_imu.w);
 
       // NOTE(milo): Sending empty covariance matrix for now (denoted with -1 in the 0th position).
-      double[] zeroMatrix3x3 = new double[]{-1, 0, 0, 0, 0, 0, 0, 0, 0};
+      double[] Zero_3x3 = new double[]{-1, 0, 0, 0, 0, 0, 0, 0, 0};
 
-      var zeroVect3 = new Vector3Msg(0.0, 0.0, 0.0);
-      var linearAccelMsg = new Vector3Msg(imuBodyAccel.x, imuBodyAccel.y, imuBodyAccel.z);
-      var msg = new ImuMessage(headerMessage, imuData, zeroMatrix3x3, zeroVect3, zeroMatrix3x3,
-                               linearAccelMsg, zeroMatrix3x3);
+      var zero3 = new Vector3Msg(0.0, 0.0, 0.0);
+
+      // NOTE(milo): The imuBodyAccel is already in a right-handed frame, so need to convert here.
+      var accel_msg = new Vector3Msg(imuBodyAccel.x, imuBodyAccel.y, imuBodyAccel.z);
+      var msg = new ImuMessage(headerMessage, q_world_imu_msg, Zero_3x3, zero3, Zero_3x3,
+                               accel_msg, Zero_3x3);
 
       this.roslink.ros.Publish(ImuPublisher.GetMessageTopic(), msg);
 
       // Publish the heading (yaw) of the vehicle.
-      float theta = imuBody.transform.rotation.eulerAngles.z;
-      this.roslink.ros.Publish(HeadingPublisher.GetMessageTopic(), new Float64Msg(theta));
-      this.roslink.ros.Publish(GroundtruthHeadingPublisher.GetMessageTopic(), new Float64Msg(theta));
-      this.roslink.ros.Render();
+      // float theta = imuBody.transform.rotation.eulerAngles.z;
+      // this.roslink.ros.Publish(HeadingPublisher.GetMessageTopic(), new Float64Msg(theta));
+      // this.roslink.ros.Publish(GroundtruthHeadingPublisher.GetMessageTopic(), new Float64Msg(theta));
+      // this.roslink.ros.Render();
 
       // Publish the current barometer depth (groundtruth and depth with simulated noise).
-      float depth = imuBody.transform.position.y;
-      Float64Msg gtDepthMessage = new Float64Msg(depth);
-      Float64Msg depthMessage = new Float64Msg(depth + Utils.Gaussian(0, this.depthSensorSigma));
-      this.roslink.ros.Publish(DepthPublisher.GetMessageTopic(), depthMessage);
-      this.roslink.ros.Publish(GroundtruthDepthPublisher.GetMessageTopic(), gtDepthMessage);
+      float depth = t_world_imu.y;
+      Float64Msg depth_msg_gt = new Float64Msg(depth);
+      Float64Msg depth_msg = new Float64Msg(depth + Utils.Gaussian(0, this.depthSensorSigma));
+      this.roslink.ros.Publish(DepthPublisher.GetMessageTopic(), depth_msg);
+      this.roslink.ros.Publish(GroundtruthDepthPublisher.GetMessageTopic(), depth_msg_gt);
     }
   }
 
@@ -397,8 +395,11 @@ public class AUV : MonoBehaviour {
       File.AppendAllLines(Path.Combine(datasetFolder, "times.txt"), new string[] { sec });
 
       Transform T_world_cam = this.camera_forward_left.transform;
-      Quaternion q_world_cam = T_world_cam.rotation;
-      Vector3 t_world_cam = T_world_cam.position;
+
+      Quaternion q_world_cam;
+      Vector3 t_world_cam;
+      Utils.ToRightHandedTransform(T_world_cam, out t_world_cam, out q_world_cam);
+
       List<string> pose_line = new List<string>{
         sec,
         q_world_cam.w.ToString(),

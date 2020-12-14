@@ -61,5 +61,23 @@ class Utils {
     return mu + sigma*standardNormal;
   }
 
+  /**
+   * Converts a Unity3D left-handed transform to a right-handed one (for compatibility with
+   * everything else in the robotics world).
+   *
+   * Keeps the x and z axes the same, and flips the y axis.
+   */
+  public static void ToRightHandedTransform(Transform lh, out Vector3 t_rh, out Quaternion q_rh)
+  {
+    t_rh = new Vector3(lh.position.x, -lh.position.y, lh.position.z);
+
+    // Flip the y-component of the rotation axis.
+    float angle_lh = 0.0f;
+    Vector3 axis_rh = Vector3.zero;
+    lh.rotation.ToAngleAxis(out angle_lh, out axis_rh);
+    axis_rh.y *= -1;
+
+    q_rh = Quaternion.AngleAxis(angle_lh, axis_rh);
+  }
 }
 }
