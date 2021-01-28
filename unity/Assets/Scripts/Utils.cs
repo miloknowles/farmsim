@@ -75,7 +75,11 @@ class Utils {
     float angle_lh = 0.0f;
     Vector3 axis_rh = Vector3.zero;
     lh.rotation.ToAngleAxis(out angle_lh, out axis_rh);
-    axis_rh.y *= -1;
+
+    // NOTE(milo): I can't quite wrap my head around this, but we DON'T need to flip the direction
+    // of the y-axis for axis-angle rotations. Regardless of the handedness of the coordinate
+    // system, a rotation around +y (LH) will have the same effect as a rotation around +y (RH).
+    // axis_rh.y *= -1;
 
     q_rh = Quaternion.AngleAxis(angle_lh, axis_rh);
   }

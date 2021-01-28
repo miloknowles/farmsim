@@ -1280,8 +1280,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 420561424}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -10.18, y: -10.93, z: -5.96}
+  m_LocalRotation: {x: 0, y: -0.7071068, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: 29.07, y: -11.01, z: -3.34}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 518964988}
@@ -1295,7 +1295,7 @@ Transform:
   - {fileID: 724607433}
   m_Father: {fileID: 0}
   m_RootOrder: 4
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: -90, z: 0}
 --- !u!114 &420561427
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3646,7 +3646,7 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 35eb2c550b08018c99f61b84db0f8b30,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 35eb2c550b08018c99f61b84db0f8b30,
         type: 3}
@@ -6390,7 +6390,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 027a1753f7851b0f59ed1451c22ef96b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  WATER_VISIBILITY_METERS: 20
+  WATER_VISIBILITY_METERS: 80
   MARINE_SNOW_PARTICLES: 500
 --- !u!1 &760134485
 GameObject:
@@ -9738,7 +9738,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1845133841
 Transform:
   m_ObjectHideFlags: 0
@@ -10234,7 +10234,7 @@ PrefabInstance:
     - target: {fileID: 1014769243698996646, guid: edaa969f7645c26eba3dfc50cf8ff2ba,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -35
+      value: 14.51
       objectReference: {fileID: 0}
     - target: {fileID: 1014769243698996646, guid: edaa969f7645c26eba3dfc50cf8ff2ba,
         type: 3}
@@ -10244,7 +10244,7 @@ PrefabInstance:
     - target: {fileID: 1014769243698996646, guid: edaa969f7645c26eba3dfc50cf8ff2ba,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: -4.99
+      value: -3.78
       objectReference: {fileID: 0}
     - target: {fileID: 1014769243698996646, guid: edaa969f7645c26eba3dfc50cf8ff2ba,
         type: 3}
