@@ -56,8 +56,9 @@ public class AUV : MonoBehaviour {
 
   // NOTE(milo): This needs to be an absolute path!
   public string outputDatasetRoot = "/home/milo/datasets/Unity3D/farmsim/";
-  private string leftImageSubfolder = "image_0";
-  private string rightImageSubfolder = "image_1";
+  private string leftImageSubfolder = "cam0";
+  private string rightImageSubfolder = "cam1";
+  private string imuSubfolder = "imu0";
 
   private RenderTexture _preallocRT;
 
@@ -106,6 +107,7 @@ public class AUV : MonoBehaviour {
       StartCoroutine(PublishImu());
     } else if (this.simulatorIOMode == Simulator.IOMode.SAVE_TO_DISK) {
       StartCoroutine(SaveStereoImageDataset());
+      StartCoroutine(SaveImuDataset());
     }
   }
 
@@ -214,6 +216,48 @@ public class AUV : MonoBehaviour {
                                               new PoseMsg(t_world_imu_msg, q_world_imu_msg));
       this.roslink.ros.Publish(PoseStampedPublisher.GetMessageTopic(), msg);
       this.roslink.ros.Render();
+    }
+  }
+
+  IEnumerator SaveImuDataset() {
+    string datasetFolder = Path.Combine(this.outputDatasetRoot, this.outputDatasetName);
+
+    // Wait until the outer dataset folder has been created (done by the image saving routine).
+    // while (!Directory.Exists(datasetFolder)) {
+    //   yield return new WaitForEndOfFrame();
+    // }
+
+    string imuFolder = Path.Combine(datasetFolder, this.imuSubfolder);
+
+    if (Directory.Exists(imuFolder)) {
+      Debug.Log("WARNING: Deleting existing IMU folder: " + imuFolder);
+      Directory.Delete(imuFolder, true);
+    }
+
+    Directory.CreateDirectory(imuFolder);
+
+    string csv = Path.Combine(imuFolder, "data.csv");
+
+    // NOTE(milo): Maximum number of frames to save. Avoids using up all disk space by accident.
+    while (true) {
+      // yield return new WaitForSeconds(1.0f / SimulationController.CAMERA_PUBLISH_HZ);
+      yield return new WaitForFixedUpdate();
+
+      string nsec = ((long)(Time.fixedTime * 1e9)).ToString("D19");
+
+      // timestamp [ns],w_RS_S_x [rad s^-1],w_RS_S_y [rad s^-1],w_RS_S_z [rad s^-1],a_RS_S_x [m s^-2],a_RS_S_y [m s^-2],a_RS_S_z [m s^-2]
+      List<string> imu_line = new List<string>{
+        nsec,
+        this.imuBody.angularVelocity.x.ToString("F18"),
+        this.imuBody.angularVelocity.y.ToString("F18"),
+        this.imuBody.angularVelocity.z.ToString("F18"),
+        this.imuBodyAccel.x.ToString("F18"),
+        this.imuBodyAccel.y.ToString("F18"),
+        this.imuBodyAccel.z.ToString("F18"),
+        "\n"
+      };
+
+      File.AppendAllText(csv, string.Join(",", imu_line));
     }
   }
 
@@ -377,11 +421,15 @@ public class AUV : MonoBehaviour {
 
     string leftImageFolder = Path.Combine(datasetFolder, this.leftImageSubfolder);
     string rightImageFolder = Path.Combine(datasetFolder, this.rightImageSubfolder);
-    Debug.Log(leftImageFolder);
-    Debug.Log(rightImageFolder);
+    string leftImageDataFolder = Path.Combine(leftImageFolder, "data");
+    string rightImageDataFolder = Path.Combine(rightImageFolder, "data");
+    // Debug.Log(leftImageFolder);
+    // Debug.Log(rightImageFolder);
 
     Directory.CreateDirectory(leftImageFolder);
     Directory.CreateDirectory(rightImageFolder);
+    Directory.CreateDirectory(leftImageDataFolder);
+    Directory.CreateDirectory(rightImageDataFolder);
 
     int frame_id = 0;
 
@@ -390,9 +438,8 @@ public class AUV : MonoBehaviour {
       // yield return new WaitForSeconds(1.0f / SimulationController.CAMERA_PUBLISH_HZ);
       yield return new WaitForEndOfFrame();
 
-      // Writes the time in seconds with 5 decimal places.
-      string sec = Time.fixedTime.ToString("F6");
-      File.AppendAllLines(Path.Combine(datasetFolder, "times.txt"), new string[] { sec });
+      string nsec = ((long)(Time.fixedTime * 1e9)).ToString("D19");
+      File.AppendAllLines(Path.Combine(datasetFolder, "timestamps.txt"), new string[] { nsec });
 
       Transform T_world_cam = this.camera_forward_left.transform;
 
@@ -401,7 +448,7 @@ public class AUV : MonoBehaviour {
       Utils.ToRightHandedTransform(T_world_cam, out t_world_cam, out q_world_cam);
 
       List<string> pose_line = new List<string>{
-        sec,
+        nsec,
         q_world_cam.w.ToString(),
         q_world_cam.x.ToString(),
         q_world_cam.y.ToString(),
@@ -412,7 +459,7 @@ public class AUV : MonoBehaviour {
         "\n"
       };
 
-      File.AppendAllText(Path.Combine(datasetFolder, "poses_0.txt"), string.Join(" ", pose_line));
+      File.AppendAllText(Path.Combine(datasetFolder, "pose0.txt"), string.Join(",", pose_line));
 
       Texture2D leftImage = GetImageFromCamera(camera_forward_left);
       Texture2D rightImage = GetImageFromCamera(camera_forward_right);
@@ -420,10 +467,15 @@ public class AUV : MonoBehaviour {
       byte[] leftPng = leftImage.EncodeToPNG();
       byte[] rightPng = rightImage.EncodeToPNG();
 
-      string imagePath = $"{frame_id:000000}.png";
+      // string imagePath = $"{frame_id:000000}.png";
+      string imagePath = $"{nsec}.png";
 
-      File.WriteAllBytes(Path.Combine(leftImageFolder, imagePath), leftPng);
-      File.WriteAllBytes(Path.Combine(rightImageFolder, imagePath), rightPng);
+      List<string> img_line = new List<string>{ nsec, imagePath };
+      File.AppendAllText(Path.Combine(leftImageFolder, "data.csv"), string.Join(",", img_line));
+      File.AppendAllText(Path.Combine(rightImageFolder, "data.csv"), string.Join(",", img_line));
+
+      File.WriteAllBytes(Path.Combine(leftImageDataFolder, imagePath), leftPng);
+      File.WriteAllBytes(Path.Combine(rightImageDataFolder, imagePath), rightPng);
 
       ++frame_id;
     }

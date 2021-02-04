@@ -71,12 +71,15 @@ public class KeyboardMove : MonoBehaviour {
 
 	private void KeyboardDriveCommand()
 	{
-		float w_pitch = Input.GetAxis("Vertical") * 20.0f;
-		float w_yaw = Input.GetAxis("Horizontal") * 20.0f;
-		float speed = Input.GetKey(KeyCode.Space) ? 5.0f : 0.0f;
+		float w_pitch = Input.GetAxis("Vertical") * 5.0f;
+		float w_yaw = Input.GetAxis("Horizontal") * 5.0f;
+		float thrust = Input.GetKey(KeyCode.Space) ? 3.0f : 0.0f;
 
-		this.rigidBody.transform.Translate(0, 0, speed * Time.fixedDeltaTime);
-		this.rigidBody.transform.Rotate(w_pitch * Time.fixedDeltaTime, w_yaw * Time.fixedDeltaTime, 0.0f);
+		// this.rigidBody.transform.Translate(0, 0, speed * Time.fixedDeltaTime);
+		// this.rigidBody.transform.Rotate(w_pitch * Time.fixedDeltaTime, w_yaw * Time.fixedDeltaTime, 0.0f);
+
+		this.rigidBody.AddRelativeForce(new Vector3(0, 0, thrust) * this.rigidBody.mass);
+		this.rigidBody.AddRelativeTorque(new Vector3(w_pitch, w_yaw, 0.0f));
 
 		// Disable roll, since we always want the vehicle level.
 		Vector3 euler = this.rigidBody.transform.eulerAngles;

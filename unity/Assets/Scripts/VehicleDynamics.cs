@@ -74,9 +74,13 @@ public class VehicleDynamics : MonoBehaviour {
     Vector3 tau_linear_drag = Vector3.Cross(this.t_CP_body, F_drag);
     Vector3 tau_angular_drag = -1.0f * w_body.normalized * this.angularDragCoefficient * Mathf.Pow(w_body.magnitude, 2);
 
+    Vector3 tau_total = tau_lt + tau_rt + tau_ct + tau_angular_drag + tau_linear_drag;
+    tau_total = Vector3.ClampMagnitude(tau_total, 0.3f * (w_body.magnitude * this.rigidBody.inertiaTensor / Time.fixedDeltaTime).magnitude);
+
     // Apply forces and torques to the vehicle in its body frame.
     this.rigidBody.AddRelativeForce(flt + frt + fct + F_drag);
-    this.rigidBody.AddRelativeTorque(tau_lt + tau_rt + tau_ct + tau_linear_drag + tau_angular_drag);
+    this.rigidBody.AddRelativeTorque(tau_total);
+    // this.rigidBody.AddRelativeTorque(tau_lt + tau_rt + tau_ct + tau_linear_drag + tau_angular_drag);
   }
 
   public void Callback(ROSBridgeMsg msg)
