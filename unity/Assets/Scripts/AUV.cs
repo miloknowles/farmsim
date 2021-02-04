@@ -470,7 +470,7 @@ public class AUV : MonoBehaviour {
       // string imagePath = $"{frame_id:000000}.png";
       string imagePath = $"{nsec}.png";
 
-      List<string> img_line = new List<string>{ nsec, imagePath };
+      List<string> img_line = new List<string>{ nsec, imagePath, "\n" };
       File.AppendAllText(Path.Combine(leftImageFolder, "data.csv"), string.Join(",", img_line));
       File.AppendAllText(Path.Combine(rightImageFolder, "data.csv"), string.Join(",", img_line));
 
