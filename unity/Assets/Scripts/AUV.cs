@@ -113,9 +113,14 @@ public class AUV : MonoBehaviour {
 
   void FixedUpdate()
   {
-    Vector3 velocity_rh = new Vector3(imuBody.velocity.x, -imuBody.velocity.y, imuBody.velocity.z);
-    imuBodyAccel = (velocity_rh - lastImuBodyVelocity) / Time.fixedDeltaTime;
-    lastImuBodyVelocity = imuBody.velocity;
+    // Get the velocity in the local IMU frame.
+    Quaternion q_imu_world = Quaternion.Inverse(this.imuBody.transform.rotation);
+    Vector3 v_imu = q_imu_world * this.imuBody.velocity;
+
+    v_imu.y *= -1; // Convert to right-handed frame.
+
+    imuBodyAccel = (v_imu - lastImuBodyVelocity) / Time.fixedDeltaTime;
+    lastImuBodyVelocity = v_imu;
   }
 
   /**
