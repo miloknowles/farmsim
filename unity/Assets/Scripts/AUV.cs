@@ -245,15 +245,23 @@ public class AUV : MonoBehaviour {
 
       string nsec = ((long)(Time.fixedTime * 1e9)).ToString("D19");
 
+      // Rotate the gravity vector into the IMU's frame, then add it to acceleration.
+      // NOTE(milo): Really important that we transform gravity into the local frame and THEN flip
+      // the sign of the y-component.
+      Quaternion q_imu_world = Quaternion.Inverse(this.imuBody.transform.rotation);
+      Vector3 localGravityRH = q_imu_world * Physics.gravity;
+      localGravityRH.y *= -1;
+      Vector3 imuBodyAccelPlusGravity = this.imuBodyAccel + localGravityRH;
+
       // timestamp [ns],w_RS_S_x [rad s^-1],w_RS_S_y [rad s^-1],w_RS_S_z [rad s^-1],a_RS_S_x [m s^-2],a_RS_S_y [m s^-2],a_RS_S_z [m s^-2]
       List<string> imu_line = new List<string>{
         nsec,
         this.imuBody.angularVelocity.x.ToString("F18"),
         this.imuBody.angularVelocity.y.ToString("F18"),
         this.imuBody.angularVelocity.z.ToString("F18"),
-        this.imuBodyAccel.x.ToString("F18"),
-        this.imuBodyAccel.y.ToString("F18"),
-        this.imuBodyAccel.z.ToString("F18"),
+        imuBodyAccelPlusGravity.x.ToString("F18"),
+        imuBodyAccelPlusGravity.y.ToString("F18"),
+        imuBodyAccelPlusGravity.z.ToString("F18"),
         "\n"
       };
 
