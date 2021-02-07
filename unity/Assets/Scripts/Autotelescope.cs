@@ -48,7 +48,7 @@ public class Autotelescope : MonoBehaviour
     Vector3 unit_01 = Vector3.Normalize(vector_01);
     float length_01 = vector_01.magnitude;
 
-    Quaternion q_align_long = Simulator.Utils.RotateAlignVectors(alignVector, unit_01);
+    Quaternion q_align_long = Simulator.TransformUtils.RotateAlignVectors(alignVector, unit_01);
 
     // Position the attached game object at the center of the two endpoints.
     this.gameObject.transform.position = midpoint;

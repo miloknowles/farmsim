@@ -38,13 +38,14 @@ public class AUV : MonoBehaviour {
   public Camera camera_upward_left;
   private RenderTexture rt;
 
-  public Rigidbody imuBody;
+  public Rigidbody imu_rigidbody;
   public FarmController farm;
 
   // Used to calculate accleration with finite-differencing.
-  private Vector3 lastImuBodyVelocity;
-  private Vector3 imuBodyAccel;
-  private float depthSensorSigma = 0.1f;       // Standard deviation of depth noise.
+  private Vector3 prev_imu_velocity;
+  private Vector3 imu_linear_accel;
+  private Vector3 imu_angular_velocity;
+  private float depth_sensor_sigma = 0.1f;       // Standard deviation of depth noise.
 
   private List<IEnumerator> routines;
   private Quaternion rotationFaceWinch = Quaternion.identity;
@@ -104,7 +105,7 @@ public class AUV : MonoBehaviour {
 
     if (this.simulatorIOMode == Simulator.IOMode.PUBLISH_TO_ROS) {
       StartCoroutine(PublishCameraSyncedMessages());
-      StartCoroutine(PublishImu());
+      // StartCoroutine(PublishImu());
     } else if (this.simulatorIOMode == Simulator.IOMode.SAVE_TO_DISK) {
       StartCoroutine(SaveStereoImageDataset());
       StartCoroutine(SaveImuDataset());
@@ -114,13 +115,13 @@ public class AUV : MonoBehaviour {
   void FixedUpdate()
   {
     // Get the velocity in the local IMU frame.
-    Quaternion q_imu_world = Quaternion.Inverse(this.imuBody.transform.rotation);
-    Vector3 v_imu = q_imu_world * this.imuBody.velocity;
+    Quaternion q_imu_world = Quaternion.Inverse(this.imu_rigidbody.transform.rotation);
+    Vector3 v_imu = q_imu_world * this.imu_rigidbody.velocity;
 
-    v_imu.y *= -1; // Convert to right-handed frame.
+    this.imu_linear_accel = (v_imu - prev_imu_velocity) / Time.fixedDeltaTime;
+    this.imu_angular_velocity = q_imu_world * this.imu_rigidbody.angularVelocity;
 
-    imuBodyAccel = (v_imu - lastImuBodyVelocity) / Time.fixedDeltaTime;
-    lastImuBodyVelocity = v_imu;
+    this.prev_imu_velocity = v_imu;
   }
 
   /**
@@ -209,68 +210,60 @@ public class AUV : MonoBehaviour {
       //     CameraUpwardLeftPublisher.GetMessageTopic());
 
       // Publish the pose of the vehicle in the world (right-handed!).
-      Transform T_world_imu = imuBody.transform;
-      Vector3 t_world_imu;
-      Quaternion q_world_imu;
-      Utils.ToRightHandedTransform(T_world_imu, out t_world_imu, out q_world_imu);
+      // Transform T_world_imu = imu_rigidbody.transform;
+      // Vector3 t_world_imu;
+      // Quaternion q_world_imu;
+      // Utils.ToRightHandedTransform(T_world_imu, out t_world_imu, out q_world_imu);
 
-      QuaternionMsg q_world_imu_msg = new QuaternionMsg(
-          q_world_imu.x, q_world_imu.y, q_world_imu.z, q_world_imu.w);
-      PointMsg t_world_imu_msg = new PointMsg(t_world_imu.x, t_world_imu.y, t_world_imu.z);
-      PoseStampedMsg msg = new PoseStampedMsg(new HeaderMsg(msgPublishCount, timeMessage, "imu"),
-                                              new PoseMsg(t_world_imu_msg, q_world_imu_msg));
-      this.roslink.ros.Publish(PoseStampedPublisher.GetMessageTopic(), msg);
+      // QuaternionMsg q_world_imu_msg = new QuaternionMsg(
+      //     q_world_imu.x, q_world_imu.y, q_world_imu.z, q_world_imu.w);
+      // PointMsg t_world_imu_msg = new PointMsg(t_world_imu.x, t_world_imu.y, t_world_imu.z);
+      // PoseStampedMsg msg = new PoseStampedMsg(new HeaderMsg(msgPublishCount, timeMessage, "imu"),
+      //                                         new PoseMsg(t_world_imu_msg, q_world_imu_msg));
+      // this.roslink.ros.Publish(PoseStampedPublisher.GetMessageTopic(), msg);
       this.roslink.ros.Render();
     }
   }
 
   IEnumerator SaveImuDataset() {
-    string datasetFolder = Path.Combine(this.outputDatasetRoot, this.outputDatasetName);
+    string dataset_folder = Path.Combine(this.outputDatasetRoot, this.outputDatasetName);
+    string imu_folder = Path.Combine(dataset_folder, this.imuSubfolder);
 
-    // Wait until the outer dataset folder has been created (done by the image saving routine).
-    // while (!Directory.Exists(datasetFolder)) {
-    //   yield return new WaitForEndOfFrame();
-    // }
-
-    string imuFolder = Path.Combine(datasetFolder, this.imuSubfolder);
-
-    if (Directory.Exists(imuFolder)) {
-      Debug.Log("WARNING: Deleting existing IMU folder: " + imuFolder);
-      Directory.Delete(imuFolder, true);
+    if (Directory.Exists(imu_folder)) {
+      Debug.Log("WARNING: Deleting existing IMU folder: " + imu_folder);
+      Directory.Delete(imu_folder, true);
     }
 
-    Directory.CreateDirectory(imuFolder);
+    Directory.CreateDirectory(imu_folder);
 
-    string csv = Path.Combine(imuFolder, "data.csv");
+    string csv = Path.Combine(imu_folder, "data.csv");
 
     // NOTE(milo): Maximum number of frames to save. Avoids using up all disk space by accident.
     while (true) {
-      // yield return new WaitForSeconds(1.0f / SimulationController.CAMERA_PUBLISH_HZ);
       yield return new WaitForFixedUpdate();
 
       string nsec = ((long)(Time.fixedTime * 1e9)).ToString("D19");
 
       // Rotate the gravity vector into the IMU's frame, then add it to acceleration.
-      // NOTE(milo): Really important that we transform gravity into the local frame and THEN flip
-      // the sign of the y-component.
-      Quaternion q_imu_world = Quaternion.Inverse(this.imuBody.transform.rotation);
-      Vector3 localGravityRH = q_imu_world * Physics.gravity;
-      localGravityRH.y *= -1;
-
-      Vector3 w_body = q_imu_world * this.imuBody.angularVelocity;
+      Quaternion q_imu_world = Quaternion.Inverse(this.imu_rigidbody.transform.rotation);
+      Vector3 imu_gravity = q_imu_world * Physics.gravity;
 
       // NOTE(milo): The IMU "feels" an upward acceleration due to gravity!
-      Vector3 imuBodyAccelPlusGravity = this.imuBodyAccel - localGravityRH;
+      Vector3 imu_linear_accel_g_rh = TransformUtils.ToRightHandedTranslation(this.imu_linear_accel - imu_gravity);
+      Vector3 imu_angular_velocity_rh = TransformUtils.ToRightHandedAngularVelocity(this.imu_angular_velocity);
+
+      // Debug.Log(imu_linear_accel_g_rh);
+      Debug.Log(imu_angular_velocity_rh);
 
       // timestamp [ns],w_RS_S_x [rad s^-1],w_RS_S_y [rad s^-1],w_RS_S_z [rad s^-1],a_RS_S_x [m s^-2],a_RS_S_y [m s^-2],a_RS_S_z [m s^-2]
       List<string> imu_line = new List<string>{
         nsec,
-        w_body.x.ToString("F18"),
-        w_body.y.ToString("F18"),
-        w_body.z.ToString("F18"),
-        imuBodyAccelPlusGravity.x.ToString("F18"),
-        imuBodyAccelPlusGravity.y.ToString("F18"),
-        imuBodyAccelPlusGravity.z.ToString("F18"),
+        imu_angular_velocity_rh.x.ToString("F18"),
+        imu_angular_velocity_rh.y.ToString("F18"),
+        imu_angular_velocity_rh.z.ToString("F18"),
+        imu_linear_accel_g_rh.x.ToString("F18"),
+        imu_linear_accel_g_rh.y.ToString("F18"),
+        imu_linear_accel_g_rh.z.ToString("F18"),
         "\n"
       };
 
@@ -278,47 +271,48 @@ public class AUV : MonoBehaviour {
     }
   }
 
-  IEnumerator PublishImu() {
-    while (true) {
-      // yield return new WaitForEndOfFrame();
-      yield return new WaitForSeconds(1.0f / SimulationController.SENSOR_PUBLISH_HZ);
+  // TODO(milo): Redo this with correct right-handed transforms!
+  // IEnumerator PublishImu() {
+  //   while (true) {
+  //     // yield return new WaitForEndOfFrame();
+  //     yield return new WaitForSeconds(1.0f / SimulationController.SENSOR_PUBLISH_HZ);
 
-      var now = DateTime.Now;
-      var timeSinceStart = now - camStart;
-      var timeMessage = new TimeMsg(timeSinceStart.Seconds, timeSinceStart.Milliseconds);
-      var headerMessage = new HeaderMsg(msgPublishCount, timeMessage, "imu");
+  //     var now = DateTime.Now;
+  //     var timeSinceStart = now - camStart;
+  //     var timeMessage = new TimeMsg(timeSinceStart.Seconds, timeSinceStart.Milliseconds);
+  //     var headerMessage = new HeaderMsg(msgPublishCount, timeMessage, "imu");
 
-      Vector3 t_world_imu;
-      Quaternion q_world_imu;
-      Utils.ToRightHandedTransform(imuBody.transform, out t_world_imu, out q_world_imu);
-      QuaternionMsg q_world_imu_msg = new QuaternionMsg(q_world_imu.x, q_world_imu.y, q_world_imu.z, q_world_imu.w);
+  //     Vector3 t_world_imu;
+  //     Quaternion q_world_imu;
+  //     Utils.ToRightHandedTransform(imu_rigidbody.transform, out t_world_imu, out q_world_imu);
+  //     QuaternionMsg q_world_imu_msg = new QuaternionMsg(q_world_imu.x, q_world_imu.y, q_world_imu.z, q_world_imu.w);
 
-      // NOTE(milo): Sending empty covariance matrix for now (denoted with -1 in the 0th position).
-      double[] Zero_3x3 = new double[]{-1, 0, 0, 0, 0, 0, 0, 0, 0};
+  //     // NOTE(milo): Sending empty covariance matrix for now (denoted with -1 in the 0th position).
+  //     double[] Zero_3x3 = new double[]{-1, 0, 0, 0, 0, 0, 0, 0, 0};
 
-      var zero3 = new Vector3Msg(0.0, 0.0, 0.0);
+  //     var zero3 = new Vector3Msg(0.0, 0.0, 0.0);
 
-      // NOTE(milo): The imuBodyAccel is already in a right-handed frame, so need to convert here.
-      var accel_msg = new Vector3Msg(imuBodyAccel.x, imuBodyAccel.y, imuBodyAccel.z);
-      var msg = new ImuMessage(headerMessage, q_world_imu_msg, Zero_3x3, zero3, Zero_3x3,
-                               accel_msg, Zero_3x3);
+  //     // NOTE(milo): The imu_linear_accel is already in a right-handed frame, so need to convert here.
+  //     var accel_msg = new Vector3Msg(imu_linear_accel.x, imu_linear_accel.y, imu_linear_accel.z);
+  //     var msg = new ImuMessage(headerMessage, q_world_imu_msg, Zero_3x3, zero3, Zero_3x3,
+  //                              accel_msg, Zero_3x3);
 
-      this.roslink.ros.Publish(ImuPublisher.GetMessageTopic(), msg);
+  //     this.roslink.ros.Publish(ImuPublisher.GetMessageTopic(), msg);
 
-      // Publish the heading (yaw) of the vehicle.
-      // float theta = imuBody.transform.rotation.eulerAngles.z;
-      // this.roslink.ros.Publish(HeadingPublisher.GetMessageTopic(), new Float64Msg(theta));
-      // this.roslink.ros.Publish(GroundtruthHeadingPublisher.GetMessageTopic(), new Float64Msg(theta));
-      // this.roslink.ros.Render();
+  //     // Publish the heading (yaw) of the vehicle.
+  //     // float theta = imu_rigidbody.transform.rotation.eulerAngles.z;
+  //     // this.roslink.ros.Publish(HeadingPublisher.GetMessageTopic(), new Float64Msg(theta));
+  //     // this.roslink.ros.Publish(GroundtruthHeadingPublisher.GetMessageTopic(), new Float64Msg(theta));
+  //     // this.roslink.ros.Render();
 
-      // Publish the current barometer depth (groundtruth and depth with simulated noise).
-      float depth = t_world_imu.y;
-      Float64Msg depth_msg_gt = new Float64Msg(depth);
-      Float64Msg depth_msg = new Float64Msg(depth + Utils.Gaussian(0, this.depthSensorSigma));
-      this.roslink.ros.Publish(DepthPublisher.GetMessageTopic(), depth_msg);
-      this.roslink.ros.Publish(GroundtruthDepthPublisher.GetMessageTopic(), depth_msg_gt);
-    }
-  }
+  //     // Publish the current barometer depth (groundtruth and depth with simulated noise).
+  //     float depth = t_world_imu.y;
+  //     Float64Msg depth_msg_gt = new Float64Msg(depth);
+  //     Float64Msg depth_msg = new Float64Msg(depth + Utils.Gaussian(0, this.depth_sensor_sigma));
+  //     this.roslink.ros.Publish(DepthPublisher.GetMessageTopic(), depth_msg);
+  //     this.roslink.ros.Publish(GroundtruthDepthPublisher.GetMessageTopic(), depth_msg_gt);
+  //   }
+  // }
 
   /**
    * Animates the vehicle moving between two waypoints.
@@ -357,7 +351,7 @@ public class AUV : MonoBehaviour {
     Quaternion q_start = vehicle.transform.rotation;
 
     // Align the vehicle with the direction of motion.
-    Quaternion q_transit = Simulator.Utils.RotateAlignVectors(new Vector3(0, 0, 1), t_end - t_start);
+    Quaternion q_transit = Simulator.TransformUtils.RotateAlignVectors(new Vector3(0, 0, 1), t_end - t_start);
 
     // Rotate in place.
     float startTime = Time.time;
@@ -429,15 +423,15 @@ public class AUV : MonoBehaviour {
 
   IEnumerator SaveStereoImageDataset()
   {
-    string datasetFolder = Path.Combine(this.outputDatasetRoot, this.outputDatasetName);
+    string dataset_folder = Path.Combine(this.outputDatasetRoot, this.outputDatasetName);
 
-    if (Directory.Exists(datasetFolder)) {
-      Debug.Log("WARNING: Deleting existing dataset folder: " + datasetFolder);
-      Directory.Delete(datasetFolder, true);
+    if (Directory.Exists(dataset_folder)) {
+      Debug.Log("WARNING: Deleting existing dataset folder: " + dataset_folder);
+      Directory.Delete(dataset_folder, true);
     }
 
-    string leftImageFolder = Path.Combine(datasetFolder, this.leftImageSubfolder);
-    string rightImageFolder = Path.Combine(datasetFolder, this.rightImageSubfolder);
+    string leftImageFolder = Path.Combine(dataset_folder, this.leftImageSubfolder);
+    string rightImageFolder = Path.Combine(dataset_folder, this.rightImageSubfolder);
     string leftImageDataFolder = Path.Combine(leftImageFolder, "data");
     string rightImageDataFolder = Path.Combine(rightImageFolder, "data");
     // Debug.Log(leftImageFolder);
@@ -456,13 +450,13 @@ public class AUV : MonoBehaviour {
       yield return new WaitForEndOfFrame();
 
       string nsec = ((long)(Time.fixedTime * 1e9)).ToString("D19");
-      File.AppendAllLines(Path.Combine(datasetFolder, "timestamps.txt"), new string[] { nsec });
+      File.AppendAllLines(Path.Combine(dataset_folder, "timestamps.txt"), new string[] { nsec });
 
       Transform T_world_cam = this.camera_forward_left.transform;
 
       Quaternion q_world_cam;
       Vector3 t_world_cam;
-      Utils.ToRightHandedTransform(T_world_cam, out t_world_cam, out q_world_cam);
+      TransformUtils.ToRightHandedTransform(T_world_cam, out t_world_cam, out q_world_cam);
 
       List<string> pose_line = new List<string>{
         nsec,
@@ -476,7 +470,7 @@ public class AUV : MonoBehaviour {
         "\n"
       };
 
-      File.AppendAllText(Path.Combine(datasetFolder, "pose0.txt"), string.Join(",", pose_line));
+      File.AppendAllText(Path.Combine(dataset_folder, "pose0.txt"), string.Join(",", pose_line));
 
       Texture2D leftImage = GetImageFromCamera(camera_forward_left);
       Texture2D rightImage = GetImageFromCamera(camera_forward_right);

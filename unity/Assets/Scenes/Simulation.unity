@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
+  m_IndirectSpecularColor: {r: 0.60540617, g: 0.5490479, b: 0.6446497, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1281,7 +1281,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 420561424}
   m_LocalRotation: {x: 0, y: -0.7071068, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 29.07, y: -25.03, z: -10.81}
+  m_LocalPosition: {x: 16.42, y: -28.9, z: -10.81}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 518964988}
@@ -1312,11 +1312,11 @@ MonoBehaviour:
   camera_forward_right: {fileID: 843407242}
   camera_downward_left: {fileID: 2059408284}
   camera_upward_left: {fileID: 689533063}
-  imuBody: {fileID: 420561429}
+  imu_rigidbody: {fileID: 420561429}
   farm: {fileID: 1763879187}
   doRoutine: 0
   simulatorIOMode: 2
-  outputDatasetName: default_dataset
+  outputDatasetName: default_dataset/mav0/
   outputDatasetRoot: /home/milo/datasets/Unity3D/farmsim/
 --- !u!114 &420561428
 MonoBehaviour:
