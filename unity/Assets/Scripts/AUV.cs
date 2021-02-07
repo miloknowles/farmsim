@@ -256,14 +256,18 @@ public class AUV : MonoBehaviour {
       Quaternion q_imu_world = Quaternion.Inverse(this.imuBody.transform.rotation);
       Vector3 localGravityRH = q_imu_world * Physics.gravity;
       localGravityRH.y *= -1;
-      Vector3 imuBodyAccelPlusGravity = this.imuBodyAccel + localGravityRH;
+
+      Vector3 w_body = q_imu_world * this.imuBody.angularVelocity;
+
+      // NOTE(milo): The IMU "feels" an upward acceleration due to gravity!
+      Vector3 imuBodyAccelPlusGravity = this.imuBodyAccel - localGravityRH;
 
       // timestamp [ns],w_RS_S_x [rad s^-1],w_RS_S_y [rad s^-1],w_RS_S_z [rad s^-1],a_RS_S_x [m s^-2],a_RS_S_y [m s^-2],a_RS_S_z [m s^-2]
       List<string> imu_line = new List<string>{
         nsec,
-        this.imuBody.angularVelocity.x.ToString("F18"),
-        this.imuBody.angularVelocity.y.ToString("F18"),
-        this.imuBody.angularVelocity.z.ToString("F18"),
+        w_body.x.ToString("F18"),
+        w_body.y.ToString("F18"),
+        w_body.z.ToString("F18"),
         imuBodyAccelPlusGravity.x.ToString("F18"),
         imuBodyAccelPlusGravity.y.ToString("F18"),
         imuBodyAccelPlusGravity.z.ToString("F18"),
