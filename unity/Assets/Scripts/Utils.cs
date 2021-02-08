@@ -5,19 +5,6 @@ using UnityEngine;
 namespace Simulator {
 
 class Utils {
-  // https://stackoverflow.com/questions/1171849/finding-quaternion-representing-the-rotation-from-one-vector-to-another
-  public static Quaternion RotateAlignVectors(Vector3 v1, Vector3 v2)
-  {
-    Vector3 hat1 = v1.normalized;
-    Vector3 hat2 = v2.normalized;
-
-    Vector3 xyz = Vector3.Cross(hat1, hat2);
-    float w = 1 + Vector3.Dot(hat1, hat2);
-
-    Quaternion q = new Quaternion(xyz.x, xyz.y, xyz.z, w).normalized;
-    return q;
-  }
-
   // If a value goes past a bound, set it to the other bound (i.e like the modulo operation).
   public static float CircularWrap(float value, float minValue, float maxValue)
   {
@@ -59,29 +46,6 @@ class Utils {
     float standardNormal = Mathf.Sqrt(-2.0f * Mathf.Log(u1)) * Mathf.Sin(2.0f * Mathf.PI * u2);
 
     return mu + sigma*standardNormal;
-  }
-
-  /**
-   * Converts a Unity3D left-handed transform to a right-handed one (for compatibility with
-   * everything else in the robotics world).
-   *
-   * Keeps the x and z axes the same, and flips the y axis.
-   */
-  public static void ToRightHandedTransform(Transform lh, out Vector3 t_rh, out Quaternion q_rh)
-  {
-    t_rh = new Vector3(lh.position.x, -lh.position.y, lh.position.z);
-
-    // Flip the y-component of the rotation axis.
-    float angle_lh = 0.0f;
-    Vector3 axis_rh = Vector3.zero;
-    lh.rotation.ToAngleAxis(out angle_lh, out axis_rh);
-
-    // NOTE(milo): I can't quite wrap my head around this, but we DON'T need to flip the direction
-    // of the y-axis for axis-angle rotations. Regardless of the handedness of the coordinate
-    // system, a rotation around +y (LH) will have the same effect as a rotation around +y (RH).
-    // axis_rh.y *= -1;
-
-    q_rh = Quaternion.AngleAxis(angle_lh, axis_rh);
   }
 }
 }
