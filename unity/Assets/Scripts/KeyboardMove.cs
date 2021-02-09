@@ -78,8 +78,9 @@ public class KeyboardMove : MonoBehaviour {
 		// this.rigidBody.transform.Translate(0, 0, speed * Time.fixedDeltaTime);
 		// this.rigidBody.transform.Rotate(w_pitch * Time.fixedDeltaTime, w_yaw * Time.fixedDeltaTime, 0.0f);
 
+		// TODO(milo)
 		this.rigidBody.AddRelativeForce(new Vector3(0, 0, thrust) * this.rigidBody.mass);
-		this.rigidBody.AddRelativeTorque(new Vector3(w_pitch, w_yaw, 0.0f));
+		this.rigidBody.AddRelativeTorque(new Vector3(0.1f*w_pitch, 0.1f*w_yaw, 0.0f));
 
 		// Disable roll, since we always want the vehicle level.
 		Vector3 euler = this.rigidBody.transform.eulerAngles;

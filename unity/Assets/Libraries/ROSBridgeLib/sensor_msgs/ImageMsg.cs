@@ -4,7 +4,7 @@ using UnityEngine;
 
 /**
  * Define a Image message.
- *  
+ *
  * @author Mathias Ciarlo Thorstensen
  */
 
@@ -36,6 +36,7 @@ namespace ROSBridgeLib {
                 _encoding = encoding;
                 _is_bigendian = is_bigendian;
                 _row_step = row_step;
+                _data = data;
             }
 
             public HeaderMsg GetHeader()
@@ -50,7 +51,7 @@ namespace ROSBridgeLib {
             public uint GetHeight() {
                 return _height;
             }
-                
+
             public uint GetRowStep() {
                 return _row_step;
             }
@@ -69,16 +70,17 @@ namespace ROSBridgeLib {
                     "width=" + _width +
                     "encoding=" + _encoding +
                     "is_bigendian=" + _is_bigendian +
-                    "row_step=" + _row_step + "]";
+                    "step=" + _row_step + "]";
             }
 
             public override string ToYAMLString() {
-                return "{\"header\" :" + _header.ToYAMLString() +
-                    "\"height\" :" + _height +
-                    "\"width\" :" + _width +
-                    "\"encoding\" :" + _encoding +
-                    "\"is_bigendian\" :" + _is_bigendian +
-                    "\"row_step\" :" + _row_step + "}";
+                return "{\"header\" : " + _header.ToYAMLString() +
+                    ", \"height\" : " + _height +
+                    ", \"width\" : " + _width +
+                    ", \"encoding\" : \"" + _encoding + "\"" +
+                    ", \"is_bigendian\" : " + (_is_bigendian ? 1 : 0) +
+                    ", \"step\" : " + _row_step +
+                    ", \"data\" : \"" + System.Convert.ToBase64String(_data) + "\"" + "}";
             }
         }
     }

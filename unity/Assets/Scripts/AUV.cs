@@ -43,6 +43,7 @@ public class AUV : MonoBehaviour {
 
   // Used to calculate accleration with finite-differencing.
   private Vector3 prev_imu_velocity;
+  private Quaternion prev_q_imu_world;
   private Vector3 imu_linear_accel;
   private Vector3 imu_angular_velocity;
   private float depth_sensor_sigma = 0.1f;       // Standard deviation of depth noise.
@@ -77,6 +78,9 @@ public class AUV : MonoBehaviour {
     this.roslink.ros.AddPublisher(typeof(CameraForwardRightPublisher));
     this.roslink.ros.AddPublisher(typeof(CameraDownwardLeftPublisher));
     this.roslink.ros.AddPublisher(typeof(CameraUpwardLeftPublisher));
+
+    this.roslink.ros.AddPublisher(typeof(StereoCamLeftPublisher));
+    this.roslink.ros.AddPublisher(typeof(StereoCamRightPublisher));
 
     this.roslink.ros.AddPublisher(typeof(DepthPublisher));
     this.roslink.ros.AddPublisher(typeof(GroundtruthDepthPublisher));
@@ -116,12 +120,14 @@ public class AUV : MonoBehaviour {
   {
     // Get the velocity in the local IMU frame.
     Quaternion q_imu_world = Quaternion.Inverse(this.imu_rigidbody.transform.rotation);
-    Vector3 v_imu = q_imu_world * this.imu_rigidbody.velocity;
+    // Vector3 v_imu = q_imu_world * this.imu_rigidbody.velocity;
+    Vector3 v_imu = this.prev_q_imu_world * this.imu_rigidbody.velocity;
 
     this.imu_linear_accel = (v_imu - prev_imu_velocity) / Time.fixedDeltaTime;
     this.imu_angular_velocity = q_imu_world * this.imu_rigidbody.angularVelocity;
 
     this.prev_imu_velocity = v_imu;
+    this.prev_q_imu_world = q_imu_world;
   }
 
   /**
@@ -163,12 +169,25 @@ public class AUV : MonoBehaviour {
    */
   void PublishCameraImage(Texture2D im, TimeMsg timeMessage, HeaderMsg headerMessage, string topic)
   {
-    byte[] data = im.EncodeToJPG();
-    string format = "jpeg";
-    var compressedImageMsg = new CompressedImageMsg(headerMessage, format, data);
-    this.roslink.ros.Publish(topic, compressedImageMsg);
+    // byte[] data = im.EncodeToJPG();
+    // string format = "jpeg";
+    // var compressedImageMsg = new CompressedImageMsg(headerMessage, format, data);
+    // this.roslink.ros.Publish(topic, compressedImageMsg);
+    // Destroy(im);
+    // this.roslink.ros.Render();
+
+    // https://docs.ros.org/en/melodic/api/sensor_msgs/html/msg/Image.html
+    bool is_bigendian = true;       // https://stackoverflow.com/questions/30423737/bitmap-from-byte-array
+    uint row_step = (uint)(im.width * 24);  // Row length in bytes.
+    byte[] data = im.GetRawTextureData();
+
+    // http://docs.ros.org/en/jade/api/sensor_msgs/html/image__encodings_8h_source.html
+    var msg = new ImageMsg(headerMessage, (uint)im.height, (uint)im.width, "rgb8", is_bigendian, row_step, data);
+    this.roslink.ros.Publish(topic, msg);
     Destroy(im);
     this.roslink.ros.Render();
+    // Debug.Log(im.format);
+    // RGB24
   }
 
   /**
@@ -185,17 +204,29 @@ public class AUV : MonoBehaviour {
       var timeSinceStart = now - camStart;
       var timeMessage = new TimeMsg(timeSinceStart.Seconds, timeSinceStart.Milliseconds);
 
+      // PublishCameraImage(
+      //     GetImageFromCamera(camera_forward_left),
+      //     timeMessage,
+      //     new HeaderMsg(msgPublishCount, timeMessage, "cam0"),
+      //     CameraForwardLeftPublisher.GetMessageTopic());
+
+      // PublishCameraImage(
+      //     GetImageFromCamera(camera_forward_right),
+      //     timeMessage,
+      //     new HeaderMsg(msgPublishCount, timeMessage, "cam1"),
+      //     CameraForwardRightPublisher.GetMessageTopic());
+
       PublishCameraImage(
           GetImageFromCamera(camera_forward_left),
           timeMessage,
-          new HeaderMsg(msgPublishCount, timeMessage, "auv_camera_fl"),
-          CameraForwardLeftPublisher.GetMessageTopic());
+          new HeaderMsg(msgPublishCount, timeMessage, "cam0"),
+          StereoCamLeftPublisher.GetMessageTopic());
 
       PublishCameraImage(
           GetImageFromCamera(camera_forward_right),
           timeMessage,
-          new HeaderMsg(msgPublishCount, timeMessage, "auv_camera_fr"),
-          CameraForwardRightPublisher.GetMessageTopic());
+          new HeaderMsg(msgPublishCount, timeMessage, "cam1"),
+          StereoCamRightPublisher.GetMessageTopic());
 
       // PublishCameraImage(
       //     GetImageFromCamera(camera_downward_left),
@@ -252,8 +283,10 @@ public class AUV : MonoBehaviour {
       Vector3 imu_linear_accel_g_rh = TransformUtils.ToRightHandedTranslation(this.imu_linear_accel - imu_gravity);
       Vector3 imu_angular_velocity_rh = TransformUtils.ToRightHandedAngularVelocity(this.imu_angular_velocity);
 
+      // imu_angular_velocity_rh.y *= -1;
+
       // Debug.Log(imu_linear_accel_g_rh);
-      Debug.Log(imu_angular_velocity_rh);
+      // Debug.Log(imu_angular_velocity_rh);
 
       // timestamp [ns],w_RS_S_x [rad s^-1],w_RS_S_y [rad s^-1],w_RS_S_z [rad s^-1],a_RS_S_x [m s^-2],a_RS_S_y [m s^-2],a_RS_S_z [m s^-2]
       List<string> imu_line = new List<string>{
