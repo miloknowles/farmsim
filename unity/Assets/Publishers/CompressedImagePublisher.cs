@@ -26,7 +26,7 @@ public class CompressedImagePublisher : ROSBridgePublisher {
 public class CameraForwardLeftPublisher : CompressedImagePublisher {
 	public static new string GetMessageTopic()
 	{
-		return "/simulator/sensors/camera_fl/compressed";
+		return "/simulator/sensors/cam0/compressed";
 	}
 }
 
@@ -34,7 +34,7 @@ public class CameraForwardLeftPublisher : CompressedImagePublisher {
 public class CameraForwardRightPublisher : CompressedImagePublisher {
 	public static new string GetMessageTopic()
 	{
-		return "/simulator/sensors/camera_fr/compressed";
+		return "/simulator/sensors/cam1/compressed";
 	}
 }
 

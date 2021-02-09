@@ -58,6 +58,8 @@ public class KeyboardMove : MonoBehaviour {
 
 	/**
 	 * Send thrust commands to motors (through ROS).
+	 * NOTE(milo): Need to have rosbridge_server running for this to work!
+	 * Command: roslaunch rosbridge_server rosbridge_websocket.launch
 	 */
 	private void KeyboardThrustCommand()
 	{
@@ -75,11 +77,8 @@ public class KeyboardMove : MonoBehaviour {
 		float w_yaw = Input.GetAxis("Horizontal") * 1.0f;
 		float thrust = Input.GetKey(KeyCode.Space) ? 3.0f : 0.0f;
 
-		// this.rigidBody.transform.Translate(0, 0, speed * Time.fixedDeltaTime);
-		// this.rigidBody.transform.Rotate(w_pitch * Time.fixedDeltaTime, w_yaw * Time.fixedDeltaTime, 0.0f);
-
 		this.rigidBody.AddRelativeForce(new Vector3(0, 0, thrust) * this.rigidBody.mass);
-		this.rigidBody.AddRelativeTorque(new Vector3(w_pitch, w_yaw, 0.0f));
+		this.rigidBody.AddRelativeTorque(new Vector3(0.1f*w_pitch, 0.1f*w_yaw, 0.0f));
 
 		// Disable roll, since we always want the vehicle level.
 		Vector3 euler = this.rigidBody.transform.eulerAngles;
