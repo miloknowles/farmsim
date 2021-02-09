@@ -936,7 +936,7 @@ GameObject:
   m_Component:
   - component: {fileID: 296058052}
   m_Layer: 0
-  m_Name: KalibrBoard
+  m_Name: KalibrAprilGrid
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1526,7 +1526,7 @@ GameObject:
   - component: {fileID: 466405591}
   - component: {fileID: 466405590}
   m_Layer: 0
-  m_Name: AprilTags
+  m_Name: Grid
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -9406,7 +9406,7 @@ GameObject:
   - component: {fileID: 1684440329}
   - component: {fileID: 1684440328}
   m_Layer: 0
-  m_Name: WhiteBkgd
+  m_Name: Bkgd
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

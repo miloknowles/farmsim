@@ -26,6 +26,7 @@ public enum IOMode
 
 }
 
+
 public class AUV : MonoBehaviour {
   private int msgPublishCount;
   DateTime lastFrame;
@@ -95,17 +96,17 @@ public class AUV : MonoBehaviour {
     camStart = DateTime.Now;
 
     //============================== DEMO SETUP ================================
-    if (this.doRoutine) {
-      this.routines = new List<IEnumerator>{
-        this.AnimateWaypoint(this.gameObject, this.farm.GetWinchLocation(0, 'A').position + new Vector3(0, 0, -2.0f), rotationFaceWinch, 6, 2),
-        this.AnimateFollowWinch(this.gameObject, 0, 'A'),
-        this.AnimateWaypoint(this.gameObject, this.farm.GetWinchLocation(0, 'B').position + new Vector3(0, 0, -2.0f), rotationFaceWinch, 6, 2),
-        this.AnimateFollowWinch(this.gameObject, 0, 'B'),
-        this.AnimateWaypoint(this.gameObject, this.farm.GetWinchLocation(0, 'C').position + new Vector3(0, 0, -2.0f), rotationFaceWinch, 6, 2),
-        this.AnimateFollowWinch(this.gameObject, 0, 'C')
-      };
-      StartCoroutine(ChainCoroutines(this.routines));
-    }
+    // if (this.doRoutine) {
+    //   this.routines = new List<IEnumerator>{
+    //     this.AnimateWaypoint(this.gameObject, this.farm.GetWinchLocation(0, 'A').position + new Vector3(0, 0, -2.0f), rotationFaceWinch, 6, 2),
+    //     this.AnimateFollowWinch(this.gameObject, 0, 'A'),
+    //     this.AnimateWaypoint(this.gameObject, this.farm.GetWinchLocation(0, 'B').position + new Vector3(0, 0, -2.0f), rotationFaceWinch, 6, 2),
+    //     this.AnimateFollowWinch(this.gameObject, 0, 'B'),
+    //     this.AnimateWaypoint(this.gameObject, this.farm.GetWinchLocation(0, 'C').position + new Vector3(0, 0, -2.0f), rotationFaceWinch, 6, 2),
+    //     this.AnimateFollowWinch(this.gameObject, 0, 'C')
+    //   };
+    //   StartCoroutine(ChainCoroutines(this.routines));
+    // }
 
     if (this.simulatorIOMode == Simulator.IOMode.PUBLISH_TO_ROS) {
       StartCoroutine(PublishCameraSyncedMessages());
@@ -164,30 +165,34 @@ public class AUV : MonoBehaviour {
     return image;
   }
 
-  /**
-   * Publishes a CompressedImageMsg on 'topic' using the given image 'im'.
-   */
-  void PublishCameraImage(Texture2D im, TimeMsg timeMessage, HeaderMsg headerMessage, string topic)
+  void PublishRawImage(Texture2D im, TimeMsg timeMessage, HeaderMsg headerMessage, string topic)
   {
-    // byte[] data = im.EncodeToJPG();
-    // string format = "jpeg";
-    // var compressedImageMsg = new CompressedImageMsg(headerMessage, format, data);
-    // this.roslink.ros.Publish(topic, compressedImageMsg);
-    // Destroy(im);
-    // this.roslink.ros.Render();
-
     // https://docs.ros.org/en/melodic/api/sensor_msgs/html/msg/Image.html
-    bool is_bigendian = true;       // https://stackoverflow.com/questions/30423737/bitmap-from-byte-array
+    bool is_bigendian = true;               // https://stackoverflow.com/questions/30423737/bitmap-from-byte-array
     uint row_step = (uint)(im.width * 24);  // Row length in bytes.
+
+    // NOTE(milo): The row order is flipped! Not sure how to fix this.
     byte[] data = im.GetRawTextureData();
 
     // http://docs.ros.org/en/jade/api/sensor_msgs/html/image__encodings_8h_source.html
     var msg = new ImageMsg(headerMessage, (uint)im.height, (uint)im.width, "rgb8", is_bigendian, row_step, data);
     this.roslink.ros.Publish(topic, msg);
     Destroy(im);
+
     this.roslink.ros.Render();
-    // Debug.Log(im.format);
-    // RGB24
+  }
+
+  /**
+   * Publishes a CompressedImageMsg on 'topic' using the given image 'im'.
+   */
+  void PublishCameraImage(Texture2D im, TimeMsg timeMessage, HeaderMsg headerMessage, string topic)
+  {
+    byte[] data = im.EncodeToPNG();
+    string format = "png";
+    var compressedImageMsg = new CompressedImageMsg(headerMessage, format, data);
+    this.roslink.ros.Publish(topic, compressedImageMsg);
+    Destroy(im);
+    this.roslink.ros.Render();
   }
 
   /**
@@ -204,29 +209,17 @@ public class AUV : MonoBehaviour {
       var timeSinceStart = now - camStart;
       var timeMessage = new TimeMsg(timeSinceStart.Seconds, timeSinceStart.Milliseconds);
 
-      // PublishCameraImage(
-      //     GetImageFromCamera(camera_forward_left),
-      //     timeMessage,
-      //     new HeaderMsg(msgPublishCount, timeMessage, "cam0"),
-      //     CameraForwardLeftPublisher.GetMessageTopic());
-
-      // PublishCameraImage(
-      //     GetImageFromCamera(camera_forward_right),
-      //     timeMessage,
-      //     new HeaderMsg(msgPublishCount, timeMessage, "cam1"),
-      //     CameraForwardRightPublisher.GetMessageTopic());
-
       PublishCameraImage(
           GetImageFromCamera(camera_forward_left),
           timeMessage,
           new HeaderMsg(msgPublishCount, timeMessage, "cam0"),
-          StereoCamLeftPublisher.GetMessageTopic());
+          CameraForwardLeftPublisher.GetMessageTopic());
 
       PublishCameraImage(
           GetImageFromCamera(camera_forward_right),
           timeMessage,
           new HeaderMsg(msgPublishCount, timeMessage, "cam1"),
-          StereoCamRightPublisher.GetMessageTopic());
+          CameraForwardRightPublisher.GetMessageTopic());
 
       // PublishCameraImage(
       //     GetImageFromCamera(camera_downward_left),
@@ -283,11 +276,7 @@ public class AUV : MonoBehaviour {
       Vector3 imu_linear_accel_g_rh = TransformUtils.ToRightHandedTranslation(this.imu_linear_accel - imu_gravity);
       Vector3 imu_angular_velocity_rh = TransformUtils.ToRightHandedAngularVelocity(this.imu_angular_velocity);
 
-      // imu_angular_velocity_rh.y *= -1;
-
-      // Debug.Log(imu_linear_accel_g_rh);
-      // Debug.Log(imu_angular_velocity_rh);
-
+      // We use the EuRoC MAV format:
       // timestamp [ns],w_RS_S_x [rad s^-1],w_RS_S_y [rad s^-1],w_RS_S_z [rad s^-1],a_RS_S_x [m s^-2],a_RS_S_y [m s^-2],a_RS_S_z [m s^-2]
       List<string> imu_line = new List<string>{
         nsec,
@@ -467,8 +456,6 @@ public class AUV : MonoBehaviour {
     string rightImageFolder = Path.Combine(dataset_folder, this.rightImageSubfolder);
     string leftImageDataFolder = Path.Combine(leftImageFolder, "data");
     string rightImageDataFolder = Path.Combine(rightImageFolder, "data");
-    // Debug.Log(leftImageFolder);
-    // Debug.Log(rightImageFolder);
 
     Directory.CreateDirectory(leftImageFolder);
     Directory.CreateDirectory(rightImageFolder);
@@ -511,7 +498,6 @@ public class AUV : MonoBehaviour {
       byte[] leftPng = leftImage.EncodeToPNG();
       byte[] rightPng = rightImage.EncodeToPNG();
 
-      // string imagePath = $"{frame_id:000000}.png";
       string imagePath = $"{nsec}.png";
 
       List<string> img_line = new List<string>{ nsec, imagePath, "\n" };
