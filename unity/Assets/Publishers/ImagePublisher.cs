@@ -26,7 +26,7 @@ public class ImagePublisher : ROSBridgePublisher {
 public class StereoCamLeftPublisher : ImagePublisher {
 	public static new string GetMessageTopic()
 	{
-		return "/cam0/image_raw";
+		return "/sim/cam0/image_raw";
 	}
 }
 
@@ -34,6 +34,6 @@ public class StereoCamLeftPublisher : ImagePublisher {
 public class StereoCamRightPublisher : ImagePublisher {
 	public static new string GetMessageTopic()
 	{
-		return "/cam1/image_raw";
+		return "/sim/cam1/image_raw";
 	}
 }

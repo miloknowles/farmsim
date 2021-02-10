@@ -35,23 +35,17 @@ public class AUV : MonoBehaviour {
   // Cameras attached to the vehicle.
   public Camera camera_forward_left;
   public Camera camera_forward_right;
-  public Camera camera_downward_left;
-  public Camera camera_upward_left;
   private RenderTexture rt;
 
   public Rigidbody imu_rigidbody;
   public FarmController farm;
 
   // Used to calculate accleration with finite-differencing.
-  private Vector3 prev_imu_velocity;
-  private Quaternion prev_q_imu_world;
-  private Vector3 imu_linear_accel;
-  private Vector3 imu_angular_velocity;
-  private float depth_sensor_sigma = 0.1f;       // Standard deviation of depth noise.
+  private ImuSensor imu_sensor;
 
-  private List<IEnumerator> routines;
-  private Quaternion rotationFaceWinch = Quaternion.identity;
-  public bool doRoutine = false;
+  // private List<IEnumerator> routines;
+  // private Quaternion rotationFaceWinch = Quaternion.identity;
+  // public bool doRoutine = false;
 
   private ROSMessageHolder roslink;
   public Simulator.IOMode simulatorIOMode = Simulator.IOMode.NO_OUTPUT;
@@ -67,6 +61,8 @@ public class AUV : MonoBehaviour {
 
   void Start()
   {
+    this.imu_sensor = this.GetComponent<ImuSensor>();
+
     this._preallocRT = new RenderTexture(
         SimulationController.AUV_CAMERA_WIDTH,
         SimulationController.AUV_CAMERA_HEIGHT,
@@ -75,25 +71,25 @@ public class AUV : MonoBehaviour {
     this.roslink = GameObject.Find("ROSMessageHolder").GetComponent<ROSMessageHolder>();
 
     // Add a publisher for each of the cameras that we want to support.
-    this.roslink.ros.AddPublisher(typeof(CameraForwardLeftPublisher));
-    this.roslink.ros.AddPublisher(typeof(CameraForwardRightPublisher));
-    this.roslink.ros.AddPublisher(typeof(CameraDownwardLeftPublisher));
-    this.roslink.ros.AddPublisher(typeof(CameraUpwardLeftPublisher));
+    this.roslink.ros.AddPublisher(typeof(StereoCamLeftPublisherCmp));
+    this.roslink.ros.AddPublisher(typeof(StereoCamRightPublisherCmp));
 
-    this.roslink.ros.AddPublisher(typeof(StereoCamLeftPublisher));
-    this.roslink.ros.AddPublisher(typeof(StereoCamRightPublisher));
+    // this.roslink.ros.AddPublisher(typeof(StereoCamLeftPublisher));
+    // this.roslink.ros.AddPublisher(typeof(StereoCamRightPublisher));
 
-    this.roslink.ros.AddPublisher(typeof(DepthPublisher));
-    this.roslink.ros.AddPublisher(typeof(GroundtruthDepthPublisher));
-    this.roslink.ros.AddPublisher(typeof(PoseStampedPublisher));
+    // this.roslink.ros.AddPublisher(typeof(DepthPublisher));
+    // this.roslink.ros.AddPublisher(typeof(GroundtruthDepthPublisher));
+    this.roslink.ros.AddPublisher(typeof(ImuPosePublisher));
+    // this.roslink.ros.AddPublisher(typeof(StereoCamLeftPosePublisher));
+    // this.roslink.ros.AddPublisher(typeof(StereoCamRightPosePublisher));
 
-    this.roslink.ros.AddPublisher(typeof(ImuPublisher));
-    this.roslink.ros.AddPublisher(typeof(HeadingPublisher));
-    this.roslink.ros.AddPublisher(typeof(GroundtruthHeadingPublisher));
+    // this.roslink.ros.AddPublisher(typeof(ImuPublisher));
+    // this.roslink.ros.AddPublisher(typeof(HeadingPublisher));
+    // this.roslink.ros.AddPublisher(typeof(GroundtruthHeadingPublisher));
 
-    msgPublishCount = 0;
-    lastFrame = DateTime.Now;
-    camStart = DateTime.Now;
+    this.msgPublishCount = 0;
+    this.lastFrame = DateTime.Now;
+    this.camStart = DateTime.Now;
 
     //============================== DEMO SETUP ================================
     // if (this.doRoutine) {
@@ -115,20 +111,6 @@ public class AUV : MonoBehaviour {
       StartCoroutine(SaveStereoImageDataset());
       StartCoroutine(SaveImuDataset());
     }
-  }
-
-  void FixedUpdate()
-  {
-    // Get the velocity in the local IMU frame.
-    Quaternion q_imu_world = Quaternion.Inverse(this.imu_rigidbody.transform.rotation);
-    // Vector3 v_imu = q_imu_world * this.imu_rigidbody.velocity;
-    Vector3 v_imu = this.prev_q_imu_world * this.imu_rigidbody.velocity;
-
-    this.imu_linear_accel = (v_imu - prev_imu_velocity) / Time.fixedDeltaTime;
-    this.imu_angular_velocity = q_imu_world * this.imu_rigidbody.angularVelocity;
-
-    this.prev_imu_velocity = v_imu;
-    this.prev_q_imu_world = q_imu_world;
   }
 
   /**
@@ -165,6 +147,7 @@ public class AUV : MonoBehaviour {
     return image;
   }
 
+  // NOTE(milo): This doesn't work! Don't use yet.
   void PublishRawImage(Texture2D im, TimeMsg timeMessage, HeaderMsg headerMessage, string topic)
   {
     // https://docs.ros.org/en/melodic/api/sensor_msgs/html/msg/Image.html
@@ -182,9 +165,7 @@ public class AUV : MonoBehaviour {
     this.roslink.ros.Render();
   }
 
-  /**
-   * Publishes a CompressedImageMsg on 'topic' using the given image 'im'.
-   */
+  // Publishes a CompressedImageMsg on 'topic' using the given image 'im'.
   void PublishCameraImage(Texture2D im, TimeMsg timeMessage, HeaderMsg headerMessage, string topic)
   {
     byte[] data = im.EncodeToPNG();
@@ -195,13 +176,10 @@ public class AUV : MonoBehaviour {
     this.roslink.ros.Render();
   }
 
-  /**
-   * Any message that is meant to be synchronized with camera images should be published here.
-   */
+  // Any message that is meant to be synchronized with camera images should be published here.
   IEnumerator PublishCameraSyncedMessages()
   {
     while (true) {
-      // yield return new WaitForEndOfFrame();
       yield return new WaitForSeconds(1.0f / SimulationController.CAMERA_PUBLISH_HZ);
       yield return new WaitForEndOfFrame();
 
@@ -213,38 +191,25 @@ public class AUV : MonoBehaviour {
           GetImageFromCamera(camera_forward_left),
           timeMessage,
           new HeaderMsg(msgPublishCount, timeMessage, "cam0"),
-          CameraForwardLeftPublisher.GetMessageTopic());
+          StereoCamLeftPublisherCmp.GetMessageTopic());
 
       PublishCameraImage(
           GetImageFromCamera(camera_forward_right),
           timeMessage,
           new HeaderMsg(msgPublishCount, timeMessage, "cam1"),
-          CameraForwardRightPublisher.GetMessageTopic());
-
-      // PublishCameraImage(
-      //     GetImageFromCamera(camera_downward_left),
-      //     timeMessage,
-      //     new HeaderMsg(msgPublishCount, timeMessage, "auv_camera_dl"),
-      //     CameraDownwardLeft.GetMessageTopic());
-
-      // PublishCameraImage(
-      //     GetImageFromCamera(camera_upward_left),
-      //     timeMessage,
-      //     new HeaderMsg(msgPublishCount, timeMessage, "auv_camera_ul"),
-      //     CameraUpwardLeftPublisher.GetMessageTopic());
+          StereoCamRightPublisherCmp.GetMessageTopic());
 
       // Publish the pose of the vehicle in the world (right-handed!).
-      // Transform T_world_imu = imu_rigidbody.transform;
-      // Vector3 t_world_imu;
-      // Quaternion q_world_imu;
-      // Utils.ToRightHandedTransform(T_world_imu, out t_world_imu, out q_world_imu);
+      Transform T_world_imu = imu_rigidbody.transform;
+      Vector3 t_world_imu;
+      Quaternion q_world_imu;
+      TransformUtils.ToRightHandedTransform(T_world_imu, out t_world_imu, out q_world_imu);
 
-      // QuaternionMsg q_world_imu_msg = new QuaternionMsg(
-      //     q_world_imu.x, q_world_imu.y, q_world_imu.z, q_world_imu.w);
-      // PointMsg t_world_imu_msg = new PointMsg(t_world_imu.x, t_world_imu.y, t_world_imu.z);
-      // PoseStampedMsg msg = new PoseStampedMsg(new HeaderMsg(msgPublishCount, timeMessage, "imu"),
-      //                                         new PoseMsg(t_world_imu_msg, q_world_imu_msg));
-      // this.roslink.ros.Publish(PoseStampedPublisher.GetMessageTopic(), msg);
+      QuaternionMsg q_world_imu_msg = new QuaternionMsg(q_world_imu.x, q_world_imu.y, q_world_imu.z, q_world_imu.w);
+      PointMsg t_world_imu_msg = new PointMsg(t_world_imu.x, t_world_imu.y, t_world_imu.z);
+      PoseStampedMsg msg = new PoseStampedMsg(new HeaderMsg(msgPublishCount, timeMessage, "imu"),
+                                              new PoseMsg(t_world_imu_msg, q_world_imu_msg));
+      this.roslink.ros.Publish(ImuPosePublisher.GetMessageTopic(), msg);
       this.roslink.ros.Render();
     }
   }
@@ -266,26 +231,18 @@ public class AUV : MonoBehaviour {
     while (true) {
       yield return new WaitForFixedUpdate();
 
-      string nsec = ((long)(Time.fixedTime * 1e9)).ToString("D19");
-
-      // Rotate the gravity vector into the IMU's frame, then add it to acceleration.
-      Quaternion q_imu_world = Quaternion.Inverse(this.imu_rigidbody.transform.rotation);
-      Vector3 imu_gravity = q_imu_world * Physics.gravity;
-
-      // NOTE(milo): The IMU "feels" an upward acceleration due to gravity!
-      Vector3 imu_linear_accel_g_rh = TransformUtils.ToRightHandedTranslation(this.imu_linear_accel - imu_gravity);
-      Vector3 imu_angular_velocity_rh = TransformUtils.ToRightHandedAngularVelocity(this.imu_angular_velocity);
+      ImuMeasurement data = this.imu_sensor.Read();
 
       // We use the EuRoC MAV format:
       // timestamp [ns],w_RS_S_x [rad s^-1],w_RS_S_y [rad s^-1],w_RS_S_z [rad s^-1],a_RS_S_x [m s^-2],a_RS_S_y [m s^-2],a_RS_S_z [m s^-2]
       List<string> imu_line = new List<string>{
-        nsec,
-        imu_angular_velocity_rh.x.ToString("F18"),
-        imu_angular_velocity_rh.y.ToString("F18"),
-        imu_angular_velocity_rh.z.ToString("F18"),
-        imu_linear_accel_g_rh.x.ToString("F18"),
-        imu_linear_accel_g_rh.y.ToString("F18"),
-        imu_linear_accel_g_rh.z.ToString("F18"),
+        data.nsec.ToString("D19"),
+        data.imu_angular_velocity_rh.x.ToString("F18"),
+        data.imu_angular_velocity_rh.y.ToString("F18"),
+        data.imu_angular_velocity_rh.z.ToString("F18"),
+        data.imu_acceleration_rh.x.ToString("F18"),
+        data.imu_acceleration_rh.y.ToString("F18"),
+        data.imu_acceleration_rh.z.ToString("F18"),
         "\n"
       };
 
@@ -490,7 +447,7 @@ public class AUV : MonoBehaviour {
         "\n"
       };
 
-      File.AppendAllText(Path.Combine(dataset_folder, "pose0.txt"), string.Join(",", pose_line));
+      File.AppendAllText(Path.Combine(dataset_folder, "cam0_poses.txt"), string.Join(",", pose_line));
 
       Texture2D leftImage = GetImageFromCamera(camera_forward_left);
       Texture2D rightImage = GetImageFromCamera(camera_forward_right);

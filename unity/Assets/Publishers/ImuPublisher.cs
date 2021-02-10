@@ -8,7 +8,7 @@ using UnityEngine;
 public class ImuPublisher : ROSBridgePublisher {
 	public static new string GetMessageTopic()
 	{
-		return "/simulator/sensors/imu";
+		return "/sim/imu0";
 	}
 
 	public static new string GetMessageType()
