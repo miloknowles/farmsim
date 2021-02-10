@@ -8,7 +8,7 @@ using UnityEngine;
 public class HeadingPublisher : ROSBridgePublisher {
   public static new string GetMessageTopic()
   {
-    return "/simulator/sensors/heading";
+    return "/sim/heading0";
   }
 
   public static new string GetMessageType()
@@ -26,6 +26,6 @@ public class HeadingPublisher : ROSBridgePublisher {
 public class GroundtruthHeadingPublisher : HeadingPublisher {
   public static new string GetMessageTopic()
   {
-    return "/simulator/groundtruth/heading";
+    return "/sim/gt_pose/heading0";
   }
 }

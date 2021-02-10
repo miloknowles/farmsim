@@ -23,33 +23,17 @@ public class CompressedImagePublisher : ROSBridgePublisher {
 }
 
 
-public class CameraForwardLeftPublisher : CompressedImagePublisher {
+public class StereoCamLeftPublisherCmp : CompressedImagePublisher {
 	public static new string GetMessageTopic()
 	{
-		return "/simulator/sensors/cam0/compressed";
+		return "/sim/cam0/compressed";
 	}
 }
 
 
-public class CameraForwardRightPublisher : CompressedImagePublisher {
+public class StereoCamRightPublisherCmp : CompressedImagePublisher {
 	public static new string GetMessageTopic()
 	{
-		return "/simulator/sensors/cam1/compressed";
-	}
-}
-
-
-public class CameraDownwardLeftPublisher : CompressedImagePublisher {
-	public static new string GetMessageTopic()
-	{
-		return "/simulator/sensors/camera_dl/compressed";
-	}
-}
-
-
-public class CameraUpwardLeftPublisher : CompressedImagePublisher {
-	public static new string GetMessageTopic()
-	{
-		return "/simulator/sensors/camera_ul/compressed";
+		return "/sim/cam1/compressed";
 	}
 }

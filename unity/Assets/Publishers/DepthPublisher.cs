@@ -8,7 +8,7 @@ using UnityEngine;
 public class DepthPublisher : ROSBridgePublisher {
 	public static new string GetMessageTopic()
 	{
-		return "/simulator/sensors/depth";
+		return "/sim/depth0";
 	}
 
 	public static new string GetMessageType()
@@ -26,6 +26,6 @@ public class DepthPublisher : ROSBridgePublisher {
 public class GroundtruthDepthPublisher : DepthPublisher {
 	public static new string GetMessageTopic()
 	{
-		return "/simulator/groundtruth/depth";
+		return "/sim/gt_pose/depth0";
 	}
 }
