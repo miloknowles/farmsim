@@ -437,13 +437,13 @@ public class AUV : MonoBehaviour {
 
       List<string> pose_line = new List<string>{
         nsec,
-        q_world_cam.w.ToString(),
-        q_world_cam.x.ToString(),
-        q_world_cam.y.ToString(),
-        q_world_cam.z.ToString(),
-        t_world_cam.x.ToString(),
-        t_world_cam.y.ToString(),
-        t_world_cam.z.ToString(),
+        q_world_cam.w.ToString("F5"),
+        q_world_cam.x.ToString("F5"),
+        q_world_cam.y.ToString("F5"),
+        q_world_cam.z.ToString("F5"),
+        t_world_cam.x.ToString("F5"),
+        t_world_cam.y.ToString("F5"),
+        t_world_cam.z.ToString("F5"),
         "\n"
       };
 

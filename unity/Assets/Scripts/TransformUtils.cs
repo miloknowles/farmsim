@@ -31,17 +31,17 @@ namespace Simulator {
       return new Vector3(t_lh.x, -t_lh.y, t_lh.z);
     }
 
-    public static Quaternion ToRightHandedQuaternion(Quaternion q_rh)
+    public static Quaternion ToRightHandedQuaternion(Quaternion q_lh)
     {
       // Flip the y-component of the rotation axis.
       float angle_rh = 0.0f;
       Vector3 axis_rh = Vector3.zero;
-      q_rh.ToAngleAxis(out angle_rh, out axis_rh);
+      q_lh.ToAngleAxis(out angle_rh, out axis_rh);
 
       axis_rh.y *= -1;
       angle_rh *= -1;
 
-      return Quaternion.AngleAxis(angle_rh, axis_rh);
+      return Quaternion.AngleAxis(angle_rh, axis_rh).normalized;
     }
 
     /**
