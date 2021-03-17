@@ -40,8 +40,8 @@ public class AUV : MonoBehaviour {
   public Rigidbody imu_rigidbody;
   public FarmController farm;
 
-  // Used to calculate accleration with finite-differencing.
-  private ImuSensor imu_sensor;
+  public ImuSensor imu_sensor;
+  public ApsSensor aps_sensor;
 
   // private List<IEnumerator> routines;
   // private Quaternion rotationFaceWinch = Quaternion.identity;
@@ -56,13 +56,12 @@ public class AUV : MonoBehaviour {
   private string leftImageSubfolder = "cam0";
   private string rightImageSubfolder = "cam1";
   private string imuSubfolder = "imu0";
+  private string apsSubfolder = "aps0";
 
   private RenderTexture _preallocRT;
 
   void Start()
   {
-    this.imu_sensor = this.GetComponent<ImuSensor>();
-
     this._preallocRT = new RenderTexture(
         SimulationController.AUV_CAMERA_WIDTH,
         SimulationController.AUV_CAMERA_HEIGHT,
@@ -110,6 +109,7 @@ public class AUV : MonoBehaviour {
     } else if (this.simulatorIOMode == Simulator.IOMode.SAVE_TO_DISK) {
       StartCoroutine(SaveStereoImageDataset());
       StartCoroutine(SaveImuDataset());
+      StartCoroutine(SaveApsDataset());
     }
   }
 
@@ -247,6 +247,39 @@ public class AUV : MonoBehaviour {
       };
 
       File.AppendAllText(csv, string.Join(",", imu_line));
+    }
+  }
+
+
+  IEnumerator SaveApsDataset() {
+    string dataset_folder = Path.Combine(this.outputDatasetRoot, this.outputDatasetName);
+    string aps_folder = Path.Combine(dataset_folder, this.apsSubfolder);
+
+    if (Directory.Exists(aps_folder)) {
+      Debug.Log("WARNING: Deleting existing APS folder: " + aps_folder);
+      Directory.Delete(aps_folder, true);
+    }
+
+    Directory.CreateDirectory(aps_folder);
+
+    string csv = Path.Combine(aps_folder, "data.csv");
+
+    while (true) {
+      // Run at 2 Hz for now.
+      yield return new WaitForSeconds(0.5f);
+      ApsMeasurement data = this.aps_sensor.Read();
+
+      // timestamp [ns], range [m], t_world_beacon.x [m], t_world_beacon.y [m], t_world_beacon.z [m],
+      List<string> line = new List<string>{
+        data.timestamp.ToString("D19"),
+        data.range.ToString("F18"),
+        data.t_world_beacon.x.ToString("F18"),
+        data.t_world_beacon.y.ToString("F18"),
+        data.t_world_beacon.z.ToString("F18"),
+        "\n"
+      };
+
+      File.AppendAllText(csv, string.Join(",", line));
     }
   }
 
