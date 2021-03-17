@@ -27,25 +27,19 @@ public enum IOMode
 }
 
 
-public class AUV : MonoBehaviour {
+public class AUV : MonoBehaviour
+{
   private int msgPublishCount;
-  DateTime lastFrame;
   DateTime camStart;
 
   // Cameras attached to the vehicle.
   public Camera camera_forward_left;
   public Camera camera_forward_right;
-  private RenderTexture rt;
 
   public Rigidbody imu_rigidbody;
-  public FarmController farm;
-
-  // Used to calculate accleration with finite-differencing.
-  private ImuSensor imu_sensor;
-
-  // private List<IEnumerator> routines;
-  // private Quaternion rotationFaceWinch = Quaternion.identity;
-  // public bool doRoutine = false;
+  public ImuSensor imu_sensor;
+  public ApsSensor aps_sensor;
+  public DepthSensor depth_sensor;
 
   private ROSMessageHolder roslink;
   public Simulator.IOMode simulatorIOMode = Simulator.IOMode.NO_OUTPUT;
@@ -56,13 +50,13 @@ public class AUV : MonoBehaviour {
   private string leftImageSubfolder = "cam0";
   private string rightImageSubfolder = "cam1";
   private string imuSubfolder = "imu0";
+  private string apsSubfolder = "aps0";
+  private string depthSubfolder = "depth0";
 
   private RenderTexture _preallocRT;
 
   void Start()
   {
-    this.imu_sensor = this.GetComponent<ImuSensor>();
-
     this._preallocRT = new RenderTexture(
         SimulationController.AUV_CAMERA_WIDTH,
         SimulationController.AUV_CAMERA_HEIGHT,
@@ -88,21 +82,7 @@ public class AUV : MonoBehaviour {
     // this.roslink.ros.AddPublisher(typeof(GroundtruthHeadingPublisher));
 
     this.msgPublishCount = 0;
-    this.lastFrame = DateTime.Now;
     this.camStart = DateTime.Now;
-
-    //============================== DEMO SETUP ================================
-    // if (this.doRoutine) {
-    //   this.routines = new List<IEnumerator>{
-    //     this.AnimateWaypoint(this.gameObject, this.farm.GetWinchLocation(0, 'A').position + new Vector3(0, 0, -2.0f), rotationFaceWinch, 6, 2),
-    //     this.AnimateFollowWinch(this.gameObject, 0, 'A'),
-    //     this.AnimateWaypoint(this.gameObject, this.farm.GetWinchLocation(0, 'B').position + new Vector3(0, 0, -2.0f), rotationFaceWinch, 6, 2),
-    //     this.AnimateFollowWinch(this.gameObject, 0, 'B'),
-    //     this.AnimateWaypoint(this.gameObject, this.farm.GetWinchLocation(0, 'C').position + new Vector3(0, 0, -2.0f), rotationFaceWinch, 6, 2),
-    //     this.AnimateFollowWinch(this.gameObject, 0, 'C')
-    //   };
-    //   StartCoroutine(ChainCoroutines(this.routines));
-    // }
 
     if (this.simulatorIOMode == Simulator.IOMode.PUBLISH_TO_ROS) {
       StartCoroutine(PublishCameraSyncedMessages());
@@ -110,6 +90,8 @@ public class AUV : MonoBehaviour {
     } else if (this.simulatorIOMode == Simulator.IOMode.SAVE_TO_DISK) {
       StartCoroutine(SaveStereoImageDataset());
       StartCoroutine(SaveImuDataset());
+      StartCoroutine(SaveApsDataset());
+      StartCoroutine(SaveDepthDataset());
     }
   }
 
@@ -236,7 +218,7 @@ public class AUV : MonoBehaviour {
       // We use the EuRoC MAV format:
       // timestamp [ns],w_RS_S_x [rad s^-1],w_RS_S_y [rad s^-1],w_RS_S_z [rad s^-1],a_RS_S_x [m s^-2],a_RS_S_y [m s^-2],a_RS_S_z [m s^-2]
       List<string> imu_line = new List<string>{
-        data.nsec.ToString("D19"),
+        data.timestamp.ToString("D19"),
         data.imu_angular_velocity_rh.x.ToString("F18"),
         data.imu_angular_velocity_rh.y.ToString("F18"),
         data.imu_angular_velocity_rh.z.ToString("F18"),
@@ -247,6 +229,70 @@ public class AUV : MonoBehaviour {
       };
 
       File.AppendAllText(csv, string.Join(",", imu_line));
+    }
+  }
+
+  IEnumerator SaveDepthDataset()
+  {
+    string dataset_folder = Path.Combine(this.outputDatasetRoot, this.outputDatasetName);
+    string depth_folder = Path.Combine(dataset_folder, this.depthSubfolder);
+
+    if (Directory.Exists(depth_folder)) {
+      Debug.Log("WARNING: Deleting existing depth folder: " + depth_folder);
+      Directory.Delete(depth_folder, true);
+    }
+
+    Directory.CreateDirectory(depth_folder);
+
+    string csv = Path.Combine(depth_folder, "data.csv");
+
+    // NOTE(milo): Maximum number of frames to save. Avoids using up all disk space by accident.
+    while (true) {
+      yield return new WaitForFixedUpdate();
+
+      DepthMeasurement data = this.depth_sensor.Read();
+
+      // timestamp [ns], depth [m]
+      List<string> line = new List<string>{
+        data.timestamp.ToString("D19"),
+        data.depth.ToString("F18"),
+        "\n"
+      };
+
+      File.AppendAllText(csv, string.Join(",", line));
+    }
+  }
+
+  IEnumerator SaveApsDataset()
+  {
+    string dataset_folder = Path.Combine(this.outputDatasetRoot, this.outputDatasetName);
+    string aps_folder = Path.Combine(dataset_folder, this.apsSubfolder);
+
+    if (Directory.Exists(aps_folder)) {
+      Debug.Log("WARNING: Deleting existing APS folder: " + aps_folder);
+      Directory.Delete(aps_folder, true);
+    }
+
+    Directory.CreateDirectory(aps_folder);
+
+    string csv = Path.Combine(aps_folder, "data.csv");
+
+    while (true) {
+      // Run at 2 Hz for now.
+      yield return new WaitForSeconds(0.5f);
+      ApsMeasurement data = this.aps_sensor.Read();
+
+      // timestamp [ns], range [m], t_world_beacon.x [m], t_world_beacon.y [m], t_world_beacon.z [m],
+      List<string> line = new List<string>{
+        data.timestamp.ToString("D19"),
+        data.range.ToString("F18"),
+        data.t_world_beacon.x.ToString("F18"),
+        data.t_world_beacon.y.ToString("F18"),
+        data.t_world_beacon.z.ToString("F18"),
+        "\n"
+      };
+
+      File.AppendAllText(csv, string.Join(",", line));
     }
   }
 
@@ -293,113 +339,6 @@ public class AUV : MonoBehaviour {
   //   }
   // }
 
-  /**
-   * Animates the vehicle moving between two waypoints.
-   */
-  IEnumerator AnimateMotion(GameObject vehicle,
-                            Vector3 t_start,
-                            Quaternion q_start,
-                            Vector3 t_end,
-                            Quaternion q_end,
-                            float transit_sec)
-  {
-    float startTime = Time.time;
-    float elap = (Time.time - startTime);
-    while (elap < transit_sec) {
-      elap = (Time.time - startTime);
-      float T = Mathf.Clamp(elap / transit_sec, 0, 1); // Compute interpolation amount.
-
-      // Linear interpolation between the two endpoints, slerp between quaternions.
-      vehicle.transform.position = (1 - T)*t_start + T*t_end;
-      vehicle.transform.rotation = Quaternion.Slerp(q_start, q_end, T);
-
-      // Yield progress.
-      yield return T;
-    }
-  }
-
-  /**
-   * Animates the vehicle moving from its current pose to a waypoint pose.
-   */
-  IEnumerator AnimateWaypoint(GameObject vehicle, Vector3 t_end, Quaternion q_end, float transit_sec, float rotate_sec)
-  {
-    // NOTE(milo): Need to grab the start transform HERE so that it's up-to-date when this coroutine
-    // starts. If it was an argument, it would be pinned to whatever location the vehicle was at
-    // upon instantiating the coroutine.
-    Vector3 t_start = vehicle.transform.position;
-    Quaternion q_start = vehicle.transform.rotation;
-
-    // Align the vehicle with the direction of motion.
-    Quaternion q_transit = Simulator.TransformUtils.RotateAlignVectors(new Vector3(0, 0, 1), t_end - t_start);
-
-    // Rotate in place.
-    float startTime = Time.time;
-    while ((Time.time - startTime) < rotate_sec) {
-      float elap = (Time.time - startTime);
-      float T = Mathf.Clamp(elap / rotate_sec, 0, 1); // Compute interpolation amount.
-      vehicle.transform.position = t_start;
-      vehicle.transform.rotation = Quaternion.Slerp(q_start, q_transit, T);
-
-      yield return T;
-    }
-
-    startTime = Time.time;
-    while ((Time.time - startTime) < transit_sec) {
-      float elap = (Time.time - startTime);
-
-      // First half of the trajectory (accelerating).
-      float T = 0;
-      if (elap < (transit_sec / 2.0f)) {
-        T = (2.0f / Mathf.Pow(transit_sec, 2.0f)) * Mathf.Pow(elap, 2.0f);
-
-      // Second half of the trajectory (decelerating).
-      } else {
-        T = 1 - (2.0f / Mathf.Pow(transit_sec, 2.0f)) * Mathf.Pow((transit_sec - elap), 2.0f);
-      }
-
-      T = Mathf.Clamp(T, 0, 1); // Compute interpolation amount.
-
-      // Linear interpolation between the two endpoints, slerp between quaternions.
-      vehicle.transform.position = (1 - T)*t_start + T*t_end;
-      vehicle.transform.rotation = q_transit;
-
-      // Yield progress.
-      yield return T;
-    }
-
-    // Rotate to goal orientation.
-    startTime = Time.time;
-    while ((Time.time - startTime) < rotate_sec) {
-      float elap = (Time.time - startTime);
-      float T = Mathf.Clamp(elap / rotate_sec, 0, 1); // Compute interpolation amount.
-      vehicle.transform.position = t_end;
-      vehicle.transform.rotation = Quaternion.Slerp(q_transit, q_end, T);
-      yield return T;
-    }
-  }
-
-  IEnumerator AnimateFollowWinch(GameObject vehicle, int row, char buoy)
-  {
-    GameObject winch_to_follow = this.farm.GetWinchesAtAddress(row, buoy)[0];
-    this.farm.ToggleDepth(row, buoy);
-    float prev_depth = 123;
-    while (this.farm.winchInProgress) {
-      prev_depth = winch_to_follow.transform.position.y;
-      vehicle.transform.position = new Vector3(vehicle.transform.position.x, prev_depth, vehicle.transform.position.z);
-      yield return null;
-    }
-  }
-
-  /**
-   * Executes a sequence of coroutines. As soon as one finishes, the next one is started.
-   */
-  IEnumerator ChainCoroutines(List<IEnumerator> routines)
-  {
-    foreach (IEnumerator r in routines) {
-      yield return StartCoroutine(r);
-    }
-  }
-
   IEnumerator SaveStereoImageDataset()
   {
     string dataset_folder = Path.Combine(this.outputDatasetRoot, this.outputDatasetName);
@@ -437,13 +376,13 @@ public class AUV : MonoBehaviour {
 
       List<string> pose_line = new List<string>{
         nsec,
-        q_world_cam.w.ToString(),
-        q_world_cam.x.ToString(),
-        q_world_cam.y.ToString(),
-        q_world_cam.z.ToString(),
-        t_world_cam.x.ToString(),
-        t_world_cam.y.ToString(),
-        t_world_cam.z.ToString(),
+        q_world_cam.w.ToString("F5"),
+        q_world_cam.x.ToString("F5"),
+        q_world_cam.y.ToString("F5"),
+        q_world_cam.z.ToString("F5"),
+        t_world_cam.x.ToString("F5"),
+        t_world_cam.y.ToString("F5"),
+        t_world_cam.z.ToString("F5"),
         "\n"
       };
 
