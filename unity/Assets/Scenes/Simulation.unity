@@ -1227,6 +1227,7 @@ GameObject:
   - component: {fileID: 420561431}
   - component: {fileID: 420561432}
   - component: {fileID: 420561433}
+  - component: {fileID: 420561434}
   m_Layer: 0
   m_Name: AUV
   m_TagString: Untagged
@@ -1272,6 +1273,7 @@ Transform:
   - {fileID: 1845133841}
   - {fileID: 724607433}
   - {fileID: 374889542}
+  - {fileID: 1300158239}
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
@@ -1290,9 +1292,9 @@ MonoBehaviour:
   camera_forward_left: {fileID: 178838056}
   camera_forward_right: {fileID: 843407242}
   imu_rigidbody: {fileID: 420561429}
-  farm: {fileID: 1763879187}
   imu_sensor: {fileID: 420561432}
   aps_sensor: {fileID: 420561433}
+  depth_sensor: {fileID: 420561434}
   simulatorIOMode: 2
   outputDatasetName: default_dataset/mav0/
   outputDatasetRoot: /home/milo/datasets/Unity3D/farmsim/
@@ -1381,6 +1383,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   apsBeaconObject: {fileID: 663678797}
   apsReceiverObject: {fileID: 374889541}
+--- !u!114 &420561434
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 420561424}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0635d77c5d571a0ab159a7244ad79cc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  depthSensorObject: {fileID: 1300158238}
 --- !u!1 &466405589
 GameObject:
   m_ObjectHideFlags: 0
@@ -7992,6 +8007,36 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1298401904}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1300158238
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1300158239}
+  m_Layer: 0
+  m_Name: DepthSensor
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1300158239
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1300158238}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 420561426}
+  m_RootOrder: 6
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1442407171
 PrefabInstance:
   m_ObjectHideFlags: 0

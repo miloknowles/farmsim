@@ -4,7 +4,6 @@ using UnityEngine;
 
 namespace Simulator {
 
-
 readonly public struct ApsMeasurement
 {
   public ApsMeasurement(long timestamp, float range, Vector3 t_world_beacon)
@@ -31,9 +30,10 @@ public class ApsSensor : MonoBehaviour
     long nsec = (long)(Time.fixedTime * 1e9);
     Vector3 t_world_beacon = this.apsBeaconObject.transform.position;
     float range = (this.apsReceiverObject.transform.position - t_world_beacon).magnitude;
-    return new ApsMeasurement(nsec, range, t_world_beacon);
+
+    // NOTE(milo): Switch to right-handed coordinates!
+    return new ApsMeasurement(nsec, range, TransformUtils.ToRightHandedTranslation(t_world_beacon));
   }
 }
-
 
 }

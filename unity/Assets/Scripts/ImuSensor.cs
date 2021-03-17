@@ -7,14 +7,14 @@ namespace Simulator {
 
 readonly public struct ImuMeasurement
 {
-  public ImuMeasurement(long nsec, Vector3 a, Vector3 w)
+  public ImuMeasurement(long timestamp, Vector3 a, Vector3 w)
   {
-    this.nsec = nsec;
+    this.timestamp = timestamp;
     this.imu_acceleration_rh = a;
     this.imu_angular_velocity_rh = w;
   }
 
-  public readonly long nsec;
+  public readonly long timestamp;
   public readonly Vector3 imu_acceleration_rh;
   public readonly Vector3 imu_angular_velocity_rh;
 };

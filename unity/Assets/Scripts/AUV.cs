@@ -39,6 +39,7 @@ public class AUV : MonoBehaviour
   public Rigidbody imu_rigidbody;
   public ImuSensor imu_sensor;
   public ApsSensor aps_sensor;
+  public DepthSensor depth_sensor;
 
   private ROSMessageHolder roslink;
   public Simulator.IOMode simulatorIOMode = Simulator.IOMode.NO_OUTPUT;
@@ -50,6 +51,7 @@ public class AUV : MonoBehaviour
   private string rightImageSubfolder = "cam1";
   private string imuSubfolder = "imu0";
   private string apsSubfolder = "aps0";
+  private string depthSubfolder = "depth0";
 
   private RenderTexture _preallocRT;
 
@@ -89,6 +91,7 @@ public class AUV : MonoBehaviour
       StartCoroutine(SaveStereoImageDataset());
       StartCoroutine(SaveImuDataset());
       StartCoroutine(SaveApsDataset());
+      StartCoroutine(SaveDepthDataset());
     }
   }
 
@@ -215,7 +218,7 @@ public class AUV : MonoBehaviour
       // We use the EuRoC MAV format:
       // timestamp [ns],w_RS_S_x [rad s^-1],w_RS_S_y [rad s^-1],w_RS_S_z [rad s^-1],a_RS_S_x [m s^-2],a_RS_S_y [m s^-2],a_RS_S_z [m s^-2]
       List<string> imu_line = new List<string>{
-        data.nsec.ToString("D19"),
+        data.timestamp.ToString("D19"),
         data.imu_angular_velocity_rh.x.ToString("F18"),
         data.imu_angular_velocity_rh.y.ToString("F18"),
         data.imu_angular_velocity_rh.z.ToString("F18"),
@@ -229,8 +232,39 @@ public class AUV : MonoBehaviour
     }
   }
 
+  IEnumerator SaveDepthDataset()
+  {
+    string dataset_folder = Path.Combine(this.outputDatasetRoot, this.outputDatasetName);
+    string depth_folder = Path.Combine(dataset_folder, this.depthSubfolder);
 
-  IEnumerator SaveApsDataset() {
+    if (Directory.Exists(depth_folder)) {
+      Debug.Log("WARNING: Deleting existing depth folder: " + depth_folder);
+      Directory.Delete(depth_folder, true);
+    }
+
+    Directory.CreateDirectory(depth_folder);
+
+    string csv = Path.Combine(depth_folder, "data.csv");
+
+    // NOTE(milo): Maximum number of frames to save. Avoids using up all disk space by accident.
+    while (true) {
+      yield return new WaitForFixedUpdate();
+
+      DepthMeasurement data = this.depth_sensor.Read();
+
+      // timestamp [ns], depth [m]
+      List<string> line = new List<string>{
+        data.timestamp.ToString("D19"),
+        data.depth.ToString("F18"),
+        "\n"
+      };
+
+      File.AppendAllText(csv, string.Join(",", line));
+    }
+  }
+
+  IEnumerator SaveApsDataset()
+  {
     string dataset_folder = Path.Combine(this.outputDatasetRoot, this.outputDatasetName);
     string aps_folder = Path.Combine(dataset_folder, this.apsSubfolder);
 
