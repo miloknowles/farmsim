@@ -24,19 +24,14 @@ public class ApsSensor : MonoBehaviour
 {
   public GameObject apsBeaconObject;
   public GameObject apsReceiverObject;
-  private ApsMeasurement _latest;
 
+  // Lazy read: only get sensor data when called.
   public ApsMeasurement Read()
-  {
-    return this._latest;
-  }
-
-  void Update()
   {
     long nsec = (long)(Time.fixedTime * 1e9);
     Vector3 t_world_beacon = this.apsBeaconObject.transform.position;
     float range = (this.apsReceiverObject.transform.position - t_world_beacon).magnitude;
-    this._latest = new ApsMeasurement(nsec, range, t_world_beacon);
+    return new ApsMeasurement(nsec, range, t_world_beacon);
   }
 }
 

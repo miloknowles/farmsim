@@ -37,8 +37,6 @@ public class AUV : MonoBehaviour
   public Camera camera_forward_right;
 
   public Rigidbody imu_rigidbody;
-  public FarmController farm;
-
   public ImuSensor imu_sensor;
   public ApsSensor aps_sensor;
 
