@@ -1369,6 +1369,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   imu_rigidbody: {fileID: 420561429}
+  enableImuNoise: 0
+  enableImuBias: 0
+  accelNoiseSigma: 0.003924
+  gyroNoiseSigma: 0.00020568902
+  accelBiasRandomWalkSigma: 0.004905
+  gyroBiasRandomWalkSigma: 0.0000014544411
+  accelBiasSigma: 0.001
+  gyroBiasSigma: 0.001
 --- !u!114 &420561433
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1383,6 +1391,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   apsBeaconObject: {fileID: 663678797}
   apsReceiverObject: {fileID: 374889541}
+  enableApsNoise: 0
+  apsNoiseSigma: 0.1
 --- !u!114 &420561434
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1396,6 +1406,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   depthSensorObject: {fileID: 1300158238}
+  enableDepthNoise: 0
+  noiseSigma: 0.05
 --- !u!1 &466405589
 GameObject:
   m_ObjectHideFlags: 0

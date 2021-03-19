@@ -69,12 +69,12 @@ public class ImuSensor : MonoBehaviour
 
   void FixedUpdate()
   {
+    // TODO(milo): You forgot to add the bias!
     // Rotation from the world to the local IMU frame.
     Quaternion q_imu_world = Quaternion.Inverse(this.imu_rigidbody.transform.rotation);
 
-    Vector3 v_imu_cur = q_imu_world * this.imu_rigidbody.velocity;
-    Vector3 v_imu_pre = q_imu_world * this.prev_world_velocity;
-    Vector3 imu_a = (v_imu_cur - v_imu_pre) / Time.fixedDeltaTime;
+    Vector3 world_a_imu = (this.imu_rigidbody.velocity - this.prev_world_velocity) / Time.fixedDeltaTime;
+    Vector3 imu_a = q_imu_world * world_a_imu;
     this.prev_world_velocity = this.imu_rigidbody.velocity;
 
     Vector3 imu_w = q_imu_world * this.imu_rigidbody.angularVelocity;
