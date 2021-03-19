@@ -71,17 +71,17 @@ public class ImuSensor : MonoBehaviour
   {
     // TODO(milo): You forgot to add the bias!
     // Rotation from the world to the local IMU frame.
-    Quaternion world_q_imu = Quaternion.Inverse(this.imu_rigidbody.transform.rotation);
+    Quaternion imu_q_world = Quaternion.Inverse(this.imu_rigidbody.transform.rotation);
 
     // NOTE(milo): Really important to do velocity-differencing in the WORLD frame!
     Vector3 world_a_imu = (this.imu_rigidbody.velocity - this.prev_world_v_imu) / Time.fixedDeltaTime;
-    Vector3 imu_a = world_q_imu * world_a_imu;
+    Vector3 imu_a = imu_q_world * world_a_imu;
     this.prev_world_v_imu = this.imu_rigidbody.velocity;
 
-    Vector3 imu_w = world_q_imu * this.imu_rigidbody.angularVelocity;
+    Vector3 imu_w = imu_q_world * this.imu_rigidbody.angularVelocity;
 
     // Rotate the gravity vector into the IMU's frame, then add it to acceleration.
-    Vector3 imu_a_gravity = world_q_imu * Physics.gravity;
+    Vector3 imu_a_gravity = imu_q_world * Physics.gravity;
     Vector3 imu_a_total = imu_a - imu_a_gravity;
 
     // NOTE(milo): The IMU "feels" an upward acceleration due to gravity!
