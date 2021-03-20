@@ -253,7 +253,7 @@ public class FarmController : MonoBehaviour {
 
         // AprilTag ID is in row-major order.
         int aprilIndex = row*(CharToInt(this.maxBuoy)+1) + CharToInt(buoy) + SimulationController.RESERVED_APRILTAGS;
-        Debug.Log($"Assigning AprilTag id={aprilIndex}");
+        // Debug.Log($"Assigning AprilTag id={aprilIndex}");
 
         // NOTE(milo): Unity doesn't find these resources with .png at the end!
         string texturePath = $"AprilTags/tagStandard41h12/tag41_12_{aprilIndex:00000}";

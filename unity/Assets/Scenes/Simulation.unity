@@ -1310,6 +1310,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ea439df9f30cf4e4eaf1babe93b5bc2f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  activeRollStabilization: 1
   rigidBody: {fileID: 420561429}
   keyThrust: 5
   controlMode: 2
