@@ -219,12 +219,12 @@ public class AUV : MonoBehaviour
       // timestamp [ns],w_RS_S_x [rad s^-1],w_RS_S_y [rad s^-1],w_RS_S_z [rad s^-1],a_RS_S_x [m s^-2],a_RS_S_y [m s^-2],a_RS_S_z [m s^-2]
       List<string> imu_line = new List<string>{
         data.timestamp.ToString("D19"),
-        data.imu_angular_velocity_rh.x.ToString("F18"),
-        data.imu_angular_velocity_rh.y.ToString("F18"),
-        data.imu_angular_velocity_rh.z.ToString("F18"),
-        data.imu_acceleration_rh.x.ToString("F18"),
-        data.imu_acceleration_rh.y.ToString("F18"),
-        data.imu_acceleration_rh.z.ToString("F18"),
+        data.imu_w_rh.x.ToString("F18"),
+        data.imu_w_rh.y.ToString("F18"),
+        data.imu_w_rh.z.ToString("F18"),
+        data.imu_a_rh.x.ToString("F18"),
+        data.imu_a_rh.y.ToString("F18"),
+        data.imu_a_rh.z.ToString("F18"),
         "\n"
       };
 

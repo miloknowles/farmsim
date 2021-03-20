@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Simulator {
 
-class TransformUtils {
+public class TransformUtils {
   /**
     * Converts a Unity3D left-handed transform to a right-handed one (for compatibility with
     * everything else in the robotics world).
