@@ -13,6 +13,8 @@ public class KeyboardMove : MonoBehaviour {
 		DRIVE_COMMMANDS = 2
 	}
 
+	public bool activeRollStabilization = true;
+
 	public Rigidbody rigidBody;
 	public float keyThrust = 5.0f; 											// Amount of force applied by each key (N).
 	public ControlMode controlMode = ControlMode.OFF;		// Turn key commands off by default.
@@ -20,9 +22,9 @@ public class KeyboardMove : MonoBehaviour {
 
 	void Start()
 	{
-		this.roslink = GameObject.Find("ROSMessageHolder").GetComponent<ROSMessageHolder>();
-		this.roslink.ros.AddPublisher(typeof(TridentThrustPublisher));
-		StartCoroutine(ListenForKeyCommands());
+		// this.roslink = GameObject.Find("ROSMessageHolder").GetComponent<ROSMessageHolder>();
+		// this.roslink.ros.AddPublisher(typeof(TridentThrustPublisher));
+		// StartCoroutine(ListenForKeyCommands());
 	}
 
 	void FixedUpdate()
@@ -71,6 +73,11 @@ public class KeyboardMove : MonoBehaviour {
 		this.roslink.ros.Render();
 	}
 
+	public static float ClampAngle(float deg)
+	{
+    return deg - 360.0f*Mathf.Floor((deg + 180.0f) * (1.0f / 360.0f));
+ 	}
+
 	private void KeyboardDriveCommand()
 	{
 		float w_pitch = Input.GetAxis("Vertical") * 1.0f;
@@ -81,7 +88,11 @@ public class KeyboardMove : MonoBehaviour {
 		this.rigidBody.AddRelativeTorque(new Vector3(0.1f*w_pitch, 0.1f*w_yaw, 0.0f));
 
 		// Disable roll, since we always want the vehicle level.
-		Vector3 euler = this.rigidBody.transform.eulerAngles;
-		this.rigidBody.transform.eulerAngles = new Vector3(euler.x, euler.y, 0.0f);
+		// TODO(milo): More sophisticated PID control (just P right now).
+		Vector3 euler_angles = this.rigidBody.transform.eulerAngles;
+		float roll_error = -ClampAngle(euler_angles.z);
+		float P_gain = 0.005f;
+		float torque_command_roll = P_gain*roll_error;
+		this.rigidBody.AddRelativeTorque(new Vector3(0, 0, torque_command_roll));
 	}
 }

@@ -83,7 +83,6 @@ public class ImuSensor : MonoBehaviour
     // Rotate the gravity vector into the IMU's frame, then add it to acceleration.
     Vector3 imu_a_gravity = imu_q_world * Physics.gravity;
     Vector3 imu_a_total = imu_a - imu_a_gravity;
-    Debug.Log(imu_a_total);
 
     // NOTE(milo): The IMU "feels" an upward acceleration due to gravity!
     Vector3 imu_a_rh = TransformUtils.ToRightHandedTranslation(imu_a_total);
