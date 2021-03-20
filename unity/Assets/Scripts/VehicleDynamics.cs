@@ -80,7 +80,6 @@ public class VehicleDynamics : MonoBehaviour {
     // Apply forces and torques to the vehicle in its body frame.
     this.rigidBody.AddRelativeForce(flt + frt + fct + F_drag);
     this.rigidBody.AddRelativeTorque(tau_total);
-    // this.rigidBody.AddRelativeTorque(tau_lt + tau_rt + tau_ct + tau_linear_drag + tau_angular_drag);
   }
 
   public void Callback(ROSBridgeMsg msg)
