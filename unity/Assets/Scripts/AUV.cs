@@ -278,8 +278,9 @@ public class AUV : MonoBehaviour
     string csv = Path.Combine(aps_folder, "data.csv");
 
     while (true) {
-      // Run at 2 Hz for now.
-      yield return new WaitForSeconds(0.5f);
+      // ping_time = max_range / speed_of_sound = 100m / 343 m/s = 0.29 sec
+      // Therefore can run at most 3ish Hz at 100m max range.
+      yield return new WaitForSeconds(0.333f);
       ApsMeasurement data = this.aps_sensor.Read();
 
       // timestamp [ns], range [m], t_world_beacon.x [m], t_world_beacon.y [m], t_world_beacon.z [m],
@@ -368,6 +369,7 @@ public class AUV : MonoBehaviour
       string nsec = ((long)(Time.fixedTime * 1e9)).ToString("D19");
       File.AppendAllLines(Path.Combine(dataset_folder, "timestamps.txt"), new string[] { nsec });
 
+      //==================================== LEFT CAMERA POSE ======================================
       Transform T_world_cam = this.camera_forward_left.transform;
 
       Quaternion q_world_cam;
@@ -387,6 +389,27 @@ public class AUV : MonoBehaviour
       };
 
       File.AppendAllText(Path.Combine(dataset_folder, "cam0_poses.txt"), string.Join(",", pose_line));
+
+      //======================================== BODY POSE =========================================
+      Transform T_world_body = this.imu_rigidbody.transform;
+
+      Quaternion q_world_body;
+      Vector3 t_world_body;
+      TransformUtils.ToRightHandedTransform(T_world_body, out t_world_body, out q_world_body);
+
+      pose_line = new List<string>{
+        nsec,
+        q_world_body.w.ToString("F5"),
+        q_world_body.x.ToString("F5"),
+        q_world_body.y.ToString("F5"),
+        q_world_body.z.ToString("F5"),
+        t_world_body.x.ToString("F5"),
+        t_world_body.y.ToString("F5"),
+        t_world_body.z.ToString("F5"),
+        "\n"
+      };
+
+      File.AppendAllText(Path.Combine(dataset_folder, "imu0_poses.txt"), string.Join(",", pose_line));
 
       Texture2D leftImage = GetImageFromCamera(camera_forward_left);
       Texture2D rightImage = GetImageFromCamera(camera_forward_right);
