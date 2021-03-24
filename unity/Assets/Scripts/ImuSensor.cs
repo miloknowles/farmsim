@@ -69,7 +69,6 @@ public class ImuSensor : MonoBehaviour
 
   void FixedUpdate()
   {
-    // TODO(milo): You forgot to add the bias!
     // Rotation from the world to the local IMU frame.
     Quaternion imu_q_world = Quaternion.Inverse(this.imu_rigidbody.transform.rotation);
 
@@ -100,6 +99,10 @@ public class ImuSensor : MonoBehaviour
       imu_w_rh.y += Utils.Gaussian(0, this.gyroNoiseSigma);
       imu_w_rh.z += Utils.Gaussian(0, this.gyroNoiseSigma);
     }
+
+    // Add bias. If enableImuBias is OFF, this will just add a zero vector.
+    imu_a_rh += this.accelBias;
+    imu_w_rh += this.gyroBias;
 
     long nsec = (long)(Time.fixedTime * 1e9);
     this._latest = new ImuMeasurement(nsec, imu_a_rh, imu_w_rh);

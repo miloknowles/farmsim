@@ -1264,7 +1264,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 420561424}
   m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
-  m_LocalPosition: {x: 16, y: -30, z: -24.75}
+  m_LocalPosition: {x: 16, y: -13.58, z: -4.4599}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 518964988}
@@ -1370,14 +1370,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   imu_rigidbody: {fileID: 420561429}
-  enableImuNoise: 0
-  enableImuBias: 0
+  enableImuNoise: 1
+  enableImuBias: 1
   accelNoiseSigma: 0.003924
   gyroNoiseSigma: 0.00020568902
   accelBiasRandomWalkSigma: 0.004905
   gyroBiasRandomWalkSigma: 0.0000014544411
-  accelBiasSigma: 0.001
-  gyroBiasSigma: 0.001
+  accelBiasSigma: 0.0001
+  gyroBiasSigma: 0.0001
 --- !u!114 &420561433
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1392,7 +1392,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   apsBeaconObject: {fileID: 663678797}
   apsReceiverObject: {fileID: 374889541}
-  enableApsNoise: 0
+  enableApsNoise: 1
   apsNoiseSigma: 0.1
 --- !u!114 &420561434
 MonoBehaviour:
@@ -1407,8 +1407,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   depthSensorObject: {fileID: 1300158238}
-  enableDepthNoise: 0
-  noiseSigma: 0.05
+  enableDepthNoise: 1
+  noiseSigma: 0.1
 --- !u!1 &466405589
 GameObject:
   m_ObjectHideFlags: 0
@@ -6002,7 +6002,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 663678797}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 13.19, y: 0, z: 2.73}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 754256996}

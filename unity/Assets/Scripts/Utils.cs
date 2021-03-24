@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Simulator {
 
-class Utils {
+public class Utils {
   // If a value goes past a bound, set it to the other bound (i.e like the modulo operation).
   public static float CircularWrap(float value, float minValue, float maxValue)
   {
@@ -39,13 +39,23 @@ class Utils {
 
   // Generate a sample from a Gaussian distribution using the Box-Muller transform.
   // https://en.wikipedia.org/wiki/Box%E2%80%93Muller_transform
+  // http://keyonvafa.com/box-muller-transform/
   public static float Gaussian(float mu, float sigma)
   {
-    float u1 = 1.0f - Random.Range(0.0f, 1.0f);
-    float u2 = 1.0f - Random.Range(0.0f, 1.0f);
-    float standardNormal = Mathf.Sqrt(-2.0f * Mathf.Log(u1)) * Mathf.Sin(2.0f * Mathf.PI * u2);
+    float U1 = Random.Range(0.0f, 1.0f);
+    float U2 = Random.Range(0.0f, 1.0f);
+    float X = Mathf.Sqrt(-2.0f * Mathf.Log(U1)) * Mathf.Sin(2.0f * Mathf.PI * U2);
 
-    return mu + sigma*standardNormal;
+    return mu + sigma*X;
+  }
+
+  public static float Average(List<float> values)
+  {
+    float total = 0;
+    foreach (float v in values) {
+      total += v;
+    }
+    return total / (float)values.Count;
   }
 }
 }
