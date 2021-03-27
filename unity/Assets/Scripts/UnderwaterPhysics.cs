@@ -51,7 +51,7 @@ public class UnderwaterPhysics : MonoBehaviour {
     // Sample a current direction.
     if (this.currentMode == CurrentMode.CONSTANT_RANDOM_DIRECTION_AND_SPEED ||
         this.currentMode == CurrentMode.DYNAMIC_RANDOM_DIRECTION_AND_SPEED) {
-      this.currentDirection = Utils.SampleDirectionShallowAzimuth(-5, 5);
+      this.currentDirection = TransformUtils.SampleDirectionShallowAzimuth(-5, 5);
       this.currentSpeed = Random.Range(this.currentSpeedMin, this.currentSpeedMax);
     } else {
       this.currentDirection = Vector3.Normalize(this.currentDirection);
@@ -79,7 +79,7 @@ public class UnderwaterPhysics : MonoBehaviour {
 
       if (timeForUpdate) {
         Debug.Log("[UnderwaterPhysics] Updated random current");
-        this.currentDirection = Utils.SampleDirectionShallowAzimuth(-5, 5);
+        this.currentDirection = TransformUtils.SampleDirectionShallowAzimuth(-5, 5);
         this.currentSpeed = Random.Range(this.currentSpeedMin, this.currentSpeedMax);
         this.lastCurrentUpdateTime = Time.time;
         this.nextCurrentUpdateInterval = Random.Range(5.0f, 20.0f);

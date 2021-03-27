@@ -55,15 +55,11 @@ public class ImuSensor : MonoBehaviour
   {
     // For now, just sample a bias when the simulation starts, and hold it constant throughout.
     if (this.accelBiasSigma > 0 && this.enableImuBias) {
-      this.accelBias.x += Utils.Gaussian(0, this.accelBiasSigma);
-      this.accelBias.y += Utils.Gaussian(0, this.accelBiasSigma);
-      this.accelBias.z += Utils.Gaussian(0, this.accelBiasSigma);
+      this.accelBias += Gaussian.Sample3D(new Vector3(0, 0, 0), new Vector3(this.accelBiasSigma, this.accelBiasSigma, this.accelBiasSigma));
     }
 
     if (this.gyroBiasSigma > 0 && this.enableImuBias) {
-      this.gyroBias.x += Utils.Gaussian(0, this.gyroBiasSigma);
-      this.gyroBias.y += Utils.Gaussian(0, this.gyroBiasSigma);
-      this.gyroBias.z += Utils.Gaussian(0, this.gyroBiasSigma);
+      this.gyroBias += Gaussian.Sample3D(new Vector3(0, 0, 0), new Vector3(this.gyroBiasSigma, this.gyroBiasSigma, this.gyroBiasSigma));
     }
   }
 
@@ -89,23 +85,18 @@ public class ImuSensor : MonoBehaviour
 
     // Optionally add zero-mean noise.
     if (this.accelNoiseSigma > 0 && this.enableImuNoise) {
-      imu_a_rh.x += Utils.Gaussian(0, this.accelNoiseSigma);
-      imu_a_rh.y += Utils.Gaussian(0, this.accelNoiseSigma);
-      imu_a_rh.z += Utils.Gaussian(0, this.accelNoiseSigma);
+      imu_a_rh += Gaussian.Sample3D(new Vector3(0, 0, 0), new Vector3(this.accelNoiseSigma, this.accelNoiseSigma, this.accelNoiseSigma));
     }
 
     if (this.gyroNoiseSigma > 0 && this.enableImuNoise) {
-      imu_w_rh.x += Utils.Gaussian(0, this.gyroNoiseSigma);
-      imu_w_rh.y += Utils.Gaussian(0, this.gyroNoiseSigma);
-      imu_w_rh.z += Utils.Gaussian(0, this.gyroNoiseSigma);
+      imu_w_rh += Gaussian.Sample3D(new Vector3(0, 0, 0), new Vector3(this.gyroNoiseSigma, this.gyroNoiseSigma, this.gyroNoiseSigma));
     }
 
     // Add bias. If enableImuBias is OFF, this will just add a zero vector.
     imu_a_rh += this.accelBias;
     imu_w_rh += this.gyroBias;
 
-    long nsec = (long)(Time.fixedTime * 1e9);
-    this._latest = new ImuMeasurement(nsec, imu_a_rh, imu_w_rh);
+    this._latest = new ImuMeasurement(Timestamp.UnityNanoseconds(), imu_a_rh, imu_w_rh);
   }
 }
 

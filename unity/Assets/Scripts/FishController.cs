@@ -39,7 +39,7 @@ public class FishController : MonoBehaviour {
           Random.Range(this.transform.position.z, this.transform.position.z + this.aquariumSize.z)
       );
 
-      Vector3 randomDir = Utils.SampleDirectionShallowAzimuth(this.minAzimuth, this.maxAzimuth);
+      Vector3 randomDir = TransformUtils.SampleDirectionShallowAzimuth(this.minAzimuth, this.maxAzimuth);
 
       GameObject fish = (GameObject)Instantiate(fishPrefab);
       fish.transform.position = randomXYZ;
@@ -70,7 +70,7 @@ public class FishController : MonoBehaviour {
     if ((Time.time - this.lastFishUpdateTime) > this.fishUpdateInterval) {
       this.lastFishUpdateTime = Time.time;
       int randomIndex = Random.Range(0, this.fishInstances.Count);
-      this.fishDirections[randomIndex] = Utils.SampleDirectionShallowAzimuth(this.minAzimuth, this.maxAzimuth);
+      this.fishDirections[randomIndex] = TransformUtils.SampleDirectionShallowAzimuth(this.minAzimuth, this.maxAzimuth);
       this.fishSpeeds[randomIndex] = Random.Range(this.fishSwimSpeedMin, this.fishSwimSpeedMax);
     }
 
@@ -78,7 +78,7 @@ public class FishController : MonoBehaviour {
     for (int i = 0; i < this.fishInstances.Count; ++i) {
       GameObject fish = this.fishInstances[i];
       Vector3 direction = this.fishDirections[i];
-      Utils.ApplyRotation(fish, direction, this.fishRotateSpeed);
+      TransformUtils.ApplyRotation(fish, direction, this.fishRotateSpeed);
       fish.transform.position += fish.transform.forward * this.fishSpeeds[i] * Time.deltaTime;
     }
   }

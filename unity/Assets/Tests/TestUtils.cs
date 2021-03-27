@@ -8,7 +8,7 @@ using Simulator;
 
 namespace Tests {
 
-public class TestUtils {
+public class TestGaussian {
   [Test]
   public void TestStandardGaussian()
   {
@@ -32,11 +32,11 @@ public class TestUtils {
     List<float> samples = new List<float>();
 
     for (int i = 0; i < 10000; ++i) {
-      float s = Utils.Gaussian(mu, sigma);
+      float s = Gaussian.Sample1D(mu, sigma);
       samples.Add(s);
     }
 
-    float mean = Utils.Average(samples);
+    float mean = ListUtils.Average(samples);
     Assert.IsTrue(Mathf.Abs(mean - mu) < 0.1f);
     Debug.Log("Empirical mean: " + mean.ToString());
 
@@ -46,7 +46,7 @@ public class TestUtils {
       sqerr.Add((s - mu) * (s - mu) / (sigma * sigma));
     }
 
-    float var = Utils.Average(sqerr);
+    float var = ListUtils.Average(sqerr);
     Assert.IsTrue(Mathf.Abs(var - 1.0f) < 0.1f);
     Debug.Log("Empirical variance (should be 1): " + var.ToString());
   }
