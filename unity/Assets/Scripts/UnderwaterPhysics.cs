@@ -44,14 +44,14 @@ public class UnderwaterPhysics : MonoBehaviour {
     float volume = ComputeMeshVolume(mesh);
     Debug.Log($"[UnderwaterPhysics] The volume of the mesh is {volume} m^3.");
 
-    this.constantBuoyantForce = -1.0f * volume * SimulationController.WATER_DENSITY_KG_M3 * Physics.gravity;
+    this.constantBuoyantForce = -1.0f * volume * SimulationParams.WATER_DENSITY_KG_M3 * Physics.gravity;
     this.constantGravityForce = Physics.gravity * body.mass;
     Debug.Log($"[UnderwaterPhysics] Gravity={this.constantGravityForce} N | Buoyancy={this.constantBuoyantForce} N");
 
     // Sample a current direction.
     if (this.currentMode == CurrentMode.CONSTANT_RANDOM_DIRECTION_AND_SPEED ||
         this.currentMode == CurrentMode.DYNAMIC_RANDOM_DIRECTION_AND_SPEED) {
-      this.currentDirection = Utils.SampleDirectionShallowAzimuth(-5, 5);
+      this.currentDirection = TransformUtils.SampleDirectionShallowAzimuth(-5, 5);
       this.currentSpeed = Random.Range(this.currentSpeedMin, this.currentSpeedMax);
     } else {
       this.currentDirection = Vector3.Normalize(this.currentDirection);
@@ -79,7 +79,7 @@ public class UnderwaterPhysics : MonoBehaviour {
 
       if (timeForUpdate) {
         Debug.Log("[UnderwaterPhysics] Updated random current");
-        this.currentDirection = Utils.SampleDirectionShallowAzimuth(-5, 5);
+        this.currentDirection = TransformUtils.SampleDirectionShallowAzimuth(-5, 5);
         this.currentSpeed = Random.Range(this.currentSpeedMin, this.currentSpeedMax);
         this.lastCurrentUpdateTime = Time.time;
         this.nextCurrentUpdateInterval = Random.Range(5.0f, 20.0f);
@@ -89,7 +89,7 @@ public class UnderwaterPhysics : MonoBehaviour {
     if (this.currentMode != CurrentMode.NONE) {
       Vector3 flowVel = this.GetComponent<Rigidbody>().velocity - (this.currentSpeed * this.currentDirection);
       // F = C * rho * V^2
-      Vector3 F = this.dragCoefficient * SimulationController.WATER_DENSITY_KG_M3 * Vector3.Scale(flowVel, flowVel);
+      Vector3 F = this.dragCoefficient * SimulationParams.WATER_DENSITY_KG_M3 * Vector3.Scale(flowVel, flowVel);
 
       // To avoid drag forces blowing up at high velocity, clamp magnitude.
       body.AddForce(Vector3.ClampMagnitude(F, 100.0f));

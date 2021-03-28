@@ -38,7 +38,7 @@ public class AUV : MonoBehaviour
 
   public Rigidbody imu_rigidbody;
   public ImuSensor imu_sensor;
-  public ApsSensor aps_sensor;
+  public RangeSensor aps_sensor;
   public DepthSensor depth_sensor;
 
   private ROSMessageHolder roslink;
@@ -58,8 +58,8 @@ public class AUV : MonoBehaviour
   void Start()
   {
     this._preallocRT = new RenderTexture(
-        SimulationController.AUV_CAMERA_WIDTH,
-        SimulationController.AUV_CAMERA_HEIGHT,
+        SimulationParams.AUV_CAMERA_WIDTH,
+        SimulationParams.AUV_CAMERA_HEIGHT,
         16, RenderTextureFormat.ARGB32);
 
     this.roslink = GameObject.Find("ROSMessageHolder").GetComponent<ROSMessageHolder>();
@@ -162,7 +162,7 @@ public class AUV : MonoBehaviour
   IEnumerator PublishCameraSyncedMessages()
   {
     while (true) {
-      yield return new WaitForSeconds(1.0f / SimulationController.CAMERA_PUBLISH_HZ);
+      yield return new WaitForSeconds(1.0f / SimulationParams.CAMERA_PUBLISH_HZ);
       yield return new WaitForEndOfFrame();
 
       var now = DateTime.Now;
@@ -281,15 +281,15 @@ public class AUV : MonoBehaviour
       // ping_time = max_range / speed_of_sound = 100m / 343 m/s = 0.29 sec
       // Therefore can run at most 3ish Hz at 100m max range.
       yield return new WaitForSeconds(0.333f);
-      ApsMeasurement data = this.aps_sensor.Read();
+      RangeMeasurement data = this.aps_sensor.Read();
 
-      // timestamp [ns], range [m], t_world_beacon.x [m], t_world_beacon.y [m], t_world_beacon.z [m],
+      // timestamp [ns], range [m], world_t_beacon.x [m], world_t_beacon.y [m], world_t_beacon.z [m],
       List<string> line = new List<string>{
         data.timestamp.ToString("D19"),
         data.range.ToString("F18"),
-        data.t_world_beacon.x.ToString("F18"),
-        data.t_world_beacon.y.ToString("F18"),
-        data.t_world_beacon.z.ToString("F18"),
+        data.world_t_beacon.x.ToString("F18"),
+        data.world_t_beacon.y.ToString("F18"),
+        data.world_t_beacon.z.ToString("F18"),
         "\n"
       };
 
@@ -301,7 +301,7 @@ public class AUV : MonoBehaviour
   // IEnumerator PublishImu() {
   //   while (true) {
   //     // yield return new WaitForEndOfFrame();
-  //     yield return new WaitForSeconds(1.0f / SimulationController.SENSOR_PUBLISH_HZ);
+  //     yield return new WaitForSeconds(1.0f / SimulationParams.SENSOR_PUBLISH_HZ);
 
   //     var now = DateTime.Now;
   //     var timeSinceStart = now - camStart;
@@ -334,7 +334,7 @@ public class AUV : MonoBehaviour
   //     // Publish the current barometer depth (groundtruth and depth with simulated noise).
   //     float depth = t_world_imu.y;
   //     Float64Msg depth_msg_gt = new Float64Msg(depth);
-  //     Float64Msg depth_msg = new Float64Msg(depth + Utils.Gaussian(0, this.depth_sensor_sigma));
+  //     Float64Msg depth_msg = new Float64Msg(depth + Gaussian.Sample1D(0, this.depth_sensor_sigma));
   //     this.roslink.ros.Publish(DepthPublisher.GetMessageTopic(), depth_msg);
   //     this.roslink.ros.Publish(GroundtruthDepthPublisher.GetMessageTopic(), depth_msg_gt);
   //   }
@@ -363,7 +363,7 @@ public class AUV : MonoBehaviour
 
     // NOTE(milo): Maximum number of frames to save. Avoids using up all disk space by accident.
     while (frame_id < 5000) {
-      // yield return new WaitForSeconds(1.0f / SimulationController.CAMERA_PUBLISH_HZ);
+      // yield return new WaitForSeconds(1.0f / SimulationParams.CAMERA_PUBLISH_HZ);
       yield return new WaitForEndOfFrame();
 
       string nsec = ((long)(Time.fixedTime * 1e9)).ToString("D19");

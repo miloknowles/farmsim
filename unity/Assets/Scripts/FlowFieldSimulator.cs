@@ -4,7 +4,6 @@ using UnityEngine;
 
 
 public class FlowFieldSimulator : MonoBehaviour {
-
   // Library for generating random noise.
   FastNoise _fastNoise;
   public Vector3Int _gridSize = new Vector3Int(50, 50, 1);

@@ -5,27 +5,30 @@ using UnityEngine;
 
 [ExecuteInEditMode, ImageEffectAllowedInSceneView]
 public class FogEffect : MonoBehaviour {
-    public Material _material;
-    public Color _fogColor;
-    // private float _depthStart = 0;
-    public float _depthDistance = 30;
+  public Material _material;
+  public Color _fogColor;
+  // private float _depthStart = 0;
+  public float _depthDistance = 30.0f;
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        GetComponent<Camera>().depthTextureMode = DepthTextureMode.Depth;
-    }
+  // TODO(milo): Implement color-dependent attenuation for more realistic underwater images.
+  public float _betaRed = 0.4f;
+  public float _betaGreen = 0.3f;
+  public float _betaBlue = 0.2f;
 
-    // Update is called once per frame
-    void Update()
-    {
-        _material.SetColor("_FogColor", _fogColor);
-        // _material.SetFloat("_DepthStart", _depthStart);
-        _material.SetFloat("_DepthDistance", _depthDistance);
-    }
+  void Start()
+  {
+    GetComponent<Camera>().depthTextureMode = DepthTextureMode.Depth;
+  }
 
-    private void OnRenderImage(RenderTexture source, RenderTexture destination)
-    {
-        Graphics.Blit(source, destination, this._material);
-    }
+  void Update()
+  {
+    _material.SetColor("_FogColor", _fogColor);
+    // _material.SetFloat("_DepthStart", _depthStart);
+    _material.SetFloat("_DepthDistance", _depthDistance);
+  }
+
+  private void OnRenderImage(RenderTexture source, RenderTexture destination)
+  {
+    Graphics.Blit(source, destination, this._material);
+  }
 }
