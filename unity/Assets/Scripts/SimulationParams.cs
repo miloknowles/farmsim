@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-// Global parameters to control the simulation.
-public struct SimulationController
-{
+// Global parameters and constants to control the simulation.
+// TODO(milo): Figure out how to make these menu-editable but also accessible as static.
+public class SimulationParams : MonoBehaviour {
   public static int RESERVED_APRILTAGS = 1;
   public static int ROS_BRIDGE_PORT = 9090;
   public static float WATER_DENSITY_KG_M3 = 1027.3f;

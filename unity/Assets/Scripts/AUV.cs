@@ -58,8 +58,8 @@ public class AUV : MonoBehaviour
   void Start()
   {
     this._preallocRT = new RenderTexture(
-        SimulationController.AUV_CAMERA_WIDTH,
-        SimulationController.AUV_CAMERA_HEIGHT,
+        SimulationParams.AUV_CAMERA_WIDTH,
+        SimulationParams.AUV_CAMERA_HEIGHT,
         16, RenderTextureFormat.ARGB32);
 
     this.roslink = GameObject.Find("ROSMessageHolder").GetComponent<ROSMessageHolder>();
@@ -162,7 +162,7 @@ public class AUV : MonoBehaviour
   IEnumerator PublishCameraSyncedMessages()
   {
     while (true) {
-      yield return new WaitForSeconds(1.0f / SimulationController.CAMERA_PUBLISH_HZ);
+      yield return new WaitForSeconds(1.0f / SimulationParams.CAMERA_PUBLISH_HZ);
       yield return new WaitForEndOfFrame();
 
       var now = DateTime.Now;
@@ -301,7 +301,7 @@ public class AUV : MonoBehaviour
   // IEnumerator PublishImu() {
   //   while (true) {
   //     // yield return new WaitForEndOfFrame();
-  //     yield return new WaitForSeconds(1.0f / SimulationController.SENSOR_PUBLISH_HZ);
+  //     yield return new WaitForSeconds(1.0f / SimulationParams.SENSOR_PUBLISH_HZ);
 
   //     var now = DateTime.Now;
   //     var timeSinceStart = now - camStart;
@@ -363,7 +363,7 @@ public class AUV : MonoBehaviour
 
     // NOTE(milo): Maximum number of frames to save. Avoids using up all disk space by accident.
     while (frame_id < 5000) {
-      // yield return new WaitForSeconds(1.0f / SimulationController.CAMERA_PUBLISH_HZ);
+      // yield return new WaitForSeconds(1.0f / SimulationParams.CAMERA_PUBLISH_HZ);
       yield return new WaitForEndOfFrame();
 
       string nsec = ((long)(Time.fixedTime * 1e9)).ToString("D19");
