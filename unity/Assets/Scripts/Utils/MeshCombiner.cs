@@ -10,6 +10,8 @@ using UnityEngine.Rendering;
 [RequireComponent(typeof(MeshFilter))]
 [RequireComponent(typeof(MeshRenderer))]
 public class MeshCombiner : MonoBehaviour {
+  public int restrictToLayer = -1;
+
   void Start()
   {
     MeshFilter[] meshFiltersAll = GetComponentsInChildren<MeshFilter>();
@@ -19,10 +21,9 @@ public class MeshCombiner : MonoBehaviour {
 
     for (int i = 0; i < meshFiltersAll.Length; ++i) {
       int layer = meshFiltersAll[i].gameObject.layer;
-
       bool valid = meshFiltersAll[i].sharedMesh != null;
 
-      if (valid) {
+      if (valid && (this.restrictToLayer < 0 || (this.restrictToLayer == layer))) {
         meshFiltersRelevant.Add(meshFiltersAll[i]);
       }
     }
