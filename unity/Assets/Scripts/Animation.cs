@@ -5,8 +5,7 @@ using UnityEngine;
 
 namespace Simulator {
 
-class Animation
-{
+class Animation {
   /**
    * Animates the vehicle moving between two waypoints.
    */
