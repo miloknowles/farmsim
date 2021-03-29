@@ -4669,6 +4669,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: DropLine_Tele_1
       objectReference: {fileID: 0}
+    - target: {fileID: 5041599435911648042, guid: 58b8a34c7d53642aca5a3346dd1720ae,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 3.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5041599435911648042, guid: 58b8a34c7d53642aca5a3346dd1720ae,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5041599436530706314, guid: 58b8a34c7d53642aca5a3346dd1720ae,
         type: 3}
       propertyPath: m_Materials.Array.data[0]
@@ -4683,6 +4693,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: DropLine_1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5041599437012798620, guid: 58b8a34c7d53642aca5a3346dd1720ae,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -3.5
       objectReference: {fileID: 0}
     - target: {fileID: 5041599437012798621, guid: 58b8a34c7d53642aca5a3346dd1720ae,
         type: 3}
@@ -5115,6 +5130,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: DropLine_Tele_2
       objectReference: {fileID: 0}
+    - target: {fileID: 5041599435911648042, guid: 58b8a34c7d53642aca5a3346dd1720ae,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 3.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5041599435911648042, guid: 58b8a34c7d53642aca5a3346dd1720ae,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5041599436530706314, guid: 58b8a34c7d53642aca5a3346dd1720ae,
         type: 3}
       propertyPath: m_Materials.Array.data[0]
@@ -5129,6 +5154,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: DropLine_2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5041599437012798620, guid: 58b8a34c7d53642aca5a3346dd1720ae,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -3.5
       objectReference: {fileID: 0}
     - target: {fileID: 5041599437012798621, guid: 58b8a34c7d53642aca5a3346dd1720ae,
         type: 3}
@@ -6241,6 +6271,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: DropLine_Tele_0
       objectReference: {fileID: 0}
+    - target: {fileID: 5041599435911648042, guid: 58b8a34c7d53642aca5a3346dd1720ae,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 3.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5041599435911648042, guid: 58b8a34c7d53642aca5a3346dd1720ae,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5041599436530706314, guid: 58b8a34c7d53642aca5a3346dd1720ae,
         type: 3}
       propertyPath: m_Materials.Array.data[0]
@@ -6255,6 +6295,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: DropLine_0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5041599437012798620, guid: 58b8a34c7d53642aca5a3346dd1720ae,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -3.5
       objectReference: {fileID: 0}
     - target: {fileID: 5041599437012798621, guid: 58b8a34c7d53642aca5a3346dd1720ae,
         type: 3}
@@ -11269,6 +11314,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: DropLine_Tele_3
       objectReference: {fileID: 0}
+    - target: {fileID: 5041599435911648042, guid: 58b8a34c7d53642aca5a3346dd1720ae,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 3.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5041599435911648042, guid: 58b8a34c7d53642aca5a3346dd1720ae,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5041599436530706314, guid: 58b8a34c7d53642aca5a3346dd1720ae,
         type: 3}
       propertyPath: m_Materials.Array.data[0]
@@ -11283,6 +11338,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: DropLine_3
+      objectReference: {fileID: 0}
+    - target: {fileID: 5041599437012798620, guid: 58b8a34c7d53642aca5a3346dd1720ae,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -3.5
       objectReference: {fileID: 0}
     - target: {fileID: 5041599437012798621, guid: 58b8a34c7d53642aca5a3346dd1720ae,
         type: 3}

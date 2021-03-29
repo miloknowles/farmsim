@@ -2,7 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-
+// Add this to a cylinder as a cheap way to simulate elasticity.
+// The object with lengthen so that its endpoints stay near the specified game objects.
+// IMPORTANT: This object that this script is attached to should position itself exactly at the
+// midpoint of the endpoint objects.
 public class Autotelescope : MonoBehaviour
 {
   public enum LongitudinalAxis { X, Y, Z }
