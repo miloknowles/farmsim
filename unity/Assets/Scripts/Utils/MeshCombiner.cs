@@ -10,6 +10,7 @@ using UnityEngine.Rendering;
 [RequireComponent(typeof(MeshFilter))]
 [RequireComponent(typeof(MeshRenderer))]
 public class MeshCombiner : MonoBehaviour {
+  // If specified (nonnegative), only children with this layer index will be included.
   public int restrictToLayer = -1;
 
   void Start()
@@ -28,7 +29,7 @@ public class MeshCombiner : MonoBehaviour {
       }
     }
 
-    Debug.Log("Combining " + meshFiltersRelevant.Count.ToString() + " sub-meshes");
+    // Debug.Log("Combining " + meshFiltersRelevant.Count.ToString() + " sub-meshes");
 
     CombineInstance[] combine = new CombineInstance[meshFiltersRelevant.Count];
 

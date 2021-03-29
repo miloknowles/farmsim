@@ -816,6 +816,53 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 197492257}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &202800057
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 202800058}
+  - component: {fileID: 202800059}
+  m_Layer: 0
+  m_Name: RangeSensorA
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &202800058
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 202800057}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 374889542}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &202800059
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 202800057}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a094bd3cd7578f666afe00d2b0c9e5a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  apsBeaconObject: {fileID: 952967118}
+  apsReceiverObject: {fileID: 374889541}
+  enableApsNoise: 1
+  apsNoiseSigma: 0.1
 --- !u!1001 &206626810
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1157,7 +1204,9 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: -0.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
+  m_Children:
+  - {fileID: 202800058}
+  - {fileID: 1207165785}
   m_Father: {fileID: 420561426}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1309,7 +1358,6 @@ GameObject:
   - component: {fileID: 420561430}
   - component: {fileID: 420561431}
   - component: {fileID: 420561432}
-  - component: {fileID: 420561433}
   - component: {fileID: 420561434}
   - component: {fileID: 420561435}
   m_Layer: 0
@@ -1375,7 +1423,8 @@ MonoBehaviour:
   camera_forward_right: {fileID: 843407242}
   imu_rigidbody: {fileID: 420561429}
   imu_sensor: {fileID: 420561432}
-  aps_sensor: {fileID: 420561433}
+  range_sensor_A: {fileID: 202800059}
+  range_sensor_B: {fileID: 1207165784}
   depth_sensor: {fileID: 420561434}
   stereo_rig: {fileID: 420561435}
   simulatorIOMode: 2
@@ -1461,22 +1510,6 @@ MonoBehaviour:
   gyroBiasRandomWalkSigma: 0.0000014544411
   accelBiasSigma: 0.0001
   gyroBiasSigma: 0.0001
---- !u!114 &420561433
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 420561424}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a094bd3cd7578f666afe00d2b0c9e5a4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  apsBeaconObject: {fileID: 663678797}
-  apsReceiverObject: {fileID: 374889541}
-  enableApsNoise: 1
-  apsNoiseSigma: 0.1
 --- !u!114 &420561434
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6302,7 +6335,7 @@ GameObject:
   - component: {fileID: 663678800}
   - component: {fileID: 663678799}
   m_Layer: 0
-  m_Name: ZBL-APS-Beacon
+  m_Name: ZBL-APS-Beacon-A
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6317,7 +6350,7 @@ Transform:
   m_GameObject: {fileID: 663678797}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
+  m_LocalScale: {x: 0.3, y: 0.3, z: 0.3}
   m_Children: []
   m_Father: {fileID: 754256996}
   m_RootOrder: 7
@@ -6837,6 +6870,7 @@ Transform:
   - {fileID: 1763879186}
   - {fileID: 750594728}
   - {fileID: 663678798}
+  - {fileID: 952967119}
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -7587,6 +7621,101 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 917281689}
   m_Mesh: {fileID: 0}
+--- !u!1 &952967118
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 952967119}
+  - component: {fileID: 952967122}
+  - component: {fileID: 952967121}
+  - component: {fileID: 952967120}
+  m_Layer: 0
+  m_Name: ZBL-APS-Beacon-B
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &952967119
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 952967118}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 2}
+  m_LocalScale: {x: 0.3, y: 0.3, z: 0.3}
+  m_Children: []
+  m_Father: {fileID: 754256996}
+  m_RootOrder: 8
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &952967120
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 952967118}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!23 &952967121
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 952967118}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 1a1fea063a56041b9a2c9d7379b278a4, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &952967122
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 952967118}
+  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1 &973168482
 GameObject:
   m_ObjectHideFlags: 0
@@ -8518,6 +8647,53 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1196015130}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1207165783
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1207165785}
+  - component: {fileID: 1207165784}
+  m_Layer: 0
+  m_Name: RangeSensorB
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1207165784
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1207165783}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a094bd3cd7578f666afe00d2b0c9e5a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  apsBeaconObject: {fileID: 663678797}
+  apsReceiverObject: {fileID: 374889541}
+  enableApsNoise: 1
+  apsNoiseSigma: 0.1
+--- !u!4 &1207165785
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1207165783}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 374889542}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1260060928
 PrefabInstance:
   m_ObjectHideFlags: 0

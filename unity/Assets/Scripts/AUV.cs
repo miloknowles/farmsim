@@ -27,8 +27,7 @@ public enum IOMode
 }
 
 
-public class AUV : MonoBehaviour
-{
+public class AUV : MonoBehaviour {
   private int msgPublishCount;
   DateTime camStart;
 
@@ -38,7 +37,8 @@ public class AUV : MonoBehaviour
 
   public Rigidbody imu_rigidbody;
   public ImuSensor imu_sensor;
-  public RangeSensor aps_sensor;
+  public RangeSensor range_sensor_A;
+  public RangeSensor range_sensor_B;
   public DepthSensor depth_sensor;
   public StereoRig stereo_rig;
 
@@ -51,7 +51,8 @@ public class AUV : MonoBehaviour
   private string leftImageSubfolder = "cam0";
   private string rightImageSubfolder = "cam1";
   private string imuSubfolder = "imu0";
-  private string apsSubfolder = "aps0";
+  private string apsSubfolderA = "aps0";
+  private string apsSubfolderB = "aps1";
   private string depthSubfolder = "depth0";
 
   void Start()
@@ -179,6 +180,9 @@ public class AUV : MonoBehaviour
 
       ImuMeasurement data = this.imu_sensor.Read();
 
+      // NOTE(milo): Need to correct the IMU timestamp (shift backwards one timestamp)?
+      // long timestamp_shifted = data.timestamp - (long)(1e9*Time.fixedDeltaTime);
+
       // We use the EuRoC MAV format:
       // timestamp [ns],w_RS_S_x [rad s^-1],w_RS_S_y [rad s^-1],w_RS_S_z [rad s^-1],a_RS_S_x [m s^-2],a_RS_S_y [m s^-2],a_RS_S_z [m s^-2]
       List<string> imu_line = new List<string>{
@@ -230,34 +234,52 @@ public class AUV : MonoBehaviour
   IEnumerator SaveApsDataset()
   {
     string dataset_folder = Path.Combine(this.outputDatasetRoot, this.outputDatasetName);
-    string aps_folder = Path.Combine(dataset_folder, this.apsSubfolder);
+    string aps_folder_A = Path.Combine(dataset_folder, this.apsSubfolderA);
+    string aps_folder_B = Path.Combine(dataset_folder, this.apsSubfolderB);
 
-    if (Directory.Exists(aps_folder)) {
-      Debug.Log("WARNING: Deleting existing APS folder: " + aps_folder);
-      Directory.Delete(aps_folder, true);
+    if (Directory.Exists(aps_folder_A)) {
+      Debug.Log("WARNING: Deleting existing APS folder: " + aps_folder_A);
+      Directory.Delete(aps_folder_A, true);
+    }
+    if (Directory.Exists(aps_folder_B)) {
+      Debug.Log("WARNING: Deleting existing APS folder: " + aps_folder_B);
+      Directory.Delete(aps_folder_B, true);
     }
 
-    Directory.CreateDirectory(aps_folder);
+    Directory.CreateDirectory(aps_folder_A);
+    Directory.CreateDirectory(aps_folder_B);
 
-    string csv = Path.Combine(aps_folder, "data.csv");
+    string csv_A = Path.Combine(aps_folder_A, "data.csv");
+    string csv_B = Path.Combine(aps_folder_B, "data.csv");
 
     while (true) {
       // ping_time = max_range / speed_of_sound = 100m / 343 m/s = 0.29 sec
       // Therefore can run at most 3ish Hz at 100m max range.
-      yield return new WaitForSeconds(0.333f);
-      RangeMeasurement data = this.aps_sensor.Read();
+      yield return new WaitForSeconds(0.3f);
+      RangeMeasurement data_A = this.range_sensor_A.Read();
+      RangeMeasurement data_B = this.range_sensor_B.Read();
 
       // timestamp [ns], range [m], world_t_beacon.x [m], world_t_beacon.y [m], world_t_beacon.z [m],
-      List<string> line = new List<string>{
-        data.timestamp.ToString("D19"),
-        data.range.ToString("F18"),
-        data.world_t_beacon.x.ToString("F18"),
-        data.world_t_beacon.y.ToString("F18"),
-        data.world_t_beacon.z.ToString("F18"),
+      List<string> line_A = new List<string>{
+        data_A.timestamp.ToString("D19"),
+        data_A.range.ToString("F18"),
+        data_A.world_t_beacon.x.ToString("F18"),
+        data_A.world_t_beacon.y.ToString("F18"),
+        data_A.world_t_beacon.z.ToString("F18"),
         "\n"
       };
 
-      File.AppendAllText(csv, string.Join(",", line));
+      List<string> line_B = new List<string>{
+        data_B.timestamp.ToString("D19"),
+        data_B.range.ToString("F18"),
+        data_B.world_t_beacon.x.ToString("F18"),
+        data_B.world_t_beacon.y.ToString("F18"),
+        data_B.world_t_beacon.z.ToString("F18"),
+        "\n"
+      };
+
+      File.AppendAllText(csv_A, string.Join(",", line_A));
+      File.AppendAllText(csv_B, string.Join(",", line_B));
     }
   }
 
@@ -378,9 +400,9 @@ public class AUV : MonoBehaviour
 
       this.stereo_rig.CaptureStereoPair(out leftImage, out rightImage);
 
-      byte[] leftPng = leftImage.EncodeToTGA();
-      byte[] rightPng = rightImage.EncodeToTGA();
-      string imagePath = $"{nsec}.tga";
+      byte[] leftPng = leftImage.EncodeToPNG();
+      byte[] rightPng = rightImage.EncodeToPNG();
+      string imagePath = $"{nsec}.png";
 
       List<string> img_line = new List<string>{ nsec, imagePath, "\n" };
       File.AppendAllText(Path.Combine(leftImageFolder, "data.csv"), string.Join(",", img_line));
