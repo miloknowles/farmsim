@@ -2063,7 +2063,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 482875942}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -50, y: -30, z: -10}
+  m_LocalPosition: {x: -50, y: -31, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 973168483}
@@ -2085,7 +2085,7 @@ MonoBehaviour:
   fishSwimSpeedMin: 0.1
   fishSwimSpeedMax: 5
   fishRotateSpeed: 30
-  aquariumSize: {x: 100, y: 15, z: 50}
+  aquariumSize: {x: 100, y: 14, z: 50}
   fishPrefab: {fileID: 100000, guid: 49a87e3402ce60f4eba9b0498164bdd5, type: 3}
 --- !u!1001 &484003076
 PrefabInstance:
@@ -7042,7 +7042,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 724607432}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -5, y: -5, z: -5}
+  m_LocalPosition: {x: 2.5, y: -2.5, z: 4}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 420561426}
@@ -7060,11 +7060,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d10b5120da0e38a859d79ab880e73db8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _gridSize: {x: 10, y: 10, z: 10}
+  _gridSize: {x: 5, y: 5, z: 5}
   _cellSize: 1
   _offset: {x: 0, y: 0, z: 0}
   _offsetSpeed: {x: 1, y: 4, z: -2}
-  _numberOfParticles: 500
+  _numberOfParticles: 200
   _particleScale: 0.01
   _particlePrefab: {fileID: 6003994997900738337, guid: 1bf81d93d9f603dcfa5535cc959cd116,
     type: 3}
