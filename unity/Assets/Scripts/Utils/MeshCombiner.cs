@@ -14,40 +14,39 @@ public class MeshCombiner : MonoBehaviour {
   {
     MeshFilter[] meshFiltersAll = GetComponentsInChildren<MeshFilter>();
 
-    // Get all relevant meshes (non-empty and of the target material).
+    // Get all relevant meshes (non-empty).
     List<MeshFilter> meshFiltersRelevant = new List<MeshFilter>();
 
     for (int i = 0; i < meshFiltersAll.Length; ++i) {
-      if (meshFiltersAll[i].sharedMesh != null) {
+      int layer = meshFiltersAll[i].gameObject.layer;
+
+      bool valid = meshFiltersAll[i].sharedMesh != null;
+
+      if (valid) {
         meshFiltersRelevant.Add(meshFiltersAll[i]);
       }
     }
 
+    Debug.Log("Combining " + meshFiltersRelevant.Count.ToString() + " sub-meshes");
+
     CombineInstance[] combine = new CombineInstance[meshFiltersRelevant.Count];
+
+    Matrix4x4 thisLocalToWorld = this.gameObject.transform.localToWorldMatrix;
 
     // Add sub-meshes to the combined mesh.
     for (int i = 0; i < combine.Length; ++i) {
       if (!meshFiltersRelevant[i].sharedMesh.isReadable) {
+        Debug.Log("WARNING: Encountered static object. Combining mesh won't work.");
         Debug.Log(meshFiltersRelevant[i].gameObject);
       }
       combine[i].mesh = meshFiltersRelevant[i].sharedMesh;
-      combine[i].transform = meshFiltersRelevant[i].transform.localToWorldMatrix;
+      combine[i].transform = thisLocalToWorld.inverse * meshFiltersRelevant[i].transform.localToWorldMatrix;
       meshFiltersRelevant[i].gameObject.SetActive(false);
     }
 
-    // int i = 0;
-    // while (i < meshFilters.Length) {
-    //   if (meshFilters[i].sharedMesh != null) {
-    //     combine[i].mesh = meshFilters[i].sharedMesh;
-    //     combine[i].transform = meshFilters[i].transform.localToWorldMatrix;
-    //     meshFilters[i].gameObject.SetActive(false);
-    //     i++;
-    //   }
-    // }
-
     this.transform.GetComponent<MeshFilter>().mesh = new Mesh();
     this.transform.GetComponent<MeshFilter>().mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
-    this.transform.GetComponent<MeshFilter>().mesh.CombineMeshes(combine);
+    this.transform.GetComponent<MeshFilter>().mesh.CombineMeshes(combine, true, true, false);
     this.transform.gameObject.SetActive(true);
   }
 }
