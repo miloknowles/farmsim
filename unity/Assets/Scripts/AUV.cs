@@ -378,17 +378,16 @@ public class AUV : MonoBehaviour
 
       this.stereo_rig.CaptureStereoPair(out leftImage, out rightImage);
 
-      // byte[] leftPng = leftImage.EncodeToPNG();
-      // byte[] rightPng = rightImage.EncodeToPNG();
+      byte[] leftPng = leftImage.EncodeToTGA();
+      byte[] rightPng = rightImage.EncodeToTGA();
+      string imagePath = $"{nsec}.tga";
 
-      // string imagePath = $"{nsec}.png";
+      List<string> img_line = new List<string>{ nsec, imagePath, "\n" };
+      File.AppendAllText(Path.Combine(leftImageFolder, "data.csv"), string.Join(",", img_line));
+      File.AppendAllText(Path.Combine(rightImageFolder, "data.csv"), string.Join(",", img_line));
 
-      // List<string> img_line = new List<string>{ nsec, imagePath, "\n" };
-      // File.AppendAllText(Path.Combine(leftImageFolder, "data.csv"), string.Join(",", img_line));
-      // File.AppendAllText(Path.Combine(rightImageFolder, "data.csv"), string.Join(",", img_line));
-
-      // File.WriteAllBytes(Path.Combine(leftImageDataFolder, imagePath), leftPng);
-      // File.WriteAllBytes(Path.Combine(rightImageDataFolder, imagePath), rightPng);
+      File.WriteAllBytes(Path.Combine(leftImageDataFolder, imagePath), leftPng);
+      File.WriteAllBytes(Path.Combine(rightImageDataFolder, imagePath), rightPng);
 
       ++frame_id;
     }
