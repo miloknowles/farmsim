@@ -745,7 +745,7 @@ PrefabInstance:
     - target: {fileID: 4653121137522870155, guid: 59265c06d324f395682cb16b67f1d258,
         type: 3}
       propertyPath: m_Name
-      value: stereo_cam_left
+      value: LeftCamera
       objectReference: {fileID: 0}
     - target: {fileID: 4653121137522870165, guid: 59265c06d324f395682cb16b67f1d258,
         type: 3}
@@ -1505,7 +1505,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 100002, guid: 21543d2b66928224f8a9536ff3811682, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 400002, guid: 21543d2b66928224f8a9536ff3811682, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1571,8 +1571,9 @@ GameObject:
   - component: {fileID: 420561432}
   - component: {fileID: 420561433}
   - component: {fileID: 420561434}
+  - component: {fileID: 420561435}
   m_Layer: 0
-  m_Name: AUV
+  m_Name: RobotAUV
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1606,8 +1607,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 420561424}
-  m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
-  m_LocalPosition: {x: 16, y: -13.58, z: -4.4599}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 11.931, y: -4.47, z: -8.628}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 518964988}
@@ -1617,7 +1618,7 @@ Transform:
   - {fileID: 1300158239}
   m_Father: {fileID: 0}
   m_RootOrder: 4
-  m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &420561427
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1636,6 +1637,7 @@ MonoBehaviour:
   imu_sensor: {fileID: 420561432}
   aps_sensor: {fileID: 420561433}
   depth_sensor: {fileID: 420561434}
+  stereo_rig: {fileID: 420561435}
   simulatorIOMode: 2
   outputDatasetName: default_dataset/mav0/
   outputDatasetRoot: /home/milo/datasets/Unity3D/farmsim/
@@ -1750,6 +1752,20 @@ MonoBehaviour:
   depthSensorObject: {fileID: 1300158238}
   enableDepthNoise: 1
   noiseSigma: 0.1
+--- !u!114 &420561435
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 420561424}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2ebbc50ef2e7fc510924ee79ddaf5ee0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  leftCamera: {fileID: 178838056}
+  rightCamera: {fileID: 843407242}
 --- !u!1001 &457454128
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -7695,7 +7711,7 @@ PrefabInstance:
     - target: {fileID: 4653121137522870155, guid: 59265c06d324f395682cb16b67f1d258,
         type: 3}
       propertyPath: m_Name
-      value: stereo_cam_right
+      value: RightCamera
       objectReference: {fileID: 0}
     - target: {fileID: 4653121137522870165, guid: 59265c06d324f395682cb16b67f1d258,
         type: 3}
@@ -13089,7 +13105,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 100002, guid: 46b12845355544642bf8f9d0cb373af7, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 400002, guid: 46b12845355544642bf8f9d0cb373af7, type: 3}
       propertyPath: m_LocalPosition.x

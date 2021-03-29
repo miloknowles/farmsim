@@ -40,6 +40,7 @@ public class AUV : MonoBehaviour
   public ImuSensor imu_sensor;
   public RangeSensor aps_sensor;
   public DepthSensor depth_sensor;
+  public StereoRig stereo_rig;
 
   private ROSMessageHolder roslink;
   public Simulator.IOMode simulatorIOMode = Simulator.IOMode.NO_OUTPUT;
@@ -53,15 +54,8 @@ public class AUV : MonoBehaviour
   private string apsSubfolder = "aps0";
   private string depthSubfolder = "depth0";
 
-  private RenderTexture _preallocRT;
-
   void Start()
   {
-    this._preallocRT = new RenderTexture(
-        SimulationParams.AUV_CAMERA_WIDTH,
-        SimulationParams.AUV_CAMERA_HEIGHT,
-        16, RenderTextureFormat.ARGB32);
-
     this.roslink = GameObject.Find("ROSMessageHolder").GetComponent<ROSMessageHolder>();
 
     // Add a publisher for each of the cameras that we want to support.
@@ -93,40 +87,6 @@ public class AUV : MonoBehaviour
       StartCoroutine(SaveApsDataset());
       StartCoroutine(SaveDepthDataset());
     }
-  }
-
-  /**
-   * Grabs an image from a camera and returns it.
-   */
-  Texture2D GetImageFromCamera(Camera camera)
-  {
-    RenderTexture currentActiveRT = RenderTexture.active; // Placeholder for active render texture.
-
-    RenderTexture originalTexture = camera.targetTexture;
-
-    // NOTE(milo): Using the ARGB32 format since it's in tutorials, not sure what the best option is
-    // here though. It uses 8 bits per RGB channel, which seems standard.
-    // NOTE(milo): Documentation on camera rendering is a little confusing.
-    // We instantiate a RenderTexture above, which is basically just a buffer that cameras render
-    // into. Then, we call Render() and read the rendered image into a Texture2D with ReadPixels().
-    camera.targetTexture = this._preallocRT;
-
-    camera.Render();
-    RenderTexture.active = camera.targetTexture;
-
-    // Make a new (empty) image and read the camera image into it.
-    Texture2D image = new Texture2D(camera.targetTexture.width, camera.targetTexture.height,
-                                    TextureFormat.RGB24, false);
-
-    // This will read pixels from the ACTIVE render texture.
-    image.ReadPixels(new Rect(0, 0, camera.targetTexture.width, camera.targetTexture.height), 0, 0);
-    image.Apply();
-
-    camera.targetTexture = originalTexture;
-
-    RenderTexture.active = currentActiveRT; // Reset the active render texture.
-
-    return image;
   }
 
   // NOTE(milo): This doesn't work! Don't use yet.
@@ -161,6 +121,8 @@ public class AUV : MonoBehaviour
   // Any message that is meant to be synchronized with camera images should be published here.
   IEnumerator PublishCameraSyncedMessages()
   {
+    Texture2D leftImage, rightImage;
+
     while (true) {
       yield return new WaitForSeconds(1.0f / SimulationParams.CAMERA_PUBLISH_HZ);
       yield return new WaitForEndOfFrame();
@@ -169,14 +131,16 @@ public class AUV : MonoBehaviour
       var timeSinceStart = now - camStart;
       var timeMessage = new TimeMsg(timeSinceStart.Seconds, timeSinceStart.Milliseconds);
 
+      this.stereo_rig.CaptureStereoPair(out leftImage, out rightImage);
+
       PublishCameraImage(
-          GetImageFromCamera(camera_forward_left),
+          leftImage,
           timeMessage,
           new HeaderMsg(msgPublishCount, timeMessage, "cam0"),
           StereoCamLeftPublisherCmp.GetMessageTopic());
 
       PublishCameraImage(
-          GetImageFromCamera(camera_forward_right),
+          rightImage,
           timeMessage,
           new HeaderMsg(msgPublishCount, timeMessage, "cam1"),
           StereoCamRightPublisherCmp.GetMessageTopic());
@@ -360,6 +324,7 @@ public class AUV : MonoBehaviour
     Directory.CreateDirectory(rightImageDataFolder);
 
     int frame_id = 0;
+    Texture2D leftImage, rightImage;
 
     // NOTE(milo): Maximum number of frames to save. Avoids using up all disk space by accident.
     while (frame_id < 5000) {
@@ -411,8 +376,7 @@ public class AUV : MonoBehaviour
 
       File.AppendAllText(Path.Combine(dataset_folder, "imu0_poses.txt"), string.Join(",", pose_line));
 
-      Texture2D leftImage = GetImageFromCamera(camera_forward_left);
-      Texture2D rightImage = GetImageFromCamera(camera_forward_right);
+      this.stereo_rig.CaptureStereoPair(out leftImage, out rightImage);
 
       byte[] leftPng = leftImage.EncodeToPNG();
       byte[] rightPng = rightImage.EncodeToPNG();
