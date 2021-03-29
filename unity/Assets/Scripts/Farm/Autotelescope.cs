@@ -2,7 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-
+// Add this to a cylinder as a cheap way to simulate elasticity.
+// The object with lengthen so that its endpoints stay near the specified game objects.
+// IMPORTANT: This object that this script is attached to should position itself exactly at the
+// midpoint of the endpoint objects.
 public class Autotelescope : MonoBehaviour
 {
   public enum LongitudinalAxis { X, Y, Z }
@@ -55,6 +58,7 @@ public class Autotelescope : MonoBehaviour
     this.gameObject.transform.rotation = q_align_long;
 
     // Make the attached telescope scale to fit between the endpoints.
-    telescope.transform.localScale = new Vector3(this.originalScaleX, 0.5f*length_01, this.originalScaleZ);
+    // NOTE(milo): Should be 0.5f * scale for cylinders!
+    telescope.transform.localScale = new Vector3(this.originalScaleX, length_01, this.originalScaleZ);
   }
 }

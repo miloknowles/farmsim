@@ -27,8 +27,7 @@ public enum IOMode
 }
 
 
-public class AUV : MonoBehaviour
-{
+public class AUV : MonoBehaviour {
   private int msgPublishCount;
   DateTime camStart;
 
@@ -38,8 +37,10 @@ public class AUV : MonoBehaviour
 
   public Rigidbody imu_rigidbody;
   public ImuSensor imu_sensor;
-  public RangeSensor aps_sensor;
+  public RangeSensor range_sensor_A;
+  public RangeSensor range_sensor_B;
   public DepthSensor depth_sensor;
+  public StereoRig stereo_rig;
 
   private ROSMessageHolder roslink;
   public Simulator.IOMode simulatorIOMode = Simulator.IOMode.NO_OUTPUT;
@@ -50,18 +51,12 @@ public class AUV : MonoBehaviour
   private string leftImageSubfolder = "cam0";
   private string rightImageSubfolder = "cam1";
   private string imuSubfolder = "imu0";
-  private string apsSubfolder = "aps0";
+  private string apsSubfolderA = "aps0";
+  private string apsSubfolderB = "aps1";
   private string depthSubfolder = "depth0";
-
-  private RenderTexture _preallocRT;
 
   void Start()
   {
-    this._preallocRT = new RenderTexture(
-        SimulationParams.AUV_CAMERA_WIDTH,
-        SimulationParams.AUV_CAMERA_HEIGHT,
-        16, RenderTextureFormat.ARGB32);
-
     this.roslink = GameObject.Find("ROSMessageHolder").GetComponent<ROSMessageHolder>();
 
     // Add a publisher for each of the cameras that we want to support.
@@ -93,40 +88,6 @@ public class AUV : MonoBehaviour
       StartCoroutine(SaveApsDataset());
       StartCoroutine(SaveDepthDataset());
     }
-  }
-
-  /**
-   * Grabs an image from a camera and returns it.
-   */
-  Texture2D GetImageFromCamera(Camera camera)
-  {
-    RenderTexture currentActiveRT = RenderTexture.active; // Placeholder for active render texture.
-
-    RenderTexture originalTexture = camera.targetTexture;
-
-    // NOTE(milo): Using the ARGB32 format since it's in tutorials, not sure what the best option is
-    // here though. It uses 8 bits per RGB channel, which seems standard.
-    // NOTE(milo): Documentation on camera rendering is a little confusing.
-    // We instantiate a RenderTexture above, which is basically just a buffer that cameras render
-    // into. Then, we call Render() and read the rendered image into a Texture2D with ReadPixels().
-    camera.targetTexture = this._preallocRT;
-
-    camera.Render();
-    RenderTexture.active = camera.targetTexture;
-
-    // Make a new (empty) image and read the camera image into it.
-    Texture2D image = new Texture2D(camera.targetTexture.width, camera.targetTexture.height,
-                                    TextureFormat.RGB24, false);
-
-    // This will read pixels from the ACTIVE render texture.
-    image.ReadPixels(new Rect(0, 0, camera.targetTexture.width, camera.targetTexture.height), 0, 0);
-    image.Apply();
-
-    camera.targetTexture = originalTexture;
-
-    RenderTexture.active = currentActiveRT; // Reset the active render texture.
-
-    return image;
   }
 
   // NOTE(milo): This doesn't work! Don't use yet.
@@ -161,6 +122,8 @@ public class AUV : MonoBehaviour
   // Any message that is meant to be synchronized with camera images should be published here.
   IEnumerator PublishCameraSyncedMessages()
   {
+    Texture2D leftImage, rightImage;
+
     while (true) {
       yield return new WaitForSeconds(1.0f / SimulationParams.CAMERA_PUBLISH_HZ);
       yield return new WaitForEndOfFrame();
@@ -169,14 +132,16 @@ public class AUV : MonoBehaviour
       var timeSinceStart = now - camStart;
       var timeMessage = new TimeMsg(timeSinceStart.Seconds, timeSinceStart.Milliseconds);
 
+      this.stereo_rig.CaptureStereoPair(out leftImage, out rightImage);
+
       PublishCameraImage(
-          GetImageFromCamera(camera_forward_left),
+          leftImage,
           timeMessage,
           new HeaderMsg(msgPublishCount, timeMessage, "cam0"),
           StereoCamLeftPublisherCmp.GetMessageTopic());
 
       PublishCameraImage(
-          GetImageFromCamera(camera_forward_right),
+          rightImage,
           timeMessage,
           new HeaderMsg(msgPublishCount, timeMessage, "cam1"),
           StereoCamRightPublisherCmp.GetMessageTopic());
@@ -214,6 +179,9 @@ public class AUV : MonoBehaviour
       yield return new WaitForFixedUpdate();
 
       ImuMeasurement data = this.imu_sensor.Read();
+
+      // NOTE(milo): Need to correct the IMU timestamp (shift backwards one timestamp)?
+      // long timestamp_shifted = data.timestamp - (long)(1e9*Time.fixedDeltaTime);
 
       // We use the EuRoC MAV format:
       // timestamp [ns],w_RS_S_x [rad s^-1],w_RS_S_y [rad s^-1],w_RS_S_z [rad s^-1],a_RS_S_x [m s^-2],a_RS_S_y [m s^-2],a_RS_S_z [m s^-2]
@@ -266,34 +234,52 @@ public class AUV : MonoBehaviour
   IEnumerator SaveApsDataset()
   {
     string dataset_folder = Path.Combine(this.outputDatasetRoot, this.outputDatasetName);
-    string aps_folder = Path.Combine(dataset_folder, this.apsSubfolder);
+    string aps_folder_A = Path.Combine(dataset_folder, this.apsSubfolderA);
+    string aps_folder_B = Path.Combine(dataset_folder, this.apsSubfolderB);
 
-    if (Directory.Exists(aps_folder)) {
-      Debug.Log("WARNING: Deleting existing APS folder: " + aps_folder);
-      Directory.Delete(aps_folder, true);
+    if (Directory.Exists(aps_folder_A)) {
+      Debug.Log("WARNING: Deleting existing APS folder: " + aps_folder_A);
+      Directory.Delete(aps_folder_A, true);
+    }
+    if (Directory.Exists(aps_folder_B)) {
+      Debug.Log("WARNING: Deleting existing APS folder: " + aps_folder_B);
+      Directory.Delete(aps_folder_B, true);
     }
 
-    Directory.CreateDirectory(aps_folder);
+    Directory.CreateDirectory(aps_folder_A);
+    Directory.CreateDirectory(aps_folder_B);
 
-    string csv = Path.Combine(aps_folder, "data.csv");
+    string csv_A = Path.Combine(aps_folder_A, "data.csv");
+    string csv_B = Path.Combine(aps_folder_B, "data.csv");
 
     while (true) {
       // ping_time = max_range / speed_of_sound = 100m / 343 m/s = 0.29 sec
       // Therefore can run at most 3ish Hz at 100m max range.
-      yield return new WaitForSeconds(0.333f);
-      RangeMeasurement data = this.aps_sensor.Read();
+      yield return new WaitForSeconds(0.3f);
+      RangeMeasurement data_A = this.range_sensor_A.Read();
+      RangeMeasurement data_B = this.range_sensor_B.Read();
 
       // timestamp [ns], range [m], world_t_beacon.x [m], world_t_beacon.y [m], world_t_beacon.z [m],
-      List<string> line = new List<string>{
-        data.timestamp.ToString("D19"),
-        data.range.ToString("F18"),
-        data.world_t_beacon.x.ToString("F18"),
-        data.world_t_beacon.y.ToString("F18"),
-        data.world_t_beacon.z.ToString("F18"),
+      List<string> line_A = new List<string>{
+        data_A.timestamp.ToString("D19"),
+        data_A.range.ToString("F18"),
+        data_A.world_t_beacon.x.ToString("F18"),
+        data_A.world_t_beacon.y.ToString("F18"),
+        data_A.world_t_beacon.z.ToString("F18"),
         "\n"
       };
 
-      File.AppendAllText(csv, string.Join(",", line));
+      List<string> line_B = new List<string>{
+        data_B.timestamp.ToString("D19"),
+        data_B.range.ToString("F18"),
+        data_B.world_t_beacon.x.ToString("F18"),
+        data_B.world_t_beacon.y.ToString("F18"),
+        data_B.world_t_beacon.z.ToString("F18"),
+        "\n"
+      };
+
+      File.AppendAllText(csv_A, string.Join(",", line_A));
+      File.AppendAllText(csv_B, string.Join(",", line_B));
     }
   }
 
@@ -360,6 +346,7 @@ public class AUV : MonoBehaviour
     Directory.CreateDirectory(rightImageDataFolder);
 
     int frame_id = 0;
+    Texture2D leftImage, rightImage;
 
     // NOTE(milo): Maximum number of frames to save. Avoids using up all disk space by accident.
     while (frame_id < 5000) {
@@ -411,12 +398,10 @@ public class AUV : MonoBehaviour
 
       File.AppendAllText(Path.Combine(dataset_folder, "imu0_poses.txt"), string.Join(",", pose_line));
 
-      Texture2D leftImage = GetImageFromCamera(camera_forward_left);
-      Texture2D rightImage = GetImageFromCamera(camera_forward_right);
+      this.stereo_rig.CaptureStereoPair(out leftImage, out rightImage);
 
       byte[] leftPng = leftImage.EncodeToPNG();
       byte[] rightPng = rightImage.EncodeToPNG();
-
       string imagePath = $"{nsec}.png";
 
       List<string> img_line = new List<string>{ nsec, imagePath, "\n" };
