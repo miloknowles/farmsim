@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: cd15b44974268b041b8c8be1aa209001
+guid: 14e68348d68b280dfa4ea4fc87e4a2d9
 ModelImporter:
   serializedVersion: 20101
   internalIDToNameTable: []
@@ -7,23 +7,23 @@ ModelImporter:
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
-      name: 0.101961_0.101961_0.101961_0.000000_0.000000
-    second: {fileID: 2100000, guid: 1a1fea063a56041b9a2c9d7379b278a4, type: 2}
+      name: 0.231373_0.380392_0.705882_0.000000_0.000000
+    second: {fileID: 2100000, guid: a8946dfb1dc49eec1b6bf687d462ab75, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
-      name: 0.109804_0.109804_0.109804_0.000000_0.000000
-    second: {fileID: 2100000, guid: 1a1fea063a56041b9a2c9d7379b278a4, type: 2}
+      name: 0.262745_0.282353_0.301961_0.000000_0.000000
+    second: {fileID: 2100000, guid: 04ec8189d807b43ea926da6ae72cc0e7, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
-      name: 0.792157_0.819608_0.933333_0.000000_0.000000
-    second: {fileID: 2100000, guid: f01c415c7ad20411bbb093cb1d631f6a, type: 2}
+      name: 0.439216_0.474510_0.501961_0.000000_0.000000
+    second: {fileID: 2100000, guid: 7b54ecad22d93bff1ab2342e017c5dea, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
-      name: 0.792157_0.819608_0.933333_0.000000_0.752941
-    second: {fileID: 2100000, guid: 1a1fea063a56041b9a2c9d7379b278a4, type: 2}
+      name: 0.984314_0.160784_0.215686_0.000000_0.000000
+    second: {fileID: 2100000, guid: 58877f972f7cfdae1a10f6698f6bbaba, type: 2}
   materials:
     materialImportMode: 1
     materialName: 0
@@ -59,10 +59,10 @@ ModelImporter:
     addColliders: 0
     useSRGBMaterialColor: 1
     sortHierarchyByName: 1
-    importVisibility: 1
-    importBlendShapes: 1
-    importCameras: 1
-    importLights: 1
+    importVisibility: 0
+    importBlendShapes: 0
+    importCameras: 0
+    importLights: 0
     fileIdsGeneration: 2
     swapUVChannels: 0
     generateSecondaryUV: 0
