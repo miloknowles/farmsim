@@ -90,10 +90,12 @@ public class AUV : MonoBehaviour {
       vehicle.imu_measurement_t imu_msg = new vehicle.imu_measurement_t();
       imu_msg.header = header_msg;
 
+      imu_msg.linear_acc = new vehicle.vector3_t();
       imu_msg.linear_acc.x = data.imu_a_rh.x;
       imu_msg.linear_acc.y = data.imu_a_rh.y;
       imu_msg.linear_acc.z = data.imu_a_rh.z;
 
+      imu_msg.angular_vel = new vehicle.vector3_t();
       imu_msg.angular_vel.x = data.imu_w_rh.x;
       imu_msg.angular_vel.y = data.imu_w_rh.y;
       imu_msg.angular_vel.z = data.imu_w_rh.z;
@@ -146,6 +148,7 @@ public class AUV : MonoBehaviour {
       vehicle.range_measurement_t msg0 = new vehicle.range_measurement_t();
       msg0.header = header_msg;
       msg0.range = data0.range;
+      msg0.point = new vehicle.vector3_t();
       msg0.point.x = data0.world_t_beacon.x;
       msg0.point.y = data0.world_t_beacon.y;
       msg0.point.z = data0.world_t_beacon.z;
@@ -153,6 +156,7 @@ public class AUV : MonoBehaviour {
       vehicle.range_measurement_t msg1 = new vehicle.range_measurement_t();
       msg1.header = header_msg;
       msg1.range = data1.range;
+      msg1.point = new vehicle.vector3_t();
       msg1.point.x = data1.world_t_beacon.x;
       msg1.point.y = data1.world_t_beacon.y;
       msg1.point.z = data1.world_t_beacon.z;
@@ -183,10 +187,13 @@ public class AUV : MonoBehaviour {
 
       vehicle.pose3_stamped_t msg = new vehicle.pose3_stamped_t();
       msg.header = header_msg;
+      msg.pose = new vehicle.pose3_t();
+      msg.pose.orientation = new vehicle.quaternion_t();
       msg.pose.orientation.w = world_q_body.w;
       msg.pose.orientation.x = world_q_body.x;
       msg.pose.orientation.y = world_q_body.y;
       msg.pose.orientation.z = world_q_body.z;
+      msg.pose.position = new vehicle.vector3_t();
       msg.pose.position.x = world_t_body.x;
       msg.pose.position.y = world_t_body.y;
       msg.pose.position.z = world_t_body.z;
