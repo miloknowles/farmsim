@@ -1,7 +1,8 @@
 {
     "name": "ScriptsAssembly",
     "references": [
-        "GUID:66175ed9cb3d4216e9a5cbd41410c692"
+        "GUID:66175ed9cb3d4216e9a5cbd41410c692",
+        "GUID:57f2c046d0c3a82a6b3e925c191286d7"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
