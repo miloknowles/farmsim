@@ -82,23 +82,10 @@ public class AUV : MonoBehaviour {
 
       ImuMeasurement data = this.imu_sensor.Read();
 
-      vehicle.header_t header_msg = new vehicle.header_t();
-      header_msg.timestamp = data.timestamp;
-      header_msg.seq = seq;
-      header_msg.frame_id = "imu0";
-
       vehicle.imu_measurement_t imu_msg = new vehicle.imu_measurement_t();
-      imu_msg.header = header_msg;
-
-      imu_msg.linear_acc = new vehicle.vector3_t();
-      imu_msg.linear_acc.x = data.imu_a_rh.x;
-      imu_msg.linear_acc.y = data.imu_a_rh.y;
-      imu_msg.linear_acc.z = data.imu_a_rh.z;
-
-      imu_msg.angular_vel = new vehicle.vector3_t();
-      imu_msg.angular_vel.x = data.imu_w_rh.x;
-      imu_msg.angular_vel.y = data.imu_w_rh.y;
-      imu_msg.angular_vel.z = data.imu_w_rh.z;
+      imu_msg.header = LCMUtils.pack_header_t(data.timestamp, seq, "imu0");
+      imu_msg.linear_acc = LCMUtils.pack_vector3_t(data.imu_a_rh);
+      imu_msg.angular_vel = LCMUtils.pack_vector3_t(data.imu_w_rh);
 
       this.lcmHandle.Publish(SimulationParams.CHANNEL_AUV_IMU, imu_msg);
 
@@ -115,13 +102,8 @@ public class AUV : MonoBehaviour {
 
       DepthMeasurement data = this.depth_sensor.Read();
 
-      vehicle.header_t header_msg = new vehicle.header_t();
-      header_msg.timestamp = data.timestamp;
-      header_msg.seq = seq;
-      header_msg.frame_id = "depth0";
-
       vehicle.depth_measurement_t depth_msg = new vehicle.depth_measurement_t();
-      depth_msg.header = header_msg;
+      depth_msg.header = LCMUtils.pack_header_t(data.timestamp, seq, "depth0");
       depth_msg.depth = data.depth;
 
       this.lcmHandle.Publish(SimulationParams.CHANNEL_AUV_DEPTH, depth_msg);
@@ -140,26 +122,15 @@ public class AUV : MonoBehaviour {
       RangeMeasurement data0 = this.range_sensor_A.Read();
       RangeMeasurement data1 = this.range_sensor_B.Read();
 
-      vehicle.header_t header_msg = new vehicle.header_t();
-      header_msg.timestamp = data0.timestamp;
-      header_msg.seq = seq;
-      header_msg.frame_id = "aps_receiver";
-
       vehicle.range_measurement_t msg0 = new vehicle.range_measurement_t();
-      msg0.header = header_msg;
+      msg0.header = LCMUtils.pack_header_t(data0.timestamp, seq, "aps_receiver");
       msg0.range = data0.range;
-      msg0.point = new vehicle.vector3_t();
-      msg0.point.x = data0.world_t_beacon.x;
-      msg0.point.y = data0.world_t_beacon.y;
-      msg0.point.z = data0.world_t_beacon.z;
+      msg0.point = LCMUtils.pack_vector3_t(data0.world_t_beacon);
 
       vehicle.range_measurement_t msg1 = new vehicle.range_measurement_t();
-      msg1.header = header_msg;
+      msg1.header = LCMUtils.pack_header_t(data1.timestamp, seq, "aps_receiver");
       msg1.range = data1.range;
-      msg1.point = new vehicle.vector3_t();
-      msg1.point.x = data1.world_t_beacon.x;
-      msg1.point.y = data1.world_t_beacon.y;
-      msg1.point.z = data1.world_t_beacon.z;
+      msg1.point = LCMUtils.pack_vector3_t(data1.world_t_beacon);
 
       this.lcmHandle.Publish(SimulationParams.CHANNEL_AUV_RANGE0, msg0);
       this.lcmHandle.Publish(SimulationParams.CHANNEL_AUV_RANGE1, msg1);
@@ -180,23 +151,9 @@ public class AUV : MonoBehaviour {
       Vector3 world_t_body;
       TransformUtils.ToRightHandedTransform(world_T_body, out world_t_body, out world_q_body);
 
-      vehicle.header_t header_msg = new vehicle.header_t();
-      header_msg.timestamp = Timestamp.UnityNanoseconds();
-      header_msg.seq = seq;
-      header_msg.frame_id = "imu0";
-
       vehicle.pose3_stamped_t msg = new vehicle.pose3_stamped_t();
-      msg.header = header_msg;
-      msg.pose = new vehicle.pose3_t();
-      msg.pose.orientation = new vehicle.quaternion_t();
-      msg.pose.orientation.w = world_q_body.w;
-      msg.pose.orientation.x = world_q_body.x;
-      msg.pose.orientation.y = world_q_body.y;
-      msg.pose.orientation.z = world_q_body.z;
-      msg.pose.position = new vehicle.vector3_t();
-      msg.pose.position.x = world_t_body.x;
-      msg.pose.position.y = world_t_body.y;
-      msg.pose.position.z = world_t_body.z;
+      msg.header = LCMUtils.pack_header_t(Timestamp.UnityNanoseconds(), seq, "imu0");
+      msg.pose = LCMUtils.pack_pose3_t(world_q_body, world_t_body);
 
       this.lcmHandle.Publish(SimulationParams.CHANNEL_AUV_WORLD_P_IMU, msg);
 
