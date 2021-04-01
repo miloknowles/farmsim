@@ -10,30 +10,30 @@ using LCM.LCM;
  
 namespace vehicle
 {
-    public sealed class point3_t : LCM.LCM.LCMEncodable
+    public sealed class vector3_t : LCM.LCM.LCMEncodable
     {
         public double x;
         public double y;
         public double z;
  
-        public point3_t()
+        public vector3_t()
         {
         }
  
         public static readonly ulong LCM_FINGERPRINT;
         public static readonly ulong LCM_FINGERPRINT_BASE = 0x573f2fdd2f76508fL;
  
-        static point3_t()
+        static vector3_t()
         {
             LCM_FINGERPRINT = _hashRecursive(new List<String>());
         }
  
         public static ulong _hashRecursive(List<String> classes)
         {
-            if (classes.Contains("vehicle.point3_t"))
+            if (classes.Contains("vehicle.vector3_t"))
                 return 0L;
  
-            classes.Add("vehicle.point3_t");
+            classes.Add("vehicle.vector3_t");
             ulong hash = LCM_FINGERPRINT_BASE
                 ;
             classes.RemoveAt(classes.Count - 1);
@@ -56,11 +56,11 @@ namespace vehicle
  
         }
  
-        public point3_t(byte[] data) : this(new LCMDataInputStream(data))
+        public vector3_t(byte[] data) : this(new LCMDataInputStream(data))
         {
         }
  
-        public point3_t(LCMDataInputStream ins)
+        public vector3_t(LCMDataInputStream ins)
         {
             if ((ulong) ins.ReadInt64() != LCM_FINGERPRINT)
                 throw new System.IO.IOException("LCM Decode error: bad fingerprint");
@@ -68,9 +68,9 @@ namespace vehicle
             _decodeRecursive(ins);
         }
  
-        public static vehicle.point3_t _decodeRecursiveFactory(LCMDataInputStream ins)
+        public static vehicle.vector3_t _decodeRecursiveFactory(LCMDataInputStream ins)
         {
-            vehicle.point3_t o = new vehicle.point3_t();
+            vehicle.vector3_t o = new vehicle.vector3_t();
             o._decodeRecursive(ins);
             return o;
         }
@@ -85,9 +85,9 @@ namespace vehicle
  
         }
  
-        public vehicle.point3_t Copy()
+        public vehicle.vector3_t Copy()
         {
-            vehicle.point3_t outobj = new vehicle.point3_t();
+            vehicle.vector3_t outobj = new vehicle.vector3_t();
             outobj.x = this.x;
  
             outobj.y = this.y;

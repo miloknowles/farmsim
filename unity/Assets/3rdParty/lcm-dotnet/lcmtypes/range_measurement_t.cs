@@ -14,7 +14,7 @@ namespace vehicle
     {
         public vehicle.header_t header;
         public double range;
-        public vehicle.point3_t point;
+        public vehicle.vector3_t point;
  
         public range_measurement_t()
         {
@@ -36,7 +36,7 @@ namespace vehicle
             classes.Add("vehicle.range_measurement_t");
             ulong hash = LCM_FINGERPRINT_BASE
                  + vehicle.header_t._hashRecursive(classes)
-                 + vehicle.point3_t._hashRecursive(classes)
+                 + vehicle.vector3_t._hashRecursive(classes)
                 ;
             classes.RemoveAt(classes.Count - 1);
             return (hash<<1) + ((hash>>63)&1);
@@ -83,7 +83,7 @@ namespace vehicle
  
             this.range = ins.ReadDouble();
  
-            this.point = vehicle.point3_t._decodeRecursiveFactory(ins);
+            this.point = vehicle.vector3_t._decodeRecursiveFactory(ins);
  
         }
  

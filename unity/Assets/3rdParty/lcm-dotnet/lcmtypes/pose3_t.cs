@@ -12,7 +12,7 @@ namespace vehicle
 {
     public sealed class pose3_t : LCM.LCM.LCMEncodable
     {
-        public vehicle.point3_t position;
+        public vehicle.vector3_t position;
         public vehicle.quaternion_t orientation;
  
         public pose3_t()
@@ -34,7 +34,7 @@ namespace vehicle
  
             classes.Add("vehicle.pose3_t");
             ulong hash = LCM_FINGERPRINT_BASE
-                 + vehicle.point3_t._hashRecursive(classes)
+                 + vehicle.vector3_t._hashRecursive(classes)
                  + vehicle.quaternion_t._hashRecursive(classes)
                 ;
             classes.RemoveAt(classes.Count - 1);
@@ -76,7 +76,7 @@ namespace vehicle
  
         public void _decodeRecursive(LCMDataInputStream ins)
         {
-            this.position = vehicle.point3_t._decodeRecursiveFactory(ins);
+            this.position = vehicle.vector3_t._decodeRecursiveFactory(ins);
  
             this.orientation = vehicle.quaternion_t._decodeRecursiveFactory(ins);
  

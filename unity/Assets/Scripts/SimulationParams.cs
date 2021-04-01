@@ -22,5 +22,5 @@ public class SimulationParams : MonoBehaviour {
   public static string CHANNEL_AUV_STEREO = "sim/auv/stereo";
   public static string CHANNEL_AUV_RANGE0 = "sim/auv/range0";
   public static string CHANNEL_AUV_RANGE1 = "sim/auv/range1";
-  public static string CHANNEL_AUV_world_P_imu = "sim/auv/pose/world_P_imu";
+  public static string CHANNEL_AUV_WORLD_P_IMU = "sim/auv/pose/world_P_imu";
 }

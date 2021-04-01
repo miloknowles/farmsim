@@ -13,8 +13,8 @@ namespace vehicle
     public sealed class imu_measurement_t : LCM.LCM.LCMEncodable
     {
         public vehicle.header_t header;
-        public vehicle.point3_t linear_acc;
-        public vehicle.point3_t angular_vel;
+        public vehicle.vector3_t linear_acc;
+        public vehicle.vector3_t angular_vel;
  
         public imu_measurement_t()
         {
@@ -36,8 +36,8 @@ namespace vehicle
             classes.Add("vehicle.imu_measurement_t");
             ulong hash = LCM_FINGERPRINT_BASE
                  + vehicle.header_t._hashRecursive(classes)
-                 + vehicle.point3_t._hashRecursive(classes)
-                 + vehicle.point3_t._hashRecursive(classes)
+                 + vehicle.vector3_t._hashRecursive(classes)
+                 + vehicle.vector3_t._hashRecursive(classes)
                 ;
             classes.RemoveAt(classes.Count - 1);
             return (hash<<1) + ((hash>>63)&1);
@@ -82,9 +82,9 @@ namespace vehicle
         {
             this.header = vehicle.header_t._decodeRecursiveFactory(ins);
  
-            this.linear_acc = vehicle.point3_t._decodeRecursiveFactory(ins);
+            this.linear_acc = vehicle.vector3_t._decodeRecursiveFactory(ins);
  
-            this.angular_vel = vehicle.point3_t._decodeRecursiveFactory(ins);
+            this.angular_vel = vehicle.vector3_t._decodeRecursiveFactory(ins);
  
         }
  

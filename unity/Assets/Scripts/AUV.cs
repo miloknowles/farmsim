@@ -64,6 +64,7 @@ public class AUV : MonoBehaviour {
       StartCoroutine(PublishImu());
       StartCoroutine(PublishDepth());
       StartCoroutine(PublishRange());
+      StartCoroutine(PublishPose());
     } else if (this.simulatorIOMode == Simulator.IOMode.DATASET) {
       StartCoroutine(SaveStereoImageDataset());
       StartCoroutine(SaveImuDataset());
@@ -88,8 +89,6 @@ public class AUV : MonoBehaviour {
 
       vehicle.imu_measurement_t imu_msg = new vehicle.imu_measurement_t();
       imu_msg.header = header_msg;
-      imu_msg.linear_acc = new vehicle.point3_t();
-      imu_msg.angular_vel = new vehicle.point3_t();
 
       imu_msg.linear_acc.x = data.imu_a_rh.x;
       imu_msg.linear_acc.y = data.imu_a_rh.y;
@@ -147,7 +146,6 @@ public class AUV : MonoBehaviour {
       vehicle.range_measurement_t msg0 = new vehicle.range_measurement_t();
       msg0.header = header_msg;
       msg0.range = data0.range;
-      msg0.point = new vehicle.point3_t();
       msg0.point.x = data0.world_t_beacon.x;
       msg0.point.y = data0.world_t_beacon.y;
       msg0.point.z = data0.world_t_beacon.z;
@@ -155,13 +153,45 @@ public class AUV : MonoBehaviour {
       vehicle.range_measurement_t msg1 = new vehicle.range_measurement_t();
       msg1.header = header_msg;
       msg1.range = data1.range;
-      msg1.point = new vehicle.point3_t();
       msg1.point.x = data1.world_t_beacon.x;
       msg1.point.y = data1.world_t_beacon.y;
       msg1.point.z = data1.world_t_beacon.z;
 
       this.lcmHandle.Publish(SimulationParams.CHANNEL_AUV_RANGE0, msg0);
       this.lcmHandle.Publish(SimulationParams.CHANNEL_AUV_RANGE1, msg1);
+
+      ++seq;
+    }
+  }
+
+  IEnumerator PublishPose()
+  {
+    long seq = 0;
+
+    while (true) {
+      yield return new WaitForFixedUpdate();
+
+      Transform world_T_body = this.imu_rigidbody.transform;
+      Quaternion world_q_body;
+      Vector3 world_t_body;
+      TransformUtils.ToRightHandedTransform(world_T_body, out world_t_body, out world_q_body);
+
+      vehicle.header_t header_msg = new vehicle.header_t();
+      header_msg.timestamp = Timestamp.UnityNanoseconds();
+      header_msg.seq = seq;
+      header_msg.frame_id = "imu0";
+
+      vehicle.pose3_stamped_t msg = new vehicle.pose3_stamped_t();
+      msg.header = header_msg;
+      msg.pose.orientation.w = world_q_body.w;
+      msg.pose.orientation.x = world_q_body.x;
+      msg.pose.orientation.y = world_q_body.y;
+      msg.pose.orientation.z = world_q_body.z;
+      msg.pose.position.x = world_t_body.x;
+      msg.pose.position.y = world_t_body.y;
+      msg.pose.position.z = world_t_body.z;
+
+      this.lcmHandle.Publish(SimulationParams.CHANNEL_AUV_WORLD_P_IMU, msg);
 
       ++seq;
     }
@@ -220,9 +250,6 @@ public class AUV : MonoBehaviour {
       yield return new WaitForFixedUpdate();
 
       ImuMeasurement data = this.imu_sensor.Read();
-
-      // NOTE(milo): Need to correct the IMU timestamp (shift backwards one timestamp)?
-      // long timestamp_shifted = data.timestamp - (long)(1e9*Time.fixedDeltaTime);
 
       // We use the EuRoC MAV format:
       // timestamp [ns],w_RS_S_x [rad s^-1],w_RS_S_y [rad s^-1],w_RS_S_z [rad s^-1],a_RS_S_x [m s^-2],a_RS_S_y [m s^-2],a_RS_S_z [m s^-2]
