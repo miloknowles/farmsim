@@ -1,14 +1,7 @@
 using System;
 using UnityEngine;
 using System.Collections;
-using ROSBridgeLib.std_msgs;
-using ROSBridgeLib.sensor_msgs;
-using ROSBridgeLib.geometry_msgs;
-using ROSBridgeLib.CustomMessages;
-using ROSBridgeLib;
 
-
-using ROSCallback = System.Action<ROSBridgeMsg>;
 
 public class VehicleDynamics : MonoBehaviour {
   private Rigidbody rigidBody;
@@ -27,20 +20,9 @@ public class VehicleDynamics : MonoBehaviour {
   private Vector3 t_ct_body = new Vector3(0.0f, 0.0f, 0.05f);
   private Vector3 t_CP_body = new Vector3(0.0f, 0.0f, -0.01f);
 
-  private ROSMessageHolder roslink;
-
   void Start()
   {
     this.rigidBody = this.GetComponent<Rigidbody>();
-
-    this.roslink = GameObject.Find("ROSMessageHolder").GetComponent<ROSMessageHolder>();
-    this.roslink.RegisterCallback(TridentThrustCallback.GetMessageTopic(), this.Callback);
-    this.roslink.ros.AddSubscriber(typeof(TridentThrustCallback));
-  }
-
-  void Update()
-  {
-    this.roslink.ros.Render();
   }
 
   void FixedUpdate()
@@ -80,13 +62,5 @@ public class VehicleDynamics : MonoBehaviour {
     // Apply forces and torques to the vehicle in its body frame.
     this.rigidBody.AddRelativeForce(flt + frt + fct + F_drag);
     this.rigidBody.AddRelativeTorque(tau_total);
-  }
-
-  public void Callback(ROSBridgeMsg msg)
-  {
-    TridentThrustMsg typed = (TridentThrustMsg)msg;
-    this._F_lt = Mathf.Clamp(typed.GetFlt(), -this.maxThrust, this.maxThrust);
-    this._F_rt = Mathf.Clamp(typed.GetFrt(), -this.maxThrust, this.maxThrust);
-    this._F_ct = Mathf.Clamp(typed.GetFct(), -this.maxThrust, this.maxThrust);
   }
 }

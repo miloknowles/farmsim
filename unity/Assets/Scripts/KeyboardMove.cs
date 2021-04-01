@@ -1,8 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-using ROSBridgeLib;
-using ROSBridgeLib.CustomMessages;
 
 
 public class KeyboardMove : MonoBehaviour {
@@ -18,14 +16,6 @@ public class KeyboardMove : MonoBehaviour {
 	public Rigidbody rigidBody;
 	public float keyThrust = 5.0f; 											// Amount of force applied by each key (N).
 	public ControlMode controlMode = ControlMode.OFF;		// Turn key commands off by default.
-	private ROSMessageHolder roslink;
-
-	void Start()
-	{
-		// this.roslink = GameObject.Find("ROSMessageHolder").GetComponent<ROSMessageHolder>();
-		// this.roslink.ros.AddPublisher(typeof(TridentThrustPublisher));
-		// StartCoroutine(ListenForKeyCommands());
-	}
 
 	void FixedUpdate()
 	{
@@ -40,14 +30,12 @@ public class KeyboardMove : MonoBehaviour {
 		while (true) {
 			yield return new WaitForSeconds(0.2f);
 			if (this.controlMode == ControlMode.THRUST_COMMANDS) {
-				KeyboardThrustCommand();
+				// KeyboardThrustCommand();
 			}
 		}
 	}
 
-	/**
-	 * Returns -1 or +1 depending on which of two keys is pressed. 0 if neither.
-	 */
+	// Returns -1 or +1 depending on which of two keys is pressed. 0 if neither.
 	private float SignFromKeyPair(KeyCode key_positive, KeyCode key_negative)
 	{
 		if (Input.GetKey(key_positive)) {
@@ -63,15 +51,15 @@ public class KeyboardMove : MonoBehaviour {
 	 * NOTE(milo): Need to have rosbridge_server running for this to work!
 	 * Command: roslaunch rosbridge_server rosbridge_websocket.launch
 	 */
-	private void KeyboardThrustCommand()
-	{
-		float Flt = this.keyThrust * SignFromKeyPair(KeyCode.A, KeyCode.Q);
-		float Frt = this.keyThrust * SignFromKeyPair(KeyCode.D, KeyCode.E);
-		float Fct = this.keyThrust * SignFromKeyPair(KeyCode.S, KeyCode.W);
-		TridentThrustMsg msg = new TridentThrustMsg(Flt, Frt, Fct);
-		this.roslink.ros.Publish(TridentThrustPublisher.GetMessageTopic(), msg);
-		this.roslink.ros.Render();
-	}
+	// private void KeyboardThrustCommand()
+	// {
+	// 	float Flt = this.keyThrust * SignFromKeyPair(KeyCode.A, KeyCode.Q);
+	// 	float Frt = this.keyThrust * SignFromKeyPair(KeyCode.D, KeyCode.E);
+	// 	float Fct = this.keyThrust * SignFromKeyPair(KeyCode.S, KeyCode.W);
+	// 	TridentThrustMsg msg = new TridentThrustMsg(Flt, Frt, Fct);
+	// 	this.roslink.ros.Publish(TridentThrustPublisher.GetMessageTopic(), msg);
+	// 	this.roslink.ros.Render();
+	// }
 
 	public static float ClampAngle(float deg)
 	{
