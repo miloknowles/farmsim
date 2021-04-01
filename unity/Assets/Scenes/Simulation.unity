@@ -1346,7 +1346,7 @@ MonoBehaviour:
   range_sensor_B: {fileID: 1207165784}
   depth_sensor: {fileID: 420561434}
   stereo_rig: {fileID: 420561435}
-  simulatorIOMode: 2
+  simulatorIOMode: 1
   outputDatasetName: default_dataset/mav0/
   outputDatasetRoot: /home/milo/datasets/Unity3D/farmsim/
 --- !u!114 &420561428

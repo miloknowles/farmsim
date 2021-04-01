@@ -9,25 +9,23 @@ using Simulator;
 
 
 namespace Simulator {
-
 public enum IOMode
 {
-  NO_OUTPUT = 0,
-  PUBLISH_TO_LCM = 1,
-  SAVE_TO_DISK = 2
+  NONE = 0,
+  LCM = 1,
+  DATASET = 2
 }
-
 }
 
 
 public class AUV : MonoBehaviour {
-  private int msgPublishCount = 0;
   DateTime camStart = DateTime.Now;
 
   // Cameras attached to the vehicle.
   public Camera camera_forward_left;
   public Camera camera_forward_right;
 
+  // Attach sensors here.
   public Rigidbody imu_rigidbody;
   public ImuSensor imu_sensor;
   public RangeSensor range_sensor_A;
@@ -35,7 +33,7 @@ public class AUV : MonoBehaviour {
   public DepthSensor depth_sensor;
   public StereoRig stereo_rig;
 
-  public Simulator.IOMode simulatorIOMode = Simulator.IOMode.NO_OUTPUT;
+  public Simulator.IOMode simulatorIOMode = Simulator.IOMode.NONE;
   public string outputDatasetName = "default_dataset";
 
   // NOTE(milo): This needs to be an absolute path!
@@ -47,18 +45,51 @@ public class AUV : MonoBehaviour {
   private string apsSubfolderB = "aps1";
   private string depthSubfolder = "depth0";
 
+  // http://lcm-proj.github.io/tut_dotnet.html
+  // NOTE(milo): Don't initialize this here! It will crash the Unity editor.
+  private LCM.LCM.LCM lcmHandle;
+
   void Start()
   {
-    // this.camStart = DateTime.Now;
+    try {
+      this.lcmHandle = LCM.LCM.LCM.Singleton;
+    } catch (System.ArgumentException e) {
+      // https://answers.unity.com/questions/485595/uncaught-exception-doesnt-kill-the-application.html
+      Debug.Log(e);
+      Debug.Break();
+    }
 
-    if (this.simulatorIOMode == Simulator.IOMode.PUBLISH_TO_LCM) {
-      StartCoroutine(PublishCameraSyncedMessages());
-      // StartCoroutine(PublishImu());
-    } else if (this.simulatorIOMode == Simulator.IOMode.SAVE_TO_DISK) {
+    if (this.simulatorIOMode == Simulator.IOMode.LCM) {
+      // StartCoroutine(PublishCameraSyncedMessages());
+      StartCoroutine(PublishImu());
+    } else if (this.simulatorIOMode == Simulator.IOMode.DATASET) {
       StartCoroutine(SaveStereoImageDataset());
       StartCoroutine(SaveImuDataset());
       StartCoroutine(SaveApsDataset());
       StartCoroutine(SaveDepthDataset());
+    }
+  }
+
+  IEnumerator PublishImu()
+  {
+    long seq = 0;
+
+    while (true) {
+      yield return new WaitForFixedUpdate();
+
+      vehicle.header_t header_msg = new vehicle.header_t();
+      header_msg.timestamp = Timestamp.UnityNanoseconds();
+      header_msg.seq = seq;
+      header_msg.frame_id = "imu0";
+
+      vehicle.imu_measurement_t imu_msg = new vehicle.imu_measurement_t();
+      imu_msg.header = header_msg;
+      imu_msg.linear_acc = new vehicle.point3_t();
+      imu_msg.angular_vel = new vehicle.point3_t();
+
+      this.lcmHandle.Publish(SimulationParams.CHANNEL_AUV_IMU, imu_msg);
+
+      ++seq;
     }
   }
 

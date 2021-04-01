@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 namespace LCM.LCM
-{	
+{
 	/// <summary>
     /// Lightweight Communications and Marshalling C#.NET implementation
     /// </summary>
@@ -26,7 +26,7 @@ namespace LCM.LCM
         private static LCM singleton;
 
         private LCMDataOutputStream encodeBuffer = new LCMDataOutputStream(new byte[1024]);
-		
+
 		/// <summary>
         /// Retrieve a default instance of LCM using either the environment
 		/// variable LCM_DEFAULT_URL or the default. If an exception
@@ -68,7 +68,7 @@ namespace LCM.LCM
 
 				return subscriptions.Count;
 			}
-			
+
 		}
 
 		/// <summary>
@@ -93,9 +93,10 @@ namespace LCM.LCM
                     urls = new string[] { env };
                 }
 			}
-			
+
 			foreach (string url in urls)
 			{
+                Console.WriteLine("Connecting LCM to: " + url);
 				URLParser up = new URLParser(url);
 				string protocol = up.Get("protocol");
 
@@ -117,7 +118,7 @@ namespace LCM.LCM
                 }
 			}
 		}
-		
+
 		/// <summary>
         /// Publish a string on a channel. This method does not use the
 		/// LCM type definitions and thus is not type safe. This method is
@@ -138,7 +139,7 @@ namespace LCM.LCM
 
 			Publish(channel, b, 0, b.Length);
 		}
-		
+
 		/// <summary>
         /// Publish an LCM-defined type on a channel. If more than one URL was
 		/// specified, the message will be sent on each.
@@ -151,15 +152,15 @@ namespace LCM.LCM
             {
                 throw new SystemException();
             }
-				
+
 			lock (this)
 			{
 				try
 				{
 					encodeBuffer.Reset();
-					
+
 					e.Encode(encodeBuffer);
-					
+
 					Publish(channel, encodeBuffer.Buffer, 0, encodeBuffer.Length);
 				}
 				catch (System.IO.IOException ex)
@@ -168,7 +169,7 @@ namespace LCM.LCM
 				}
 			}
 		}
-		
+
 		/// <summary>
         /// Publish raw data on a channel, bypassing the LCM type
 		/// specification. If more than one URL was specified when the LCM
@@ -193,7 +194,7 @@ namespace LCM.LCM
                 }
 			}
 		}
-		
+
 		/// <summary>
         /// Subscribe to all channels whose name matches the regular
 		/// expression. Note that to subscribe to all channels, you must
@@ -212,7 +213,7 @@ namespace LCM.LCM
 			srec.regex = regex;
 			srec.pat = new Regex(regex);
 			srec.lcsub = sub;
-			
+
 			lock (this)
 			{
 				foreach (Provider p in providers)
@@ -220,12 +221,12 @@ namespace LCM.LCM
 				    p.Subscribe(regex);
                 }
 			}
-			
+
 			lock (subscriptions)
 			{
                 subscriptions.Add(srec);
                 List<SubscriptionRecord> subs;
-				
+
 				foreach (string channel in subscriptionsMap.Keys)
 				{
 					if (srec.pat.IsMatch(channel))
@@ -238,7 +239,7 @@ namespace LCM.LCM
 				}
 			}
 		}
-		
+
 		/// <summary>
         /// A convenience function that subscribes to all LCM channels.
         /// </summary>
@@ -247,7 +248,7 @@ namespace LCM.LCM
 		{
 			Subscribe(".*", sub);
 		}
-		
+
 		/// <summary>
         /// Remove this particular regex/subscriber pair (UNTESTED AND API
 		/// MAY CHANGE). If regex is null, all subscriptions for 'sub' are
@@ -264,7 +265,7 @@ namespace LCM.LCM
             {
                 throw new SystemException();
             }
-			
+
             lock (this)
             {
                 foreach (Provider p in providers)
@@ -275,9 +276,9 @@ namespace LCM.LCM
 
 			// TODO: need providers to unsubscribe?
 			// TODO: providers don't seem to use anything beyond first channel
-			
+
 			lock (subscriptions)
-			{	
+			{
 				// Find and remove subscriber from list
                 foreach (SubscriptionRecord sr in subscriptions.ToArray())
                 {
@@ -304,10 +305,10 @@ namespace LCM.LCM
 	            }
             }
 		}
-		
+
 		/// <summary>
         /// Call this function to release all resources used by the LCM instance.  After calling this
-		/// function, the LCM instance should consume no resources, and cannot be used to 
+		/// function, the LCM instance should consume no resources, and cannot be used to
 		/// receive or transmit messages.
 		/// </summary>
 		public void Close()
@@ -328,7 +329,7 @@ namespace LCM.LCM
 				this.closed = true;
 			}
 		}
-		
+
 		/// <summary>
         /// Not for use by end users. Provider back ends call this method
 		/// when they receive a message. The subscribers that match the
@@ -351,7 +352,7 @@ namespace LCM.LCM
 					// must build this list!
 					srecs = new List<SubscriptionRecord>();
 					subscriptionsMap.Add(channel, srecs);
-					
+
 					foreach (SubscriptionRecord srec in subscriptions)
 					{
                         if (srec.pat.IsMatch(channel))
@@ -360,7 +361,7 @@ namespace LCM.LCM
                         }
 					}
 				}
-				
+
 				foreach (SubscriptionRecord srec in srecs)
 				{
 					srec.lcsub.MessageReceived(this, channel, new LCMDataInputStream(data, offset, length));
