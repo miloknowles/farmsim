@@ -60,7 +60,7 @@ public class AUV : MonoBehaviour {
     }
 
     if (this.simulatorIOMode == Simulator.IOMode.LCM) {
-      // StartCoroutine(PublishCameraSyncedMessages());
+      StartCoroutine(PublishStereoImages());
       StartCoroutine(PublishImu());
       StartCoroutine(PublishDepth());
       StartCoroutine(PublishRange());
@@ -161,38 +161,26 @@ public class AUV : MonoBehaviour {
     }
   }
 
-  // Any message that is meant to be synchronized with camera images should be published here.
-  IEnumerator PublishCameraSyncedMessages()
+  IEnumerator PublishStereoImages()
   {
+    long seq = 0;
     Texture2D leftImage, rightImage;
 
     while (true) {
       yield return new WaitForSeconds(1.0f / SimulationParams.CAMERA_PUBLISH_HZ);
       yield return new WaitForEndOfFrame();
 
-      var now = DateTime.Now;
-      var timeSinceStart = now - camStart;
-      // var timeMessage = new TimeMsg(timeSinceStart.Seconds, timeSinceStart.Milliseconds);
-
       this.stereo_rig.CaptureStereoPair(out leftImage, out rightImage);
 
-      // PublishCameraImage(
-      //     leftImage,
-      //     timeMessage,
-      //     new HeaderMsg(msgPublishCount, timeMessage, "cam0"),
-      //     StereoCamLeftPublisherCmp.GetMessageTopic());
+      vehicle.stereo_image_t msg = new vehicle.stereo_image_t();
 
-      // PublishCameraImage(
-      //     rightImage,
-      //     timeMessage,
-      //     new HeaderMsg(msgPublishCount, timeMessage, "cam1"),
-      //     StereoCamRightPublisherCmp.GetMessageTopic());
+      msg.header = LCMUtils.pack_header_t(Timestamp.UnityNanoseconds(), seq, "stereo_cam");
+      msg.img_left = LCMUtils.pack_image_t(ref leftImage);
+      msg.img_right = LCMUtils.pack_image_t(ref rightImage);
 
-      // Publish the pose of the vehicle in the world (right-handed!).
-      Transform T_world_imu = imu_rigidbody.transform;
-      Vector3 t_world_imu;
-      Quaternion q_world_imu;
-      TransformUtils.ToRightHandedTransform(T_world_imu, out t_world_imu, out q_world_imu);
+      this.lcmHandle.Publish(SimulationParams.CHANNEL_AUV_STEREO, msg);
+
+      ++seq;
     }
   }
 

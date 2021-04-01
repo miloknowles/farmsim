@@ -42,6 +42,18 @@ public class LCMUtils {
     msg.position = pack_vector3_t(t);
     return msg;
   }
+
+  public static image_t pack_image_t(ref Texture2D im)
+  {
+    image_t msg = new image_t();
+    msg.height = im.height;
+    msg.width = im.width;
+    msg.channels = 3;
+    msg.format = "rgb8";
+    msg.size = msg.height * msg.width * msg.channels;
+    msg.data = im.GetRawTextureData();
+    return msg;
+  }
 }
 
 }
