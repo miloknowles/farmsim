@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
 public class StereoRig : MonoBehaviour {
 
   // Left and right stereo cameras.

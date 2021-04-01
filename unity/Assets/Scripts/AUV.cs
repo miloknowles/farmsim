@@ -5,36 +5,27 @@ using System.Text;
 using System.IO;
 
 using UnityEngine;
-
-using ROSBridgeLib.std_msgs;
-using ROSBridgeLib.sensor_msgs;
-using ROSBridgeLib.geometry_msgs;
-using ROSBridgeLib.CustomMessages;
-using ROSBridgeLib;
-
 using Simulator;
 
 
 namespace Simulator {
-
 public enum IOMode
 {
-  NO_OUTPUT = 0,
-  PUBLISH_TO_ROS = 1,
-  SAVE_TO_DISK = 2
+  NONE = 0,
+  LCM = 1,
+  DATASET = 2
 }
-
 }
 
 
 public class AUV : MonoBehaviour {
-  private int msgPublishCount;
-  DateTime camStart;
+  DateTime camStart = DateTime.Now;
 
   // Cameras attached to the vehicle.
   public Camera camera_forward_left;
   public Camera camera_forward_right;
 
+  // Attach sensors here.
   public Rigidbody imu_rigidbody;
   public ImuSensor imu_sensor;
   public RangeSensor range_sensor_A;
@@ -42,8 +33,7 @@ public class AUV : MonoBehaviour {
   public DepthSensor depth_sensor;
   public StereoRig stereo_rig;
 
-  private ROSMessageHolder roslink;
-  public Simulator.IOMode simulatorIOMode = Simulator.IOMode.NO_OUTPUT;
+  public Simulator.IOMode simulatorIOMode = Simulator.IOMode.NONE;
   public string outputDatasetName = "default_dataset";
 
   // NOTE(milo): This needs to be an absolute path!
@@ -55,34 +45,27 @@ public class AUV : MonoBehaviour {
   private string apsSubfolderB = "aps1";
   private string depthSubfolder = "depth0";
 
+  // http://lcm-proj.github.io/tut_dotnet.html
+  // NOTE(milo): Don't initialize this here! It will crash the Unity editor.
+  private LCM.LCM.LCM lcmHandle;
+
   void Start()
   {
-    this.roslink = GameObject.Find("ROSMessageHolder").GetComponent<ROSMessageHolder>();
+    try {
+      this.lcmHandle = LCM.LCM.LCM.Singleton;
+    } catch (System.ArgumentException e) {
+      // https://answers.unity.com/questions/485595/uncaught-exception-doesnt-kill-the-application.html
+      Debug.Log(e);
+      Debug.Break();
+    }
 
-    // Add a publisher for each of the cameras that we want to support.
-    this.roslink.ros.AddPublisher(typeof(StereoCamLeftPublisherCmp));
-    this.roslink.ros.AddPublisher(typeof(StereoCamRightPublisherCmp));
-
-    // this.roslink.ros.AddPublisher(typeof(StereoCamLeftPublisher));
-    // this.roslink.ros.AddPublisher(typeof(StereoCamRightPublisher));
-
-    // this.roslink.ros.AddPublisher(typeof(DepthPublisher));
-    // this.roslink.ros.AddPublisher(typeof(GroundtruthDepthPublisher));
-    this.roslink.ros.AddPublisher(typeof(ImuPosePublisher));
-    // this.roslink.ros.AddPublisher(typeof(StereoCamLeftPosePublisher));
-    // this.roslink.ros.AddPublisher(typeof(StereoCamRightPosePublisher));
-
-    // this.roslink.ros.AddPublisher(typeof(ImuPublisher));
-    // this.roslink.ros.AddPublisher(typeof(HeadingPublisher));
-    // this.roslink.ros.AddPublisher(typeof(GroundtruthHeadingPublisher));
-
-    this.msgPublishCount = 0;
-    this.camStart = DateTime.Now;
-
-    if (this.simulatorIOMode == Simulator.IOMode.PUBLISH_TO_ROS) {
-      StartCoroutine(PublishCameraSyncedMessages());
-      // StartCoroutine(PublishImu());
-    } else if (this.simulatorIOMode == Simulator.IOMode.SAVE_TO_DISK) {
+    if (this.simulatorIOMode == Simulator.IOMode.LCM) {
+      // StartCoroutine(PublishCameraSyncedMessages());
+      StartCoroutine(PublishImu());
+      StartCoroutine(PublishDepth());
+      StartCoroutine(PublishRange());
+      StartCoroutine(PublishPose());
+    } else if (this.simulatorIOMode == Simulator.IOMode.DATASET) {
       StartCoroutine(SaveStereoImageDataset());
       StartCoroutine(SaveImuDataset());
       StartCoroutine(SaveApsDataset());
@@ -90,33 +73,92 @@ public class AUV : MonoBehaviour {
     }
   }
 
-  // NOTE(milo): This doesn't work! Don't use yet.
-  void PublishRawImage(Texture2D im, TimeMsg timeMessage, HeaderMsg headerMessage, string topic)
+  IEnumerator PublishImu()
   {
-    // https://docs.ros.org/en/melodic/api/sensor_msgs/html/msg/Image.html
-    bool is_bigendian = true;               // https://stackoverflow.com/questions/30423737/bitmap-from-byte-array
-    uint row_step = (uint)(im.width * 24);  // Row length in bytes.
+    long seq = 0;
 
-    // NOTE(milo): The row order is flipped! Not sure how to fix this.
-    byte[] data = im.GetRawTextureData();
+    while (true) {
+      yield return new WaitForFixedUpdate();
 
-    // http://docs.ros.org/en/jade/api/sensor_msgs/html/image__encodings_8h_source.html
-    var msg = new ImageMsg(headerMessage, (uint)im.height, (uint)im.width, "rgb8", is_bigendian, row_step, data);
-    this.roslink.ros.Publish(topic, msg);
-    Destroy(im);
+      ImuMeasurement data = this.imu_sensor.Read();
 
-    this.roslink.ros.Render();
+      vehicle.imu_measurement_t imu_msg = new vehicle.imu_measurement_t();
+      imu_msg.header = LCMUtils.pack_header_t(data.timestamp, seq, "imu0");
+      imu_msg.linear_acc = LCMUtils.pack_vector3_t(data.imu_a_rh);
+      imu_msg.angular_vel = LCMUtils.pack_vector3_t(data.imu_w_rh);
+
+      this.lcmHandle.Publish(SimulationParams.CHANNEL_AUV_IMU, imu_msg);
+
+      ++seq;
+    }
   }
 
-  // Publishes a CompressedImageMsg on 'topic' using the given image 'im'.
-  void PublishCameraImage(Texture2D im, TimeMsg timeMessage, HeaderMsg headerMessage, string topic)
+  IEnumerator PublishDepth()
   {
-    byte[] data = im.EncodeToPNG();
-    string format = "png";
-    var compressedImageMsg = new CompressedImageMsg(headerMessage, format, data);
-    this.roslink.ros.Publish(topic, compressedImageMsg);
-    Destroy(im);
-    this.roslink.ros.Render();
+    long seq = 0;
+
+    while (true) {
+      yield return new WaitForFixedUpdate();
+
+      DepthMeasurement data = this.depth_sensor.Read();
+
+      vehicle.depth_measurement_t depth_msg = new vehicle.depth_measurement_t();
+      depth_msg.header = LCMUtils.pack_header_t(data.timestamp, seq, "depth0");
+      depth_msg.depth = data.depth;
+
+      this.lcmHandle.Publish(SimulationParams.CHANNEL_AUV_DEPTH, depth_msg);
+
+      ++seq;
+    }
+  }
+
+  IEnumerator PublishRange()
+  {
+    long seq = 0;
+
+    while (true) {
+      yield return new WaitForFixedUpdate();
+
+      RangeMeasurement data0 = this.range_sensor_A.Read();
+      RangeMeasurement data1 = this.range_sensor_B.Read();
+
+      vehicle.range_measurement_t msg0 = new vehicle.range_measurement_t();
+      msg0.header = LCMUtils.pack_header_t(data0.timestamp, seq, "aps_receiver");
+      msg0.range = data0.range;
+      msg0.point = LCMUtils.pack_vector3_t(data0.world_t_beacon);
+
+      vehicle.range_measurement_t msg1 = new vehicle.range_measurement_t();
+      msg1.header = LCMUtils.pack_header_t(data1.timestamp, seq, "aps_receiver");
+      msg1.range = data1.range;
+      msg1.point = LCMUtils.pack_vector3_t(data1.world_t_beacon);
+
+      this.lcmHandle.Publish(SimulationParams.CHANNEL_AUV_RANGE0, msg0);
+      this.lcmHandle.Publish(SimulationParams.CHANNEL_AUV_RANGE1, msg1);
+
+      ++seq;
+    }
+  }
+
+  IEnumerator PublishPose()
+  {
+    long seq = 0;
+
+    while (true) {
+      yield return new WaitForFixedUpdate();
+
+      Transform world_T_body = this.imu_rigidbody.transform;
+      Quaternion world_q_body;
+      Vector3 world_t_body;
+      TransformUtils.ToRightHandedTransform(world_T_body, out world_t_body, out world_q_body);
+
+      vehicle.pose3_stamped_t msg = new vehicle.pose3_stamped_t();
+      msg.header = LCMUtils.pack_header_t(Timestamp.UnityNanoseconds(), seq, "imu0");
+      msg.pose = LCMUtils.pack_pose3_t(world_q_body, world_t_body);
+
+      this.lcmHandle.Publish(SimulationParams.CHANNEL_AUV_WORLD_P_IMU, msg);
+
+      ++seq;
+    }
   }
 
   // Any message that is meant to be synchronized with camera images should be published here.
@@ -130,34 +172,27 @@ public class AUV : MonoBehaviour {
 
       var now = DateTime.Now;
       var timeSinceStart = now - camStart;
-      var timeMessage = new TimeMsg(timeSinceStart.Seconds, timeSinceStart.Milliseconds);
+      // var timeMessage = new TimeMsg(timeSinceStart.Seconds, timeSinceStart.Milliseconds);
 
       this.stereo_rig.CaptureStereoPair(out leftImage, out rightImage);
 
-      PublishCameraImage(
-          leftImage,
-          timeMessage,
-          new HeaderMsg(msgPublishCount, timeMessage, "cam0"),
-          StereoCamLeftPublisherCmp.GetMessageTopic());
+      // PublishCameraImage(
+      //     leftImage,
+      //     timeMessage,
+      //     new HeaderMsg(msgPublishCount, timeMessage, "cam0"),
+      //     StereoCamLeftPublisherCmp.GetMessageTopic());
 
-      PublishCameraImage(
-          rightImage,
-          timeMessage,
-          new HeaderMsg(msgPublishCount, timeMessage, "cam1"),
-          StereoCamRightPublisherCmp.GetMessageTopic());
+      // PublishCameraImage(
+      //     rightImage,
+      //     timeMessage,
+      //     new HeaderMsg(msgPublishCount, timeMessage, "cam1"),
+      //     StereoCamRightPublisherCmp.GetMessageTopic());
 
       // Publish the pose of the vehicle in the world (right-handed!).
       Transform T_world_imu = imu_rigidbody.transform;
       Vector3 t_world_imu;
       Quaternion q_world_imu;
       TransformUtils.ToRightHandedTransform(T_world_imu, out t_world_imu, out q_world_imu);
-
-      QuaternionMsg q_world_imu_msg = new QuaternionMsg(q_world_imu.x, q_world_imu.y, q_world_imu.z, q_world_imu.w);
-      PointMsg t_world_imu_msg = new PointMsg(t_world_imu.x, t_world_imu.y, t_world_imu.z);
-      PoseStampedMsg msg = new PoseStampedMsg(new HeaderMsg(msgPublishCount, timeMessage, "imu"),
-                                              new PoseMsg(t_world_imu_msg, q_world_imu_msg));
-      this.roslink.ros.Publish(ImuPosePublisher.GetMessageTopic(), msg);
-      this.roslink.ros.Render();
     }
   }
 
@@ -179,9 +214,6 @@ public class AUV : MonoBehaviour {
       yield return new WaitForFixedUpdate();
 
       ImuMeasurement data = this.imu_sensor.Read();
-
-      // NOTE(milo): Need to correct the IMU timestamp (shift backwards one timestamp)?
-      // long timestamp_shifted = data.timestamp - (long)(1e9*Time.fixedDeltaTime);
 
       // We use the EuRoC MAV format:
       // timestamp [ns],w_RS_S_x [rad s^-1],w_RS_S_y [rad s^-1],w_RS_S_z [rad s^-1],a_RS_S_x [m s^-2],a_RS_S_y [m s^-2],a_RS_S_z [m s^-2]
@@ -282,49 +314,6 @@ public class AUV : MonoBehaviour {
       File.AppendAllText(csv_B, string.Join(",", line_B));
     }
   }
-
-  // TODO(milo): Redo this with correct right-handed transforms!
-  // IEnumerator PublishImu() {
-  //   while (true) {
-  //     // yield return new WaitForEndOfFrame();
-  //     yield return new WaitForSeconds(1.0f / SimulationParams.SENSOR_PUBLISH_HZ);
-
-  //     var now = DateTime.Now;
-  //     var timeSinceStart = now - camStart;
-  //     var timeMessage = new TimeMsg(timeSinceStart.Seconds, timeSinceStart.Milliseconds);
-  //     var headerMessage = new HeaderMsg(msgPublishCount, timeMessage, "imu");
-
-  //     Vector3 t_world_imu;
-  //     Quaternion q_world_imu;
-  //     Utils.ToRightHandedTransform(imu_rigidbody.transform, out t_world_imu, out q_world_imu);
-  //     QuaternionMsg q_world_imu_msg = new QuaternionMsg(q_world_imu.x, q_world_imu.y, q_world_imu.z, q_world_imu.w);
-
-  //     // NOTE(milo): Sending empty covariance matrix for now (denoted with -1 in the 0th position).
-  //     double[] Zero_3x3 = new double[]{-1, 0, 0, 0, 0, 0, 0, 0, 0};
-
-  //     var zero3 = new Vector3Msg(0.0, 0.0, 0.0);
-
-  //     // NOTE(milo): The imu_linear_accel is already in a right-handed frame, so need to convert here.
-  //     var accel_msg = new Vector3Msg(imu_linear_accel.x, imu_linear_accel.y, imu_linear_accel.z);
-  //     var msg = new ImuMessage(headerMessage, q_world_imu_msg, Zero_3x3, zero3, Zero_3x3,
-  //                              accel_msg, Zero_3x3);
-
-  //     this.roslink.ros.Publish(ImuPublisher.GetMessageTopic(), msg);
-
-  //     // Publish the heading (yaw) of the vehicle.
-  //     // float theta = imu_rigidbody.transform.rotation.eulerAngles.z;
-  //     // this.roslink.ros.Publish(HeadingPublisher.GetMessageTopic(), new Float64Msg(theta));
-  //     // this.roslink.ros.Publish(GroundtruthHeadingPublisher.GetMessageTopic(), new Float64Msg(theta));
-  //     // this.roslink.ros.Render();
-
-  //     // Publish the current barometer depth (groundtruth and depth with simulated noise).
-  //     float depth = t_world_imu.y;
-  //     Float64Msg depth_msg_gt = new Float64Msg(depth);
-  //     Float64Msg depth_msg = new Float64Msg(depth + Gaussian.Sample1D(0, this.depth_sensor_sigma));
-  //     this.roslink.ros.Publish(DepthPublisher.GetMessageTopic(), depth_msg);
-  //     this.roslink.ros.Publish(GroundtruthDepthPublisher.GetMessageTopic(), depth_msg_gt);
-  //   }
-  // }
 
   IEnumerator SaveStereoImageDataset()
   {

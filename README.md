@@ -13,28 +13,20 @@ This project is currently being developed with:
 - Ubuntu 18.04
 - ROS Melodic
 - Unity 2020.1.6.f1
+- Our fork of LCM
 
 ## First-Time Setup
 
-N/A
-
-## Connecting Unity3D to ROS
-
-We currently use the [`ROSBridgeLib`](https://github.com/MathiasCiarlo/ROSBridgeLib) library to connect Unity3D to ROS.
-
-```bash
-# Launch to rosbridge server before playing the Unity simulation.
-source ros/devel/setup.bash
-roslaunch rosbridge_server rosbridge_websocket.launch
-
-# Publish a thrust command.
-rostopic pub -r 1 /auv/controls/trident_thrust/ auv/TridentThrust '{F_lt: 1.0, F_rt: 1.0, F_ct: -1.0}'
-```
-
 ## Troubleshooting
+
+### Launch Error Loop
 
 Sometimes you'll get stuck in an error loop on launch about the editor layout. It can be fixed by copying an existing `CurrentLayout-default.dwlt` into the project:
 ```bash
 # Don't modify this file!
 cp ~/resources/CurrentLayout-default.dwlt Library/
 ```
+
+### LCM Crashes Editor / Makes Simulation Hang in Play Mode
+
+Check `~/.config/unity3d/Editor.log` for the crash.
