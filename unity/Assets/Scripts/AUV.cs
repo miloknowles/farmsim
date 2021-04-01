@@ -62,6 +62,8 @@ public class AUV : MonoBehaviour {
     if (this.simulatorIOMode == Simulator.IOMode.LCM) {
       // StartCoroutine(PublishCameraSyncedMessages());
       StartCoroutine(PublishImu());
+      StartCoroutine(PublishDepth());
+      StartCoroutine(PublishRange());
     } else if (this.simulatorIOMode == Simulator.IOMode.DATASET) {
       StartCoroutine(SaveStereoImageDataset());
       StartCoroutine(SaveImuDataset());
@@ -77,8 +79,10 @@ public class AUV : MonoBehaviour {
     while (true) {
       yield return new WaitForFixedUpdate();
 
+      ImuMeasurement data = this.imu_sensor.Read();
+
       vehicle.header_t header_msg = new vehicle.header_t();
-      header_msg.timestamp = Timestamp.UnityNanoseconds();
+      header_msg.timestamp = data.timestamp;
       header_msg.seq = seq;
       header_msg.frame_id = "imu0";
 
@@ -87,7 +91,77 @@ public class AUV : MonoBehaviour {
       imu_msg.linear_acc = new vehicle.point3_t();
       imu_msg.angular_vel = new vehicle.point3_t();
 
+      imu_msg.linear_acc.x = data.imu_a_rh.x;
+      imu_msg.linear_acc.y = data.imu_a_rh.y;
+      imu_msg.linear_acc.z = data.imu_a_rh.z;
+
+      imu_msg.angular_vel.x = data.imu_w_rh.x;
+      imu_msg.angular_vel.y = data.imu_w_rh.y;
+      imu_msg.angular_vel.z = data.imu_w_rh.z;
+
       this.lcmHandle.Publish(SimulationParams.CHANNEL_AUV_IMU, imu_msg);
+
+      ++seq;
+    }
+  }
+
+  IEnumerator PublishDepth()
+  {
+    long seq = 0;
+
+    while (true) {
+      yield return new WaitForFixedUpdate();
+
+      DepthMeasurement data = this.depth_sensor.Read();
+
+      vehicle.header_t header_msg = new vehicle.header_t();
+      header_msg.timestamp = data.timestamp;
+      header_msg.seq = seq;
+      header_msg.frame_id = "depth0";
+
+      vehicle.depth_measurement_t depth_msg = new vehicle.depth_measurement_t();
+      depth_msg.header = header_msg;
+      depth_msg.depth = data.depth;
+
+      this.lcmHandle.Publish(SimulationParams.CHANNEL_AUV_DEPTH, depth_msg);
+
+      ++seq;
+    }
+  }
+
+  IEnumerator PublishRange()
+  {
+    long seq = 0;
+
+    while (true) {
+      yield return new WaitForFixedUpdate();
+
+      RangeMeasurement data0 = this.range_sensor_A.Read();
+      RangeMeasurement data1 = this.range_sensor_B.Read();
+
+      vehicle.header_t header_msg = new vehicle.header_t();
+      header_msg.timestamp = data0.timestamp;
+      header_msg.seq = seq;
+      header_msg.frame_id = "aps_receiver";
+
+      vehicle.range_measurement_t msg0 = new vehicle.range_measurement_t();
+      msg0.header = header_msg;
+      msg0.range = data0.range;
+      msg0.point = new vehicle.point3_t();
+      msg0.point.x = data0.world_t_beacon.x;
+      msg0.point.y = data0.world_t_beacon.y;
+      msg0.point.z = data0.world_t_beacon.z;
+
+      vehicle.range_measurement_t msg1 = new vehicle.range_measurement_t();
+      msg1.header = header_msg;
+      msg1.range = data1.range;
+      msg1.point = new vehicle.point3_t();
+      msg1.point.x = data1.world_t_beacon.x;
+      msg1.point.y = data1.world_t_beacon.y;
+      msg1.point.z = data1.world_t_beacon.z;
+
+      this.lcmHandle.Publish(SimulationParams.CHANNEL_AUV_RANGE0, msg0);
+      this.lcmHandle.Publish(SimulationParams.CHANNEL_AUV_RANGE1, msg1);
 
       ++seq;
     }
