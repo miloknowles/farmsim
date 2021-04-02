@@ -17,6 +17,10 @@ public class KeyboardMove : MonoBehaviour {
 	public float keyThrust = 5.0f; 											// Amount of force applied by each key (N).
 	public ControlMode controlMode = ControlMode.OFF;		// Turn key commands off by default.
 
+	// Preallocated variables.
+	Vector3 _force = Vector3.zero;
+	Vector3 _torque = Vector3.zero;
+
 	void FixedUpdate()
 	{
 		if (this.controlMode == ControlMode.DRIVE_COMMMANDS) {
@@ -72,8 +76,13 @@ public class KeyboardMove : MonoBehaviour {
 		float w_yaw = Input.GetAxis("Horizontal") * 1.0f;
 		float thrust = Input.GetKey(KeyCode.Space) ? 3.0f : 0.0f;
 
-		this.rigidBody.AddRelativeForce(new Vector3(0, 0, thrust) * this.rigidBody.mass);
-		this.rigidBody.AddRelativeTorque(new Vector3(0.1f*w_pitch, 0.1f*w_yaw, 0.0f));
+		this._force.z = thrust * this.rigidBody.mass;
+		this._force.x = 0;
+		this._force.y = 0;
+		this.rigidBody.AddRelativeForce(this._force);
+
+		this._torque.x = 0.1f*w_pitch;
+		this._torque.y = 0.1f*w_yaw;
 
 		// Disable roll, since we always want the vehicle level.
 		// TODO(milo): More sophisticated PID control (just P right now).
@@ -81,6 +90,8 @@ public class KeyboardMove : MonoBehaviour {
 		float roll_error = -ClampAngle(euler_angles.z);
 		float P_gain = 0.005f;
 		float torque_command_roll = P_gain*roll_error;
-		this.rigidBody.AddRelativeTorque(new Vector3(0, 0, torque_command_roll));
+
+		this._torque.z = torque_command_roll;
+		this.rigidBody.AddRelativeTorque(this._torque);
 	}
 }

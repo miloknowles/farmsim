@@ -20,6 +20,8 @@ public class FlowFieldSimulator : MonoBehaviour {
 
   private List<FlowFieldParticle> _particles;
 
+  int interval = 10;
+
   void Start()
   {
     Initialize();
@@ -60,6 +62,11 @@ public class FlowFieldSimulator : MonoBehaviour {
 
   void Update()
   {
+    // Don't need to do this every frame.
+    if (Time.frameCount % this.interval != 0) {
+      return;
+    }
+
     CalculateFlowField();     // Update flow field.
     SimulateParticleMotion(); // Apply flow field.
 

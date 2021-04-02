@@ -360,7 +360,7 @@ public class AUV : MonoBehaviour {
 
     // NOTE(milo): Maximum number of frames to save. Avoids using up all disk space by accident.
     while (frame_id < 5000) {
-      yield return new WaitForSeconds(1.0f / SimulationParams.CAMERA_PUBLISH_HZ);
+      // yield return new WaitForSeconds(1.0f / SimulationParams.CAMERA_PUBLISH_HZ);
       yield return new WaitForEndOfFrame();
 
       string nsec = ((long)(Time.fixedTime * 1e9)).ToString("D19");
