@@ -28,17 +28,6 @@ public class KeyboardMove : MonoBehaviour {
 		}
 	}
 
-	// Run the control loop at a low rate to be more lightweight.
-	IEnumerator ListenForKeyCommands()
-	{
-		while (true) {
-			yield return new WaitForSeconds(0.2f);
-			if (this.controlMode == ControlMode.THRUST_COMMANDS) {
-				// KeyboardThrustCommand();
-			}
-		}
-	}
-
 	// Returns -1 or +1 depending on which of two keys is pressed. 0 if neither.
 	private float SignFromKeyPair(KeyCode key_positive, KeyCode key_negative)
 	{
@@ -49,21 +38,6 @@ public class KeyboardMove : MonoBehaviour {
 		}
 		return 0.0f;
 	}
-
-	/**
-	 * Send thrust commands to motors (through ROS).
-	 * NOTE(milo): Need to have rosbridge_server running for this to work!
-	 * Command: roslaunch rosbridge_server rosbridge_websocket.launch
-	 */
-	// private void KeyboardThrustCommand()
-	// {
-	// 	float Flt = this.keyThrust * SignFromKeyPair(KeyCode.A, KeyCode.Q);
-	// 	float Frt = this.keyThrust * SignFromKeyPair(KeyCode.D, KeyCode.E);
-	// 	float Fct = this.keyThrust * SignFromKeyPair(KeyCode.S, KeyCode.W);
-	// 	TridentThrustMsg msg = new TridentThrustMsg(Flt, Frt, Fct);
-	// 	this.roslink.ros.Publish(TridentThrustPublisher.GetMessageTopic(), msg);
-	// 	this.roslink.ros.Render();
-	// }
 
 	public static float ClampAngle(float deg)
 	{

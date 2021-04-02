@@ -30,22 +30,26 @@ public class Autotelescope : MonoBehaviour
   // By default, assume cylinder is aligned with the +y axis.
   private Vector3 alignVector = new Vector3(0, 1, 0);
 
+  // Preallocated variables.
+  private Vector3 _midpoint;
+  private Vector3 _localScale = Vector3.zero;
+
   void Start()
   {
-    originalScaleX = telescope.transform.localScale.x;
-    originalScaleZ = telescope.transform.localScale.z;
+    this.originalScaleX = telescope.transform.localScale.x;
+    this.originalScaleZ = telescope.transform.localScale.z;
 
-    if (longitudinalAxis == LongitudinalAxis.X) {
-      alignVector = new Vector3(1, 0, 0);
-    } else if (longitudinalAxis == LongitudinalAxis.Z) {
-      alignVector = new Vector3(0, 0, 1);
+    if (this.longitudinalAxis == LongitudinalAxis.X) {
+      this.alignVector = new Vector3(1, 0, 0);
+    } else if (this.longitudinalAxis == LongitudinalAxis.Z) {
+      this.alignVector = new Vector3(0, 0, 1);
     }
   }
 
   void Update()
   {
     // Average of the two endpoints.
-    Vector3 midpoint = 0.5f * (endpoint0.transform.position + offset0 + endpoint1.transform.position + offset1);
+    this._midpoint = 0.5f * (endpoint0.transform.position + offset0 + endpoint1.transform.position + offset1);
 
     Vector3 vector_01 = (endpoint1.transform.position - offset1) - (endpoint0.transform.position + offset0);
     Vector3 unit_01 = Vector3.Normalize(vector_01);
@@ -54,11 +58,13 @@ public class Autotelescope : MonoBehaviour
     Quaternion q_align_long = Simulator.TransformUtils.RotateAlignVectors(alignVector, unit_01);
 
     // Position the attached game object at the center of the two endpoints.
-    this.gameObject.transform.position = midpoint;
-    this.gameObject.transform.rotation = q_align_long;
+    this.gameObject.transform.SetPositionAndRotation(this._midpoint, q_align_long);
 
     // Make the attached telescope scale to fit between the endpoints.
     // NOTE(milo): Should be 0.5f * scale for cylinders!
-    telescope.transform.localScale = new Vector3(this.originalScaleX, length_01, this.originalScaleZ);
+    this._localScale.x = this.originalScaleX;
+    this._localScale.y = length_01;
+    this._localScale.z = this.originalScaleZ;
+    telescope.transform.localScale = this._localScale;
   }
 }

@@ -25,6 +25,7 @@ public class VehicleDynamics : MonoBehaviour {
     this.rigidBody = this.GetComponent<Rigidbody>();
   }
 
+  // TODO(milo): Lots of allocation here...
   void FixedUpdate()
   {
     // Get velocity and angular velocity in the body frame.
