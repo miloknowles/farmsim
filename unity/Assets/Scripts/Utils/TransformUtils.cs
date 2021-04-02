@@ -102,8 +102,7 @@ public class TransformUtils {
     Vector3 xyz = Vector3.Cross(hat1, hat2);
     float w = 1 + Vector3.Dot(hat1, hat2);
 
-    Quaternion q = new Quaternion(xyz.x, xyz.y, xyz.z, w).normalized;
-    return q;
+    return new Quaternion(xyz.x, xyz.y, xyz.z, w).normalized;
   }
 
   // Rotate an object towards a look direction.
