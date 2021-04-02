@@ -1495,7 +1495,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rigidBody: {fileID: 420561429}
   followObject: {fileID: 1456178310}
-  pGain: 0.03
+  pGainPitch: 0.05
+  pGainYaw: 0.05
+  pGainThrust: 3
 --- !u!114 &420561434
 MonoBehaviour:
   m_ObjectHideFlags: 0
