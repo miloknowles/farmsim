@@ -103,7 +103,7 @@ public class AUV : MonoBehaviour {
     depth_msg.header = new vehicle.header_t();
 
     while (true) {
-      yield return new WaitForFixedUpdate();
+      yield return new WaitForEndOfFrame();
 
       this.depth_sensor.Read();
       DepthMeasurement data = this.depth_sensor.data;
@@ -163,7 +163,7 @@ public class AUV : MonoBehaviour {
     Vector3 world_t_body = Vector3.zero;
 
     while (true) {
-      yield return new WaitForFixedUpdate();
+      yield return new WaitForEndOfFrame();
 
       Transform world_T_body = this.imu_rigidbody.transform;
 

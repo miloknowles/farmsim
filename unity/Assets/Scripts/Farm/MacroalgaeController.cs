@@ -11,6 +11,8 @@ public class MacroalgaeController : MonoBehaviour {
   private int MACROALGAE_LAYER = 9;
   private List<GameObject> plants;
 
+  private int interval = 10;
+
   void Start()
   {
     this.plants = FindGameObjectsInLayer(this.MACROALGAE_LAYER);
@@ -19,6 +21,10 @@ public class MacroalgaeController : MonoBehaviour {
 
   void Update()
   {
+    if (Time.frameCount % this.interval != 0) {
+      return;
+    }
+
     if (this.maturity != this._lastMaturity) {
       foreach (GameObject g in this.plants) {
         g.transform.localScale = new Vector3(this.maturity, this.maturity, this.maturity);

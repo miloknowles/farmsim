@@ -24,8 +24,6 @@ public class Autotelescope : MonoBehaviour
 
   private float originalScaleX;
   private float originalScaleZ;
-  // private Vector3 originalPosition0;
-  // private Vector3 originalPosition1;
 
   // By default, assume cylinder is aligned with the +y axis.
   private Vector3 alignVector = new Vector3(0, 1, 0);
