@@ -13,11 +13,15 @@ public class StereoRig : MonoBehaviour {
   // Start is called before the first frame update
   void Start()
   {
+    RenderTexture.allowThreadedTextureCreation = true;
     // TODO(milo): RGB24?
     this.preallocRenderTexture = new RenderTexture(
         SimulationParams.AUV_CAMERA_WIDTH,
         SimulationParams.AUV_CAMERA_HEIGHT,
         16, RenderTextureFormat.ARGB32);
+
+    // https://docs.unity3d.com/ScriptReference/RenderTexture.html
+    this.preallocRenderTexture.DiscardContents();
   }
 
   // Grabs a rendered texture from a camera. The passed output image must be initialized to the
@@ -42,7 +46,7 @@ public class StereoRig : MonoBehaviour {
     //                                 TextureFormat.RGB24, false);
 
     // This will read pixels from the ACTIVE render texture.
-    image.ReadPixels(new Rect(0, 0, camera.targetTexture.width, camera.targetTexture.height), 0, 0);
+    image.ReadPixels(new Rect(0, 0, camera.targetTexture.width, camera.targetTexture.height), 0, 0, false);
     image.Apply();
 
     camera.targetTexture = originalTexture;
