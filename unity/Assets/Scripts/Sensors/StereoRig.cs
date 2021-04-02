@@ -41,10 +41,6 @@ public class StereoRig : MonoBehaviour {
     camera.Render();
     RenderTexture.active = camera.targetTexture;
 
-    // Make a new (empty) image and read the camera image into it.
-    // Texture2D image = new Texture2D(camera.targetTexture.width, camera.targetTexture.height,
-    //                                 TextureFormat.RGB24, false);
-
     // This will read pixels from the ACTIVE render texture.
     image.ReadPixels(new Rect(0, 0, camera.targetTexture.width, camera.targetTexture.height), 0, 0, false);
     image.Apply();

@@ -16,6 +16,7 @@ namespace vehicle
         public int height;
         public int channels;
         public String format;
+        public String encoding;
         public int size;
         public byte[] data;
  
@@ -24,7 +25,7 @@ namespace vehicle
         }
  
         public static readonly ulong LCM_FINGERPRINT;
-        public static readonly ulong LCM_FINGERPRINT_BASE = 0xca702625827c2df2L;
+        public static readonly ulong LCM_FINGERPRINT_BASE = 0x8caeeeef94f1d6b6L;
  
         static image_t()
         {
@@ -59,6 +60,8 @@ namespace vehicle
             outs.Write(this.channels); 
  
             __strbuf = System.Text.Encoding.GetEncoding("US-ASCII").GetBytes(this.format); outs.Write(__strbuf.Length+1); outs.Write(__strbuf, 0, __strbuf.Length); outs.Write((byte) 0); 
+ 
+            __strbuf = System.Text.Encoding.GetEncoding("US-ASCII").GetBytes(this.encoding); outs.Write(__strbuf.Length+1); outs.Write(__strbuf, 0, __strbuf.Length); outs.Write((byte) 0); 
  
             outs.Write(this.size); 
  
@@ -98,6 +101,8 @@ namespace vehicle
  
             __strbuf = new byte[ins.ReadInt32()-1]; ins.ReadFully(__strbuf); ins.ReadByte(); this.format = System.Text.Encoding.GetEncoding("US-ASCII").GetString(__strbuf);
  
+            __strbuf = new byte[ins.ReadInt32()-1]; ins.ReadFully(__strbuf); ins.ReadByte(); this.encoding = System.Text.Encoding.GetEncoding("US-ASCII").GetString(__strbuf);
+ 
             this.size = ins.ReadInt32();
  
             this.data = new byte[(int) size];
@@ -117,6 +122,8 @@ namespace vehicle
             outobj.channels = this.channels;
  
             outobj.format = this.format;
+ 
+            outobj.encoding = this.encoding;
  
             outobj.size = this.size;
  

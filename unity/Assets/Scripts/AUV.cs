@@ -199,10 +199,10 @@ public class AUV : MonoBehaviour {
       this.stereo_rig.CaptureStereoPair(ref leftImage, ref rightImage);
 
       LCMUtils.pack_header_t(Timestamp.UnityNanoseconds(), seq, "stereo_cam", ref msg.header);
-      // LCMUtils.pack_image_t(ref leftImage, ref msg.img_left);
-      // LCMUtils.pack_image_t(ref rightImage, ref msg.img_right);
+      LCMUtils.pack_image_t(ref leftImage, ref msg.img_left);
+      LCMUtils.pack_image_t(ref rightImage, ref msg.img_right);
 
-      // this.lcmHandle.Publish(SimulationParams.CHANNEL_AUV_STEREO, msg);
+      this.lcmHandle.Publish(SimulationParams.CHANNEL_AUV_STEREO, msg);
 
       ++seq;
     }

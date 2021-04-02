@@ -35,14 +35,18 @@ public class LCMUtils {
     pack_vector3_t(t, ref msg.position);
   }
 
+  // Packs a Unity Texture2D into an LCM image_t type.
   public static void pack_image_t(ref Texture2D im, ref image_t msg)
   {
     msg.height = im.height;
     msg.width = im.width;
     msg.channels = 3;
-    msg.format = "rgb8";
-    msg.size = msg.height * msg.width * msg.channels;
-    msg.data = im.GetRawTextureData();
+    msg.format = "bgr8";
+    msg.encoding = "jpg";
+
+    // This seems to use a "BGR" channel ordering like OpenCV.
+    msg.data = ImageConversion.EncodeToJPG(im, 75);
+    msg.size = msg.data.Length;
   }
 }
 
