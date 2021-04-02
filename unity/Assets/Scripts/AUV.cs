@@ -76,16 +76,19 @@ public class AUV : MonoBehaviour {
   IEnumerator PublishImu()
   {
     long seq = 0;
+    vehicle.imu_measurement_t imu_msg = new vehicle.imu_measurement_t();
+    imu_msg.header = new vehicle.header_t();
+    imu_msg.linear_acc = new vehicle.vector3_t();
+    imu_msg.angular_vel = new vehicle.vector3_t();
 
     while (true) {
       yield return new WaitForFixedUpdate();
 
-      ImuMeasurement data = this.imu_sensor.Read();
+      ImuMeasurement data = this.imu_sensor.data;
 
-      vehicle.imu_measurement_t imu_msg = new vehicle.imu_measurement_t();
-      imu_msg.header = LCMUtils.pack_header_t(data.timestamp, seq, "imu0");
-      imu_msg.linear_acc = LCMUtils.pack_vector3_t(data.imu_a_rh);
-      imu_msg.angular_vel = LCMUtils.pack_vector3_t(data.imu_w_rh);
+      LCMUtils.pack_header_t(data.timestamp, seq, "imu0", ref imu_msg.header);
+      LCMUtils.pack_vector3_t(data.imu_a_rh, ref imu_msg.linear_acc);
+      LCMUtils.pack_vector3_t(data.imu_w_rh, ref imu_msg.angular_vel);
 
       this.lcmHandle.Publish(SimulationParams.CHANNEL_AUV_IMU, imu_msg);
 
@@ -96,14 +99,16 @@ public class AUV : MonoBehaviour {
   IEnumerator PublishDepth()
   {
     long seq = 0;
+    vehicle.depth_measurement_t depth_msg = new vehicle.depth_measurement_t();
+    depth_msg.header = new vehicle.header_t();
 
     while (true) {
       yield return new WaitForFixedUpdate();
 
-      DepthMeasurement data = this.depth_sensor.Read();
+      this.depth_sensor.Read();
+      DepthMeasurement data = this.depth_sensor.data;
 
-      vehicle.depth_measurement_t depth_msg = new vehicle.depth_measurement_t();
-      depth_msg.header = LCMUtils.pack_header_t(data.timestamp, seq, "depth0");
+      LCMUtils.pack_header_t(data.timestamp, seq, "depth0", ref depth_msg.header);
       depth_msg.depth = data.depth;
 
       this.lcmHandle.Publish(SimulationParams.CHANNEL_AUV_DEPTH, depth_msg);
@@ -115,22 +120,28 @@ public class AUV : MonoBehaviour {
   IEnumerator PublishRange()
   {
     long seq = 0;
+    vehicle.range_measurement_t msg0 = new vehicle.range_measurement_t();
+    vehicle.range_measurement_t msg1 = new vehicle.range_measurement_t();
+    msg0.header = new vehicle.header_t();
+    msg1.header = new vehicle.header_t();
+    msg0.point = new vehicle.vector3_t();
+    msg1.point = new vehicle.vector3_t();
 
     while (true) {
-      yield return new WaitForFixedUpdate();
+      yield return new WaitForSeconds(0.3f);
 
-      RangeMeasurement data0 = this.range_sensor_A.Read();
-      RangeMeasurement data1 = this.range_sensor_B.Read();
+      this.range_sensor_A.Read();
+      this.range_sensor_B.Read();
+      RangeMeasurement data0 = this.range_sensor_A.data;
+      RangeMeasurement data1 = this.range_sensor_B.data;
 
-      vehicle.range_measurement_t msg0 = new vehicle.range_measurement_t();
-      msg0.header = LCMUtils.pack_header_t(data0.timestamp, seq, "aps_receiver");
+      LCMUtils.pack_header_t(data0.timestamp, seq, "aps_receiver", ref msg0.header);
+      LCMUtils.pack_vector3_t(data0.world_t_beacon, ref msg0.point);
       msg0.range = data0.range;
-      msg0.point = LCMUtils.pack_vector3_t(data0.world_t_beacon);
 
-      vehicle.range_measurement_t msg1 = new vehicle.range_measurement_t();
-      msg1.header = LCMUtils.pack_header_t(data1.timestamp, seq, "aps_receiver");
+      LCMUtils.pack_header_t(data1.timestamp, seq, "aps_receiver", ref msg1.header);
+      LCMUtils.pack_vector3_t(data1.world_t_beacon, ref msg1.point);
       msg1.range = data1.range;
-      msg1.point = LCMUtils.pack_vector3_t(data1.world_t_beacon);
 
       this.lcmHandle.Publish(SimulationParams.CHANNEL_AUV_RANGE0, msg0);
       this.lcmHandle.Publish(SimulationParams.CHANNEL_AUV_RANGE1, msg1);
@@ -142,6 +153,11 @@ public class AUV : MonoBehaviour {
   IEnumerator PublishPose()
   {
     long seq = 0;
+    vehicle.pose3_stamped_t msg = new vehicle.pose3_stamped_t();
+    msg.header = new vehicle.header_t();
+    msg.pose = new vehicle.pose3_t();
+    msg.pose.orientation = new vehicle.quaternion_t();
+    msg.pose.position = new vehicle.vector3_t();
 
     while (true) {
       yield return new WaitForFixedUpdate();
@@ -151,9 +167,8 @@ public class AUV : MonoBehaviour {
       Vector3 world_t_body;
       TransformUtils.ToRightHandedTransform(world_T_body, out world_t_body, out world_q_body);
 
-      vehicle.pose3_stamped_t msg = new vehicle.pose3_stamped_t();
-      msg.header = LCMUtils.pack_header_t(Timestamp.UnityNanoseconds(), seq, "imu0");
-      msg.pose = LCMUtils.pack_pose3_t(world_q_body, world_t_body);
+      LCMUtils.pack_header_t(Timestamp.UnityNanoseconds(), seq, "imu0", ref msg.header);
+      LCMUtils.pack_pose3_t(world_q_body, world_t_body, ref msg.pose);
 
       this.lcmHandle.Publish(SimulationParams.CHANNEL_AUV_WORLD_P_IMU, msg);
 
@@ -164,19 +179,24 @@ public class AUV : MonoBehaviour {
   IEnumerator PublishStereoImages()
   {
     long seq = 0;
-    Texture2D leftImage, rightImage;
+
+    // Only allocate these things once.
+    Texture2D leftImage = new Texture2D(SimulationParams.AUV_CAMERA_WIDTH, SimulationParams.AUV_CAMERA_HEIGHT, TextureFormat.RGB24, false);
+    Texture2D rightImage = new Texture2D(SimulationParams.AUV_CAMERA_WIDTH, SimulationParams.AUV_CAMERA_HEIGHT, TextureFormat.RGB24, false);
+    vehicle.stereo_image_t msg = new vehicle.stereo_image_t();
+    msg.header = new vehicle.header_t();
+    msg.img_left = new vehicle.image_t();
+    msg.img_right = new vehicle.image_t();
 
     while (true) {
       yield return new WaitForSeconds(1.0f / SimulationParams.CAMERA_PUBLISH_HZ);
       yield return new WaitForEndOfFrame();
 
-      this.stereo_rig.CaptureStereoPair(out leftImage, out rightImage);
+      this.stereo_rig.CaptureStereoPair(ref leftImage, ref rightImage);
 
-      vehicle.stereo_image_t msg = new vehicle.stereo_image_t();
-
-      msg.header = LCMUtils.pack_header_t(Timestamp.UnityNanoseconds(), seq, "stereo_cam");
-      msg.img_left = LCMUtils.pack_image_t(ref leftImage);
-      msg.img_right = LCMUtils.pack_image_t(ref rightImage);
+      LCMUtils.pack_header_t(Timestamp.UnityNanoseconds(), seq, "stereo_cam", ref msg.header);
+      LCMUtils.pack_image_t(ref leftImage, ref msg.img_left);
+      LCMUtils.pack_image_t(ref rightImage, ref msg.img_right);
 
       this.lcmHandle.Publish(SimulationParams.CHANNEL_AUV_STEREO, msg);
 
@@ -201,7 +221,8 @@ public class AUV : MonoBehaviour {
     while (true) {
       yield return new WaitForFixedUpdate();
 
-      ImuMeasurement data = this.imu_sensor.Read();
+      // Don't need to call Read() because sensor is updated during FixedUpdate().
+      ImuMeasurement data = this.imu_sensor.data;
 
       // We use the EuRoC MAV format:
       // timestamp [ns],w_RS_S_x [rad s^-1],w_RS_S_y [rad s^-1],w_RS_S_z [rad s^-1],a_RS_S_x [m s^-2],a_RS_S_y [m s^-2],a_RS_S_z [m s^-2]
@@ -238,7 +259,8 @@ public class AUV : MonoBehaviour {
     while (true) {
       yield return new WaitForFixedUpdate();
 
-      DepthMeasurement data = this.depth_sensor.Read();
+      this.depth_sensor.Read();
+      DepthMeasurement data = this.depth_sensor.data;
 
       // timestamp [ns], depth [m]
       List<string> line = new List<string>{
@@ -276,8 +298,10 @@ public class AUV : MonoBehaviour {
       // ping_time = max_range / speed_of_sound = 100m / 343 m/s = 0.29 sec
       // Therefore can run at most 3ish Hz at 100m max range.
       yield return new WaitForSeconds(0.3f);
-      RangeMeasurement data_A = this.range_sensor_A.Read();
-      RangeMeasurement data_B = this.range_sensor_B.Read();
+      this.range_sensor_A.Read();
+      this.range_sensor_B.Read();
+      RangeMeasurement data_A = this.range_sensor_A.data;
+      RangeMeasurement data_B = this.range_sensor_B.data;
 
       // timestamp [ns], range [m], world_t_beacon.x [m], world_t_beacon.y [m], world_t_beacon.z [m],
       List<string> line_A = new List<string>{
@@ -323,11 +347,12 @@ public class AUV : MonoBehaviour {
     Directory.CreateDirectory(rightImageDataFolder);
 
     int frame_id = 0;
-    Texture2D leftImage, rightImage;
+    Texture2D leftImage = new Texture2D(SimulationParams.AUV_CAMERA_WIDTH, SimulationParams.AUV_CAMERA_HEIGHT, TextureFormat.RGB24, false);
+    Texture2D rightImage = new Texture2D(SimulationParams.AUV_CAMERA_WIDTH, SimulationParams.AUV_CAMERA_HEIGHT, TextureFormat.RGB24, false);
 
     // NOTE(milo): Maximum number of frames to save. Avoids using up all disk space by accident.
     while (frame_id < 5000) {
-      // yield return new WaitForSeconds(1.0f / SimulationParams.CAMERA_PUBLISH_HZ);
+      yield return new WaitForSeconds(1.0f / SimulationParams.CAMERA_PUBLISH_HZ);
       yield return new WaitForEndOfFrame();
 
       string nsec = ((long)(Time.fixedTime * 1e9)).ToString("D19");
@@ -375,8 +400,9 @@ public class AUV : MonoBehaviour {
 
       File.AppendAllText(Path.Combine(dataset_folder, "imu0_poses.txt"), string.Join(",", pose_line));
 
-      this.stereo_rig.CaptureStereoPair(out leftImage, out rightImage);
+      this.stereo_rig.CaptureStereoPair(ref leftImage, ref rightImage);
 
+      // TODO(milo): Avoid allocating this every time.
       byte[] leftPng = leftImage.EncodeToPNG();
       byte[] rightPng = rightImage.EncodeToPNG();
       string imagePath = $"{nsec}.png";
@@ -390,5 +416,7 @@ public class AUV : MonoBehaviour {
 
       ++frame_id;
     }
+
+    Debug.Log("WARNING: Stopped saving camera images! Reached maximum.");
   }
 }

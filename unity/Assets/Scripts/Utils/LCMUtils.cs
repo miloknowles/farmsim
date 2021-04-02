@@ -7,52 +7,42 @@ using vehicle;
 namespace Simulator {
 
 public class LCMUtils {
-  public static header_t pack_header_t(long timestamp, long seq, string frame_id)
+  public static void pack_header_t(long timestamp, long seq, string frame_id, ref header_t header)
   {
-    header_t header = new header_t();
     header.timestamp = timestamp;
     header.seq = seq;
     header.frame_id = frame_id;
-    return header;
   }
 
-  public static vector3_t pack_vector3_t(Vector3 v)
+  public static void pack_vector3_t(Vector3 v, ref vector3_t msg)
   {
-    vector3_t msg = new vector3_t();
     msg.x = v.x;
     msg.y = v.y;
     msg.z = v.z;
-    return msg;
   }
 
-  public static quaternion_t pack_quaternion_t(Quaternion q)
+  public static void pack_quaternion_t(Quaternion q, ref quaternion_t msg)
   {
-    quaternion_t msg = new quaternion_t();
     msg.w = q.w;
     msg.x = q.x;
     msg.y = q.y;
     msg.z = q.z;
-    return msg;
   }
 
-  public static pose3_t pack_pose3_t(Quaternion q, Vector3 t)
+  public static void pack_pose3_t(Quaternion q, Vector3 t, ref pose3_t msg)
   {
-    pose3_t msg = new pose3_t();
-    msg.orientation = pack_quaternion_t(q);
-    msg.position = pack_vector3_t(t);
-    return msg;
+    pack_quaternion_t(q, ref msg.orientation);
+    pack_vector3_t(t, ref msg.position);
   }
 
-  public static image_t pack_image_t(ref Texture2D im)
+  public static void pack_image_t(ref Texture2D im, ref image_t msg)
   {
-    image_t msg = new image_t();
     msg.height = im.height;
     msg.width = im.width;
     msg.channels = 3;
     msg.format = "rgb8";
     msg.size = msg.height * msg.width * msg.channels;
     msg.data = im.GetRawTextureData();
-    return msg;
   }
 }
 

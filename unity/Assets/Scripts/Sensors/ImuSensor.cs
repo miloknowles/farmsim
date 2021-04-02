@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Simulator {
 
-readonly public struct ImuMeasurement
+public struct ImuMeasurement
 {
   public ImuMeasurement(long timestamp, Vector3 a, Vector3 w)
   {
@@ -14,16 +14,13 @@ readonly public struct ImuMeasurement
     this.imu_w_rh = w;
   }
 
-  public readonly long timestamp;
-  public readonly Vector3 imu_a_rh;
-  public readonly Vector3 imu_w_rh;
+  public long timestamp;
+  public Vector3 imu_a_rh;
+  public Vector3 imu_w_rh;
 };
 
 
-/**
- * Simulates measurements from an IMU (accelerometer and gyroscope).
- * NOTE(milo): The "IMU" and "Body" frames are the same for now!
- */
+// Simulates measurements from an IMU (accelerometer and gyroscope).
 public class ImuSensor : MonoBehaviour
 {
   public Rigidbody imu_rigidbody;   // Rigidbody that the IMU should experience forces from.
@@ -38,28 +35,23 @@ public class ImuSensor : MonoBehaviour
   public float accelBiasSigma = 0.001f;
   public float gyroBiasSigma = 0.001f;
 
-  private Vector3 accelBias = new Vector3(0, 0, 0);
-  private Vector3 gyroBias = new Vector3(0, 0, 0);
+  private Vector3 accelBias = Vector3.zero;
+  private Vector3 gyroBias = Vector3.zero;
 
   // Used to calculate accleration with finite-differencing.
   private Vector3 prev_world_v_imu;
 
-  private ImuMeasurement _latest;
-
-  public ImuMeasurement Read()
-  {
-    return this._latest;
-  }
+  public ImuMeasurement data = new ImuMeasurement(0, Vector3.zero, Vector3.zero);
 
   void Start()
   {
     // For now, just sample a bias when the simulation starts, and hold it constant throughout.
     if (this.accelBiasSigma > 0 && this.enableImuBias) {
-      this.accelBias += Gaussian.Sample3D(new Vector3(0, 0, 0), new Vector3(this.accelBiasSigma, this.accelBiasSigma, this.accelBiasSigma));
+      this.accelBias += Gaussian.Sample3D(Vector3.zero, new Vector3(this.accelBiasSigma, this.accelBiasSigma, this.accelBiasSigma));
     }
 
     if (this.gyroBiasSigma > 0 && this.enableImuBias) {
-      this.gyroBias += Gaussian.Sample3D(new Vector3(0, 0, 0), new Vector3(this.gyroBiasSigma, this.gyroBiasSigma, this.gyroBiasSigma));
+      this.gyroBias += Gaussian.Sample3D(Vector3.zero, new Vector3(this.gyroBiasSigma, this.gyroBiasSigma, this.gyroBiasSigma));
     }
   }
 
@@ -85,18 +77,20 @@ public class ImuSensor : MonoBehaviour
 
     // Optionally add zero-mean noise.
     if (this.accelNoiseSigma > 0 && this.enableImuNoise) {
-      imu_a_rh += Gaussian.Sample3D(new Vector3(0, 0, 0), new Vector3(this.accelNoiseSigma, this.accelNoiseSigma, this.accelNoiseSigma));
+      imu_a_rh += Gaussian.Sample3D(Vector3.zero, new Vector3(this.accelNoiseSigma, this.accelNoiseSigma, this.accelNoiseSigma));
     }
 
     if (this.gyroNoiseSigma > 0 && this.enableImuNoise) {
-      imu_w_rh += Gaussian.Sample3D(new Vector3(0, 0, 0), new Vector3(this.gyroNoiseSigma, this.gyroNoiseSigma, this.gyroNoiseSigma));
+      imu_w_rh += Gaussian.Sample3D(Vector3.zero, new Vector3(this.gyroNoiseSigma, this.gyroNoiseSigma, this.gyroNoiseSigma));
     }
 
     // Add bias. If enableImuBias is OFF, this will just add a zero vector.
     imu_a_rh += this.accelBias;
     imu_w_rh += this.gyroBias;
 
-    this._latest = new ImuMeasurement(Timestamp.UnityNanoseconds(), imu_a_rh, imu_w_rh);
+    data.timestamp = Timestamp.UnityNanoseconds();
+    data.imu_a_rh = imu_a_rh;
+    data.imu_w_rh = imu_w_rh;
   }
 }
 

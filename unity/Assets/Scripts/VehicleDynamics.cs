@@ -39,7 +39,7 @@ public class VehicleDynamics : MonoBehaviour {
     Vector3 fct = new Vector3(0.0f, this._F_ct, 0.0f);
 
     // Drag = 1/2 * rho * Cd * A * v^2
-    Vector3 F_drag = -1.0f * v_body.normalized * this.linearDragCoefficient * Mathf.Pow(v_body.magnitude, 2);
+    Vector3 F_drag = -1.0f * v_body.normalized * this.linearDragCoefficient * v_body.sqrMagnitude;
 
     // NOTE(milo): Need to clamp drag force for stability. Make sure that the force can't causes
     // an acceration that would change the direction of motion. This prevents drag forces from
@@ -54,7 +54,7 @@ public class VehicleDynamics : MonoBehaviour {
 
     // Compute torque due to drag.
     Vector3 tau_linear_drag = Vector3.Cross(this.t_CP_body, F_drag);
-    Vector3 tau_angular_drag = -1.0f * w_body.normalized * this.angularDragCoefficient * Mathf.Pow(w_body.magnitude, 2);
+    Vector3 tau_angular_drag = -1.0f * w_body.normalized * this.angularDragCoefficient * w_body.sqrMagnitude;
 
     Vector3 tau_total = tau_lt + tau_rt + tau_ct + tau_angular_drag + tau_linear_drag;
     tau_total = Vector3.ClampMagnitude(tau_total, 0.3f * (w_body.magnitude * this.rigidBody.inertiaTensor / Time.fixedDeltaTime).magnitude);
