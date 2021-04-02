@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Simulator {
 
-readonly public struct RangeMeasurement
+public struct RangeMeasurement
 {
   public RangeMeasurement(long timestamp, float range, Vector3 world_t_beacon)
   {
@@ -13,9 +13,9 @@ readonly public struct RangeMeasurement
     this.world_t_beacon = world_t_beacon;
   }
 
-  public readonly long timestamp;
-  public readonly float range;
-  public readonly Vector3 world_t_beacon;
+  public long timestamp;
+  public float range;
+  public Vector3 world_t_beacon;
 }
 
 
@@ -28,18 +28,18 @@ public class RangeSensor : MonoBehaviour
   public bool enableApsNoise = true;
   public float apsNoiseSigma = 0.1f;
 
+  public RangeMeasurement data = new RangeMeasurement(0, 0, Vector3.zero);
+
   // Lazy read: only get sensor data when called.
-  public RangeMeasurement Read()
+  public void Read()
   {
-    Vector3 world_t_beacon = this.apsBeaconObject.transform.position;
-    float range = (this.apsReceiverObject.transform.position - world_t_beacon).magnitude;
+    data.timestamp = Timestamp.UnityNanoseconds();
+    data.range = (this.apsReceiverObject.transform.position -  this.apsBeaconObject.transform.position).magnitude;
+    TransformUtils.ToRightHandedTranslation(this.apsBeaconObject.transform.position, ref data.world_t_beacon);
 
     if (this.enableApsNoise && this.apsNoiseSigma > 0) {
-      range += Gaussian.Sample1D(0, this.apsNoiseSigma);
+      data.range += Gaussian.Sample1D(0, this.apsNoiseSigma);
     }
-
-    // NOTE(milo): Switch to right-handed coordinates!
-    return new RangeMeasurement(Timestamp.UnityNanoseconds(), range, TransformUtils.ToRightHandedTranslation(world_t_beacon));
   }
 }
 

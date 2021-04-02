@@ -7,40 +7,67 @@ using vehicle;
 namespace Simulator {
 
 public class LCMUtils {
-  public static header_t pack_header_t(long timestamp, long seq, string frame_id)
+  public static void pack_header_t(long timestamp, long seq, string frame_id, ref header_t header)
   {
-    header_t header = new header_t();
     header.timestamp = timestamp;
     header.seq = seq;
     header.frame_id = frame_id;
-    return header;
   }
 
-  public static vector3_t pack_vector3_t(Vector3 v)
+  public static void pack_vector3_t(Vector3 v, ref vector3_t msg)
   {
-    vector3_t msg = new vector3_t();
     msg.x = v.x;
     msg.y = v.y;
     msg.z = v.z;
-    return msg;
   }
 
-  public static quaternion_t pack_quaternion_t(Quaternion q)
+  public static void unpack_vector3_t(vector3_t msg, ref Vector3 v)
   {
-    quaternion_t msg = new quaternion_t();
+    v.x = (float)msg.x;
+    v.y = (float)msg.y;
+    v.z = (float)msg.z;
+  }
+
+  public static void pack_quaternion_t(Quaternion q, ref quaternion_t msg)
+  {
     msg.w = q.w;
     msg.x = q.x;
     msg.y = q.y;
     msg.z = q.z;
-    return msg;
   }
 
-  public static pose3_t pack_pose3_t(Quaternion q, Vector3 t)
+  public static void unpack_quaternion_t(quaternion_t msg, ref Quaternion q)
   {
-    pose3_t msg = new pose3_t();
-    msg.orientation = pack_quaternion_t(q);
-    msg.position = pack_vector3_t(t);
-    return msg;
+    q.w = (float)msg.w;
+    q.x = (float)msg.x;
+    q.y = (float)msg.y;
+    q.z = (float)msg.z;
+  }
+
+  public static void pack_pose3_t(Quaternion q, Vector3 t, ref pose3_t msg)
+  {
+    pack_quaternion_t(q, ref msg.orientation);
+    pack_vector3_t(t, ref msg.position);
+  }
+
+  public static void unpack_pose3_t(pose3_t msg, ref Quaternion q, ref Vector3 t)
+  {
+    unpack_quaternion_t(msg.orientation, ref q);
+    unpack_vector3_t(msg.position, ref t);
+  }
+
+  // Packs a Unity Texture2D into an LCM image_t type.
+  public static void pack_image_t(ref Texture2D im, ref image_t msg)
+  {
+    msg.height = im.height;
+    msg.width = im.width;
+    msg.channels = 3;
+    msg.format = "bgr8";
+    msg.encoding = "jpg";
+
+    // This seems to use a "BGR" channel ordering like OpenCV.
+    msg.data = ImageConversion.EncodeToJPG(im, 75);
+    msg.size = msg.data.Length;
   }
 }
 

@@ -21,18 +21,32 @@ public class TransformUtils {
     *                      |
     *                     (y)
     */
-  public static void ToRightHandedTransform(Transform lh, out Vector3 t_rh, out Quaternion q_rh)
+  public static void ToRightHandedTransform(Transform lh, ref Vector3 t_rh, ref Quaternion q_rh)
   {
-    t_rh = ToRightHandedTranslation(lh.position);
-    q_rh = ToRightHandedQuaternion(lh.rotation);
+    ToRightHandedTranslation(lh.position, ref t_rh);
+    ToRightHandedQuaternion(lh.rotation, ref q_rh);
   }
 
-  public static Vector3 ToRightHandedTranslation(Vector3 t_lh)
+  public static void ToLeftHandedTransform(Transform rh, ref Vector3 t_lh, ref Quaternion q_lh)
   {
-    return new Vector3(t_lh.x, -t_lh.y, t_lh.z);
+    ToLeftHandedTranslation(rh.position, ref t_lh);
+    ToLeftHandedQuaternion(rh.rotation, ref q_lh);
   }
 
-  public static Quaternion ToRightHandedQuaternion(Quaternion q_lh)
+  public static void ToRightHandedTranslation(Vector3 t_lh, ref Vector3 rh)
+  {
+    rh.x = t_lh.x;
+    rh.y = -t_lh.y;
+    rh.z = t_lh.z;
+  }
+
+  // Symmetric so reuse code.
+  public static void ToLeftHandedTranslation(Vector3 t_rh, ref Vector3 lh)
+  {
+    ToRightHandedTranslation(t_rh, ref lh);
+  }
+
+  public static void ToRightHandedQuaternion(Quaternion q_lh, ref Quaternion rh)
   {
     // Flip the y-component of the rotation axis.
     float angle_rh = 0.0f;
@@ -42,7 +56,13 @@ public class TransformUtils {
     axis_rh.y *= -1;
     angle_rh *= -1;
 
-    return Quaternion.AngleAxis(angle_rh, axis_rh).normalized;
+    rh = Quaternion.AngleAxis(angle_rh, axis_rh).normalized;
+  }
+
+  // Symmetric so reuse code.
+  public static void ToLeftHandedQuaternion(Quaternion q_rh, ref Quaternion lh)
+  {
+    ToRightHandedQuaternion(q_rh, ref lh);
   }
 
   /**
@@ -60,9 +80,17 @@ public class TransformUtils {
     *                      |
     *                     (y)
     */
-  public static Vector3 ToRightHandedAngularVelocity(Vector3 w_lh)
+  public static void ToRightHandedAngularVelocity(Vector3 w_lh, ref Vector3 rh)
   {
-    return new Vector3(-1.0f * w_lh.x, w_lh.y, -1.0f * w_lh.z);
+    rh.x = -1.0f * w_lh.x;
+    rh.y = w_lh.y;
+    rh.z = -1.0f * w_lh.z;
+  }
+
+  // Symmetric so reuse code.
+  public static void ToLeftHandedAngularVelocity(Vector3 w_rh, ref Vector3 lh)
+  {
+    ToRightHandedAngularVelocity(w_rh, ref lh);
   }
 
   // https://stackoverflow.com/questions/1171849/finding-quaternion-representing-the-rotation-from-one-vector-to-another

@@ -17,21 +17,14 @@ public class KeyboardMove : MonoBehaviour {
 	public float keyThrust = 5.0f; 											// Amount of force applied by each key (N).
 	public ControlMode controlMode = ControlMode.OFF;		// Turn key commands off by default.
 
+	// Preallocated variables.
+	Vector3 _force = Vector3.zero;
+	Vector3 _torque = Vector3.zero;
+
 	void FixedUpdate()
 	{
 		if (this.controlMode == ControlMode.DRIVE_COMMMANDS) {
 			KeyboardDriveCommand();
-		}
-	}
-
-	// Run the control loop at a low rate to be more lightweight.
-	IEnumerator ListenForKeyCommands()
-	{
-		while (true) {
-			yield return new WaitForSeconds(0.2f);
-			if (this.controlMode == ControlMode.THRUST_COMMANDS) {
-				// KeyboardThrustCommand();
-			}
 		}
 	}
 
@@ -46,21 +39,6 @@ public class KeyboardMove : MonoBehaviour {
 		return 0.0f;
 	}
 
-	/**
-	 * Send thrust commands to motors (through ROS).
-	 * NOTE(milo): Need to have rosbridge_server running for this to work!
-	 * Command: roslaunch rosbridge_server rosbridge_websocket.launch
-	 */
-	// private void KeyboardThrustCommand()
-	// {
-	// 	float Flt = this.keyThrust * SignFromKeyPair(KeyCode.A, KeyCode.Q);
-	// 	float Frt = this.keyThrust * SignFromKeyPair(KeyCode.D, KeyCode.E);
-	// 	float Fct = this.keyThrust * SignFromKeyPair(KeyCode.S, KeyCode.W);
-	// 	TridentThrustMsg msg = new TridentThrustMsg(Flt, Frt, Fct);
-	// 	this.roslink.ros.Publish(TridentThrustPublisher.GetMessageTopic(), msg);
-	// 	this.roslink.ros.Render();
-	// }
-
 	public static float ClampAngle(float deg)
 	{
     return deg - 360.0f*Mathf.Floor((deg + 180.0f) * (1.0f / 360.0f));
@@ -72,8 +50,13 @@ public class KeyboardMove : MonoBehaviour {
 		float w_yaw = Input.GetAxis("Horizontal") * 1.0f;
 		float thrust = Input.GetKey(KeyCode.Space) ? 3.0f : 0.0f;
 
-		this.rigidBody.AddRelativeForce(new Vector3(0, 0, thrust) * this.rigidBody.mass);
-		this.rigidBody.AddRelativeTorque(new Vector3(0.1f*w_pitch, 0.1f*w_yaw, 0.0f));
+		this._force.z = thrust * this.rigidBody.mass;
+		this._force.x = 0;
+		this._force.y = 0;
+		this.rigidBody.AddRelativeForce(this._force);
+
+		this._torque.x = 0.1f*w_pitch;
+		this._torque.y = 0.1f*w_yaw;
 
 		// Disable roll, since we always want the vehicle level.
 		// TODO(milo): More sophisticated PID control (just P right now).
@@ -81,6 +64,8 @@ public class KeyboardMove : MonoBehaviour {
 		float roll_error = -ClampAngle(euler_angles.z);
 		float P_gain = 0.005f;
 		float torque_command_roll = P_gain*roll_error;
-		this.rigidBody.AddRelativeTorque(new Vector3(0, 0, torque_command_roll));
+
+		this._torque.z = torque_command_roll;
+		this.rigidBody.AddRelativeTorque(this._torque);
 	}
 }

@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Simulator {
 
-readonly public struct DepthMeasurement
+public struct DepthMeasurement
 {
   public DepthMeasurement(long timestamp, float depth)
   {
@@ -12,8 +12,8 @@ readonly public struct DepthMeasurement
     this.depth = depth;
   }
 
-  public readonly long timestamp;
-  public readonly float depth;
+  public long timestamp;
+  public float depth;
 }
 
 
@@ -24,17 +24,20 @@ public class DepthSensor : MonoBehaviour
   public bool enableDepthNoise = true;
   public float noiseSigma = 0.05f;
 
-  public DepthMeasurement Read()
+  // Call Read() and then access this to get data.
+  public DepthMeasurement data = new DepthMeasurement(0, 0);
+
+  public void Read()
   {
+    data.timestamp = Timestamp.UnityNanoseconds();
+
     // NOTE(milo): Unity uses a y-up convention, so flip the sign.
-    float depth = -1.0f * this.depthSensorObject.transform.position.y;
+    data.depth = -1.0f * this.depthSensorObject.transform.position.y;
 
     // Optionally add sensor noise.
     if (this.noiseSigma > 0 && this.enableDepthNoise) {
-      depth += Gaussian.Sample1D(0, this.noiseSigma);
+      data.depth += Gaussian.Sample1D(0, this.noiseSigma);
     }
-
-    return new DepthMeasurement(Timestamp.UnityNanoseconds(), depth);
   }
 }
 
