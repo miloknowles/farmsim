@@ -34,9 +34,8 @@ public class RangeSensor : MonoBehaviour
   public void Read()
   {
     data.timestamp = Timestamp.UnityNanoseconds();
-    data.world_t_beacon = this.apsBeaconObject.transform.position;
-    data.range = (this.apsReceiverObject.transform.position - data.world_t_beacon).magnitude;
-    data.world_t_beacon = TransformUtils.ToRightHandedTranslation(data.world_t_beacon);
+    data.range = (this.apsReceiverObject.transform.position -  this.apsBeaconObject.transform.position).magnitude;
+    TransformUtils.ToRightHandedTranslation(this.apsBeaconObject.transform.position, ref data.world_t_beacon);
 
     if (this.enableApsNoise && this.apsNoiseSigma > 0) {
       data.range += Gaussian.Sample1D(0, this.apsNoiseSigma);

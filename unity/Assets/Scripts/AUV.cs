@@ -159,13 +159,15 @@ public class AUV : MonoBehaviour {
     msg.pose.orientation = new vehicle.quaternion_t();
     msg.pose.position = new vehicle.vector3_t();
 
+    Quaternion world_q_body = Quaternion.identity;
+    Vector3 world_t_body = Vector3.zero;
+
     while (true) {
       yield return new WaitForFixedUpdate();
 
       Transform world_T_body = this.imu_rigidbody.transform;
-      Quaternion world_q_body;
-      Vector3 world_t_body;
-      TransformUtils.ToRightHandedTransform(world_T_body, out world_t_body, out world_q_body);
+
+      TransformUtils.ToRightHandedTransform(world_T_body, ref world_t_body, ref world_q_body);
 
       LCMUtils.pack_header_t(Timestamp.UnityNanoseconds(), seq, "imu0", ref msg.header);
       LCMUtils.pack_pose3_t(world_q_body, world_t_body, ref msg.pose);
@@ -189,7 +191,7 @@ public class AUV : MonoBehaviour {
     msg.img_right = new vehicle.image_t();
 
     while (true) {
-      yield return new WaitForSeconds(1.0f / SimulationParams.CAMERA_PUBLISH_HZ);
+      // yield return new WaitForSeconds(1.0f / SimulationParams.CAMERA_PUBLISH_HZ);
       yield return new WaitForEndOfFrame();
 
       this.stereo_rig.CaptureStereoPair(ref leftImage, ref rightImage);
@@ -350,6 +352,12 @@ public class AUV : MonoBehaviour {
     Texture2D leftImage = new Texture2D(SimulationParams.AUV_CAMERA_WIDTH, SimulationParams.AUV_CAMERA_HEIGHT, TextureFormat.RGB24, false);
     Texture2D rightImage = new Texture2D(SimulationParams.AUV_CAMERA_WIDTH, SimulationParams.AUV_CAMERA_HEIGHT, TextureFormat.RGB24, false);
 
+    Quaternion q_world_cam = Quaternion.identity;
+    Vector3 t_world_cam = Vector3.zero;
+
+    Quaternion q_world_body = Quaternion.identity;
+    Vector3 t_world_body = Vector3.zero;
+
     // NOTE(milo): Maximum number of frames to save. Avoids using up all disk space by accident.
     while (frame_id < 5000) {
       yield return new WaitForSeconds(1.0f / SimulationParams.CAMERA_PUBLISH_HZ);
@@ -361,9 +369,7 @@ public class AUV : MonoBehaviour {
       //==================================== LEFT CAMERA POSE ======================================
       Transform T_world_cam = this.camera_forward_left.transform;
 
-      Quaternion q_world_cam;
-      Vector3 t_world_cam;
-      TransformUtils.ToRightHandedTransform(T_world_cam, out t_world_cam, out q_world_cam);
+      TransformUtils.ToRightHandedTransform(T_world_cam, ref t_world_cam, ref q_world_cam);
 
       List<string> pose_line = new List<string>{
         nsec,
@@ -382,9 +388,7 @@ public class AUV : MonoBehaviour {
       //======================================== BODY POSE =========================================
       Transform T_world_body = this.imu_rigidbody.transform;
 
-      Quaternion q_world_body;
-      Vector3 t_world_body;
-      TransformUtils.ToRightHandedTransform(T_world_body, out t_world_body, out q_world_body);
+      TransformUtils.ToRightHandedTransform(T_world_body, ref t_world_body, ref q_world_body);
 
       pose_line = new List<string>{
         nsec,

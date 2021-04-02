@@ -43,6 +43,9 @@ public class ImuSensor : MonoBehaviour
 
   public ImuMeasurement data = new ImuMeasurement(0, Vector3.zero, Vector3.zero);
 
+  // Preallocated varables.
+
+
   void Start()
   {
     // For now, just sample a bias when the simulation starts, and hold it constant throughout.
@@ -72,25 +75,23 @@ public class ImuSensor : MonoBehaviour
     Vector3 imu_a_total = imu_a - imu_a_gravity;
 
     // NOTE(milo): The IMU "feels" an upward acceleration due to gravity!
-    Vector3 imu_a_rh = TransformUtils.ToRightHandedTranslation(imu_a_total);
-    Vector3 imu_w_rh = TransformUtils.ToRightHandedAngularVelocity(imu_w);
+    TransformUtils.ToRightHandedTranslation(imu_a_total, ref data.imu_a_rh);
+    TransformUtils.ToRightHandedAngularVelocity(imu_w, ref data.imu_w_rh);
 
     // Optionally add zero-mean noise.
     if (this.accelNoiseSigma > 0 && this.enableImuNoise) {
-      imu_a_rh += Gaussian.Sample3D(Vector3.zero, new Vector3(this.accelNoiseSigma, this.accelNoiseSigma, this.accelNoiseSigma));
+      data.imu_a_rh += Gaussian.Sample3D(Vector3.zero, new Vector3(this.accelNoiseSigma, this.accelNoiseSigma, this.accelNoiseSigma));
     }
 
     if (this.gyroNoiseSigma > 0 && this.enableImuNoise) {
-      imu_w_rh += Gaussian.Sample3D(Vector3.zero, new Vector3(this.gyroNoiseSigma, this.gyroNoiseSigma, this.gyroNoiseSigma));
+      data.imu_w_rh += Gaussian.Sample3D(Vector3.zero, new Vector3(this.gyroNoiseSigma, this.gyroNoiseSigma, this.gyroNoiseSigma));
     }
 
     // Add bias. If enableImuBias is OFF, this will just add a zero vector.
-    imu_a_rh += this.accelBias;
-    imu_w_rh += this.gyroBias;
+    data.imu_a_rh += this.accelBias;
+    data.imu_w_rh += this.gyroBias;
 
     data.timestamp = Timestamp.UnityNanoseconds();
-    data.imu_a_rh = imu_a_rh;
-    data.imu_w_rh = imu_w_rh;
   }
 }
 
