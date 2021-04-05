@@ -24,6 +24,12 @@ public class PursuitController : MonoBehaviour
   private float distVelocityGain = 1.5f;
   private float maxThrust = 30.0f;
 
+  // Derivative control.
+  private float dGainPitch = 0.01f;
+  private float dGainYaw = 0.01f;
+  private float lastYawError = 0.0f;
+  private float lastPitchError = 0.0f;
+
   void Start()
   {
     // Check if we're following a single waypoint or circuit.
@@ -101,9 +107,17 @@ public class PursuitController : MonoBehaviour
     float pitch_error = ClampAngle(this.body_euler_goal.x);
     float yaw_error = ClampAngle(this.body_euler_goal.y);
 
-		this.torque_command.x = this.pGainPitch*pitch_error;
-    this.torque_command.y = this.pGainYaw*yaw_error;
+    float deltaPitch = (pitch_error - this.lastPitchError) / Time.deltaTime;
+    float deltaYaw = (yaw_error - this.lastYawError) / Time.deltaTime;
+
+    // Debug.Log($"deltaPitch: {deltaPitch} || pitch_error: {pitch_error}");
+
+		this.torque_command.x = this.pGainPitch*pitch_error + this.dGainPitch*deltaPitch;
+    this.torque_command.y = this.pGainYaw*yaw_error + this.dGainYaw*deltaYaw;
     this.torque_command.z = 0.0f;
+
+    this.lastPitchError = pitch_error;
+    this.lastYawError = yaw_error;
 
 		this.rigidBody.AddRelativeTorque(this.torque_command);
 
