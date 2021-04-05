@@ -7,7 +7,7 @@ public class WaypointSequence : MonoBehaviour
   private int waypointIndex = 0;
   private List<GameObject> waypoints = new List<GameObject>();
 
-  void Start()
+  private void GetAttachedWaypoints()
   {
     // Collect all attached waypoints.
     foreach (Transform child in this.transform) {
@@ -30,6 +30,9 @@ public class WaypointSequence : MonoBehaviour
 
   public GameObject GetCurrentWaypoint()
   {
+    if (waypoints.Count == 0) {
+      this.GetAttachedWaypoints();
+    }
     return this.waypoints[this.waypointIndex];
   }
 }

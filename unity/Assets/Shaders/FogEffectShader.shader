@@ -1,10 +1,11 @@
-﻿Shader "PeerPlay/FogEffectShader" {
+﻿Shader "Custom/FogEffectShader" {
   Properties
   {
     _MainTex ("Texture", 2D) = "white" {}
     _FogColor ("Fog Color", Color) = (1, 1, 1, 1)
     _DepthStart ("Depth Start", float) = 0
     _DepthDistance ("Depth Distance", float) = 10
+    // _CameraDepthTexture ("Camera Depth Texture", 2D) = "white" {}
   }
   SubShader {
     // No culling or depth

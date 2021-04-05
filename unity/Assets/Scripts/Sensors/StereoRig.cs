@@ -13,8 +13,10 @@ public class StereoRig : MonoBehaviour {
   // Start is called before the first frame update
   void Start()
   {
+    leftCamera.depthTextureMode = DepthTextureMode.Depth;
+    rightCamera.depthTextureMode = DepthTextureMode.Depth;
+
     RenderTexture.allowThreadedTextureCreation = true;
-    // TODO(milo): RGB24?
     this.preallocRenderTexture = new RenderTexture(
         SimulationParams.AUV_CAMERA_WIDTH,
         SimulationParams.AUV_CAMERA_HEIGHT,
