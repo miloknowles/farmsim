@@ -7,6 +7,7 @@ public class PursuitController : MonoBehaviour
 {
   public Rigidbody rigidBody;
   public GameObject followObject;
+  public WaypointSequence waypointSeq;
   public float pGainPitch = 0.03f;
   public float pGainYaw = 0.02f;
   public float pGainThrust = 10.0f;
@@ -18,10 +19,19 @@ public class PursuitController : MonoBehaviour
   private Vector3 torque_command = Vector3.zero;
   private Vector3 thrust_command = Vector3.zero;
   private float turnInPlaceAngle = 20.0f;
-  private float maxForwardVelocity = 3.0f;
+  private float maxForwardVelocity = 5.0f;
   private float goalPositionTol = 0.2f;
-  private float distVelocityGain = 0.4f;
-  private float maxThrust = 5.0f;
+  private float distVelocityGain = 1.5f;
+  private float maxThrust = 30.0f;
+
+  void Start()
+  {
+    // Check if we're following a single waypoint or circuit.
+    if (this.waypointSeq != null) {
+      Debug.Log("Attached to waypoint sequence, going to first object");
+      this.followObject = this.waypointSeq.GetCurrentWaypoint();
+    }
+  }
 
   public static float ClampAngle(float deg)
 	{
@@ -47,6 +57,22 @@ public class PursuitController : MonoBehaviour
     return sign * mag;
   }
 
+  private void MaybeUpdateWaypoint()
+  {
+    if (this.waypointSeq == null) {
+      return;
+    }
+
+    this.world_t_goal = this.followObject.transform.position;
+    this.body_t_goal = this.transform.InverseTransformPoint(this.world_t_goal);
+    float distance_to_goal = this.body_t_goal.magnitude;
+
+    if (distance_to_goal < this.goalPositionTol) {
+      Debug.Log("Going to next waypoint");
+      this.followObject = this.waypointSeq.GetNextWaypoint();
+    }
+  }
+
   // Update is called once per frame
   void Update()
   {
@@ -54,8 +80,10 @@ public class PursuitController : MonoBehaviour
       return;
     }
 
-    this.world_t_goal = this.followObject.transform.position;
+    // If following a waypoint circuit, check if we've reached the current waypoint.
+    MaybeUpdateWaypoint();
 
+    this.world_t_goal = this.followObject.transform.position;
     this.body_t_goal = this.transform.InverseTransformPoint(this.world_t_goal);
     this.body_q_goal = TransformUtils.RotateAlignVectors(this.unit_forward, this.body_t_goal);
 
