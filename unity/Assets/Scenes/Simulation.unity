@@ -153,7 +153,7 @@ PrefabInstance:
     - target: {fileID: 6988258922661869246, guid: 17fdf293cf27814918b0ae7df00e6868,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: -13.519
+      value: -10.338
       objectReference: {fileID: 0}
     - target: {fileID: 6988258922661869246, guid: 17fdf293cf27814918b0ae7df00e6868,
         type: 3}
@@ -1659,7 +1659,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 420561424}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3a8d60732a92593ac9fb66443f33215d, type: 3}
   m_Name: 
@@ -2953,15 +2953,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 36b9185e8239a874c80cc1e74520eb36, type: 3}
       propertyPath: m_LocalScale.x
-      value: 1
+      value: 0.6
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 36b9185e8239a874c80cc1e74520eb36, type: 3}
       propertyPath: m_LocalScale.y
-      value: 1
+      value: 0.6
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 36b9185e8239a874c80cc1e74520eb36, type: 3}
       propertyPath: m_LocalScale.z
-      value: 1
+      value: 0.6
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 36b9185e8239a874c80cc1e74520eb36, type: 3}
@@ -5329,8 +5329,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5cd7770f6303259738990642f6e702f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  relativeOrbitCenter: {x: -20, y: 0, z: 0}
-  orbitPeriod: 30
+  relativeOrbitCenter: {x: -30, y: 0, z: 0}
+  orbitPeriod: 40
 --- !u!1001 &1058999976
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6087,12 +6087,12 @@ PrefabInstance:
     - target: {fileID: 6988258922661869246, guid: 17fdf293cf27814918b0ae7df00e6868,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -3.542
+      value: -3.262
       objectReference: {fileID: 0}
     - target: {fileID: 6988258922661869246, guid: 17fdf293cf27814918b0ae7df00e6868,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: -12.158
+      value: -10.565
       objectReference: {fileID: 0}
     - target: {fileID: 6988258922661869246, guid: 17fdf293cf27814918b0ae7df00e6868,
         type: 3}
@@ -7679,7 +7679,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1631606365
 Transform:
   m_ObjectHideFlags: 0
