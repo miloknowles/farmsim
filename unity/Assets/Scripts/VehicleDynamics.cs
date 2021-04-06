@@ -11,7 +11,7 @@ public class VehicleDynamics : MonoBehaviour {
 
   // Assume Cd of cube: https://www.engineeringtoolbox.com/drag-coefficient-d_627.html
   // Lump terms: 1/2 * rho * Cd * A
-  private float linearDragCoefficient = 0.5f * 1027.0f * 0.9f * (0.08f * 0.201f * 0.41f);
+  private float linearDragCoefficient = 0.5f * 1027.0f * 1.7f * (0.08f * 0.201f * 0.41f);
   public float angularDragCoefficient = 0.7f; // Drag = Cd * w^2
   public float maxThrust = 10.0f; // N
 
@@ -40,7 +40,8 @@ public class VehicleDynamics : MonoBehaviour {
     Vector3 fct = new Vector3(0.0f, this._F_ct, 0.0f);
 
     // Drag = 1/2 * rho * Cd * A * v^2
-    Vector3 F_drag = -1.0f * v_body.normalized * this.linearDragCoefficient * v_body.sqrMagnitude;
+    // Add this tiny little Max() term to keep the vehicle from very slow drifting.
+    Vector3 F_drag = -1.0f * v_body.normalized * this.linearDragCoefficient * Mathf.Max(0.005f, v_body.sqrMagnitude);
 
     // NOTE(milo): Need to clamp drag force for stability. Make sure that the force can't causes
     // an acceration that would change the direction of motion. This prevents drag forces from

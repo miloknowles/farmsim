@@ -23,7 +23,7 @@ public class AUV : MonoBehaviour {
 
   // Cameras attached to the vehicle.
   public Camera camera_forward_left;
-  public Camera camera_forward_right;
+  public DepthCamera depthCameraLeft;
 
   // Attach sensors here.
   public Rigidbody imu_rigidbody;
@@ -44,6 +44,7 @@ public class AUV : MonoBehaviour {
   private string apsSubfolderA = "aps0";
   private string apsSubfolderB = "aps1";
   private string depthSubfolder = "depth0";
+  private string depthImageSubfolder = "depth_image0";
 
   // http://lcm-proj.github.io/tut_dotnet.html
   // NOTE(milo): Don't initialize this here! It will crash the Unity editor.
@@ -342,17 +343,22 @@ public class AUV : MonoBehaviour {
 
     string leftImageFolder = Path.Combine(dataset_folder, this.leftImageSubfolder);
     string rightImageFolder = Path.Combine(dataset_folder, this.rightImageSubfolder);
+    string depthImageFolder = Path.Combine(dataset_folder, this.depthImageSubfolder);
     string leftImageDataFolder = Path.Combine(leftImageFolder, "data");
     string rightImageDataFolder = Path.Combine(rightImageFolder, "data");
+    string depthImageDataFolder = Path.Combine(depthImageFolder, "data");
 
     Directory.CreateDirectory(leftImageFolder);
     Directory.CreateDirectory(rightImageFolder);
     Directory.CreateDirectory(leftImageDataFolder);
     Directory.CreateDirectory(rightImageDataFolder);
+    Directory.CreateDirectory(depthImageDataFolder);
 
     int frame_id = 0;
     Texture2D leftImage = new Texture2D(SimulationParams.AUV_CAMERA_WIDTH, SimulationParams.AUV_CAMERA_HEIGHT, TextureFormat.RGB24, false);
     Texture2D rightImage = new Texture2D(SimulationParams.AUV_CAMERA_WIDTH, SimulationParams.AUV_CAMERA_HEIGHT, TextureFormat.RGB24, false);
+    Texture2D leftDepthImage = new Texture2D(SimulationParams.AUV_CAMERA_WIDTH, SimulationParams.AUV_CAMERA_HEIGHT, TextureFormat.RGB24, false);
+    byte[] leftPng, rightPng, depthPng;
 
     Quaternion q_world_cam = Quaternion.identity;
     Vector3 t_world_cam = Vector3.zero;
@@ -362,7 +368,6 @@ public class AUV : MonoBehaviour {
 
     // NOTE(milo): Maximum number of frames to save. Avoids using up all disk space by accident.
     while (frame_id < 5000) {
-      // yield return new WaitForSeconds(1.0f / SimulationParams.CAMERA_PUBLISH_HZ);
       yield return new WaitForEndOfFrame();
 
       string nsec = ((long)(Time.fixedTime * 1e9)).ToString("D19");
@@ -407,10 +412,12 @@ public class AUV : MonoBehaviour {
       File.AppendAllText(Path.Combine(dataset_folder, "imu0_poses.txt"), string.Join(",", pose_line));
 
       this.stereo_rig.CaptureStereoPair(ref leftImage, ref rightImage);
+      this.depthCameraLeft.Capture(ref leftDepthImage);
 
-      // TODO(milo): Avoid allocating this every time.
-      byte[] leftPng = leftImage.EncodeToPNG();
-      byte[] rightPng = rightImage.EncodeToPNG();
+      leftPng = leftImage.EncodeToPNG();
+      rightPng = rightImage.EncodeToPNG();
+      depthPng = leftDepthImage.EncodeToPNG();
+
       string imagePath = $"{nsec}.png";
 
       List<string> img_line = new List<string>{ nsec, imagePath, "\n" };
@@ -419,6 +426,7 @@ public class AUV : MonoBehaviour {
 
       File.WriteAllBytes(Path.Combine(leftImageDataFolder, imagePath), leftPng);
       File.WriteAllBytes(Path.Combine(rightImageDataFolder, imagePath), rightPng);
+      File.WriteAllBytes(Path.Combine(depthImageDataFolder, imagePath), depthPng);
 
       ++frame_id;
     }

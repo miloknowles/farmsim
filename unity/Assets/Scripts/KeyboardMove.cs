@@ -55,8 +55,8 @@ public class KeyboardMove : MonoBehaviour {
 		this._force.y = 0;
 		this.rigidBody.AddRelativeForce(this._force);
 
-		this._torque.x = 0.1f*w_pitch;
-		this._torque.y = 0.1f*w_yaw;
+		this._torque.x = 0.4f*w_pitch;
+		this._torque.y = 0.4f*w_yaw;
 
 		// Disable roll, since we always want the vehicle level.
 		// TODO(milo): More sophisticated PID control (just P right now).
