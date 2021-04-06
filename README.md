@@ -4,7 +4,6 @@ A simulated aquaculture farm in Unity3D.
 
 ![Banner image](/resources/images/banner2.png?raw=true)
 
-NOTE(milo): Design doc not updated recently...
 Check out the [design document](https://docs.google.com/document/d/1a0eiJ9ga0okX0kW2TVdClzvAI5Pwo11VVDSLBfVIKrc/edit?usp=sharing) for details on naming, coordinate frames, ROS topics, etc.
 
 ## Requirements
