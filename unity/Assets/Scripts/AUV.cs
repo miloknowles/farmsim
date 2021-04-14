@@ -34,6 +34,7 @@ public class AUV : MonoBehaviour {
   public StereoRig stereo_rig;
 
   public Simulator.IOMode simulatorIOMode = Simulator.IOMode.NONE;
+  public bool disableImageOutput = false;
   public string outputDatasetName = "default_dataset";
 
   // NOTE(milo): This needs to be an absolute path!
@@ -61,13 +62,17 @@ public class AUV : MonoBehaviour {
     }
 
     if (this.simulatorIOMode == Simulator.IOMode.LCM) {
-      StartCoroutine(PublishStereoImages());
+      if (!this.disableImageOutput) {
+        StartCoroutine(PublishStereoImages());
+      }
       StartCoroutine(PublishImu());
       StartCoroutine(PublishDepth());
       StartCoroutine(PublishRange());
       StartCoroutine(PublishPose());
     } else if (this.simulatorIOMode == Simulator.IOMode.DATASET) {
-      StartCoroutine(SaveStereoImageDataset());
+      if (!this.disableImageOutput) {
+        StartCoroutine(SaveStereoImageDataset());
+      }
       StartCoroutine(SaveImuDataset());
       StartCoroutine(SaveApsDataset());
       StartCoroutine(SaveDepthDataset());
@@ -144,8 +149,8 @@ public class AUV : MonoBehaviour {
       LCMUtils.pack_vector3_t(data1.world_t_beacon, ref msg1.point);
       msg1.range = data1.range;
 
-      this.lcmHandle.Publish(SimulationParams.CHANNEL_AUV_RANGE0, msg0);
-      this.lcmHandle.Publish(SimulationParams.CHANNEL_AUV_RANGE1, msg1);
+      this.lcmHandle.Publish(SimulationParams.CHANNEL_AUV_RANGE_ALL, msg0);
+      this.lcmHandle.Publish(SimulationParams.CHANNEL_AUV_RANGE_ALL, msg1);
 
       ++seq;
     }
