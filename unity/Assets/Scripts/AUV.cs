@@ -175,10 +175,11 @@ public class AUV : MonoBehaviour {
 
       TransformUtils.ToRightHandedTransform(world_T_body, ref world_t_body, ref world_q_body);
 
-      LCMUtils.pack_header_t(Timestamp.UnityNanoseconds(), seq, "imu0", ref msg.header);
+      LCMUtils.pack_header_t(Timestamp.UnityNanoseconds(), seq, "body", ref msg.header);
       LCMUtils.pack_pose3_t(world_q_body, world_t_body, ref msg.pose);
 
       this.lcmHandle.Publish(SimulationParams.CHANNEL_AUV_WORLD_P_IMU, msg);
+      this.lcmHandle.Publish(SimulationParams.CHANNEL_AUV_WORLD_P_IMU_INITIAL, msg);
 
       ++seq;
     }
