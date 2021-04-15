@@ -4407,7 +4407,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 845490732}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: -0.1, y: 0, z: 0.1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 420561426}
@@ -4432,7 +4432,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 2bf29f32851337aa59b3acf6e73d039e, type: 2}
+  - {fileID: 2100000, guid: 150603c95ae82bb4a9364677de3f13c1, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -4474,6 +4474,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d128668dc4f998ec7a8c77ed45d5f3a6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  maxRange: 30
+  nearVertexColor: {r: 0, g: 1, b: 1, a: 1}
+  farVertexColor: {r: 1, g: 0, b: 0, a: 1}
 --- !u!1 &851124847
 GameObject:
   m_ObjectHideFlags: 0
@@ -9460,7 +9463,7 @@ PrefabInstance:
     - target: {fileID: 4653121137522870167, guid: 59265c06d324f395682cb16b67f1d258,
         type: 3}
       propertyPath: m_Enabled
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 59265c06d324f395682cb16b67f1d258, type: 3}
