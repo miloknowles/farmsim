@@ -26,14 +26,21 @@ public class AUV : MonoBehaviour {
   public DepthCamera depthCameraLeft;
 
   // Attach sensors here.
+  // TODO(milo): Eventually add ability to drop messages.
+  public bool publishImu = true;
+  public bool publishRange = true;
+  public bool publishDepth = true;
+  public bool publishStereo = true;
   public Rigidbody imu_rigidbody;
   public ImuSensor imu_sensor;
   public RangeSensor range_sensor_A;
   public RangeSensor range_sensor_B;
+  public RangeSensor range_sensor_C;
   public DepthSensor depth_sensor;
   public StereoRig stereo_rig;
 
   public Simulator.IOMode simulatorIOMode = Simulator.IOMode.NONE;
+  public bool disableImageOutput = false;
   public string outputDatasetName = "default_dataset";
 
   // NOTE(milo): This needs to be an absolute path!
@@ -61,13 +68,17 @@ public class AUV : MonoBehaviour {
     }
 
     if (this.simulatorIOMode == Simulator.IOMode.LCM) {
-      StartCoroutine(PublishStereoImages());
+      if (!this.disableImageOutput) {
+        StartCoroutine(PublishStereoImages());
+      }
       StartCoroutine(PublishImu());
       StartCoroutine(PublishDepth());
       StartCoroutine(PublishRange());
       StartCoroutine(PublishPose());
     } else if (this.simulatorIOMode == Simulator.IOMode.DATASET) {
-      StartCoroutine(SaveStereoImageDataset());
+      if (!this.disableImageOutput) {
+        StartCoroutine(SaveStereoImageDataset());
+      }
       StartCoroutine(SaveImuDataset());
       StartCoroutine(SaveApsDataset());
       StartCoroutine(SaveDepthDataset());
@@ -123,18 +134,23 @@ public class AUV : MonoBehaviour {
     long seq = 0;
     vehicle.range_measurement_t msg0 = new vehicle.range_measurement_t();
     vehicle.range_measurement_t msg1 = new vehicle.range_measurement_t();
+    vehicle.range_measurement_t msg2 = new vehicle.range_measurement_t();
     msg0.header = new vehicle.header_t();
     msg1.header = new vehicle.header_t();
+    msg2.header = new vehicle.header_t();
     msg0.point = new vehicle.vector3_t();
     msg1.point = new vehicle.vector3_t();
+    msg2.point = new vehicle.vector3_t();
 
     while (true) {
       yield return new WaitForSeconds(0.3f);
 
       this.range_sensor_A.Read();
       this.range_sensor_B.Read();
+      this.range_sensor_C.Read();
       RangeMeasurement data0 = this.range_sensor_A.data;
       RangeMeasurement data1 = this.range_sensor_B.data;
+      RangeMeasurement data2 = this.range_sensor_C.data;
 
       LCMUtils.pack_header_t(data0.timestamp, seq, "aps_receiver", ref msg0.header);
       LCMUtils.pack_vector3_t(data0.world_t_beacon, ref msg0.point);
@@ -144,8 +160,13 @@ public class AUV : MonoBehaviour {
       LCMUtils.pack_vector3_t(data1.world_t_beacon, ref msg1.point);
       msg1.range = data1.range;
 
-      this.lcmHandle.Publish(SimulationParams.CHANNEL_AUV_RANGE0, msg0);
-      this.lcmHandle.Publish(SimulationParams.CHANNEL_AUV_RANGE1, msg1);
+      LCMUtils.pack_header_t(data2.timestamp, seq, "aps_receiver", ref msg2.header);
+      LCMUtils.pack_vector3_t(data2.world_t_beacon, ref msg2.point);
+      msg2.range = data2.range;
+
+      this.lcmHandle.Publish(SimulationParams.CHANNEL_AUV_RANGE_ALL, msg0);
+      this.lcmHandle.Publish(SimulationParams.CHANNEL_AUV_RANGE_ALL, msg1);
+      this.lcmHandle.Publish(SimulationParams.CHANNEL_AUV_RANGE_ALL, msg2);
 
       ++seq;
     }
@@ -170,10 +191,11 @@ public class AUV : MonoBehaviour {
 
       TransformUtils.ToRightHandedTransform(world_T_body, ref world_t_body, ref world_q_body);
 
-      LCMUtils.pack_header_t(Timestamp.UnityNanoseconds(), seq, "imu0", ref msg.header);
+      LCMUtils.pack_header_t(Timestamp.UnityNanoseconds(), seq, "body", ref msg.header);
       LCMUtils.pack_pose3_t(world_q_body, world_t_body, ref msg.pose);
 
       this.lcmHandle.Publish(SimulationParams.CHANNEL_AUV_WORLD_P_IMU, msg);
+      this.lcmHandle.Publish(SimulationParams.CHANNEL_AUV_WORLD_P_IMU_INITIAL, msg);
 
       ++seq;
     }
