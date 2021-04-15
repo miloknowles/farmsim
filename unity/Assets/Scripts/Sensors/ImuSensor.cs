@@ -43,9 +43,6 @@ public class ImuSensor : MonoBehaviour
 
   public ImuMeasurement data = new ImuMeasurement(0, Vector3.zero, Vector3.zero);
 
-  // Preallocated varables.
-
-
   void Start()
   {
     // For now, just sample a bias when the simulation starts, and hold it constant throughout.
@@ -56,6 +53,9 @@ public class ImuSensor : MonoBehaviour
     if (this.gyroBiasSigma > 0 && this.enableImuBias) {
       this.gyroBias += Gaussian.Sample3D(Vector3.zero, new Vector3(this.gyroBiasSigma, this.gyroBiasSigma, this.gyroBiasSigma));
     }
+
+    Debug.Log($"** [ImuSensor] Accelerometer bias (m/s^2): {this.accelBias.x} {this.accelBias.y} {this.accelBias.z}");
+    Debug.Log($"** [ImuSensor] Gyroscope bias: (rad/s): {this.gyroBias.x} {this.gyroBias.y} {this.gyroBias.z}");
   }
 
   void FixedUpdate()
