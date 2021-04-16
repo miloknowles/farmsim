@@ -644,7 +644,7 @@ MonoBehaviour:
   apsBeaconObject: {fileID: 1353332170}
   apsReceiverObject: {fileID: 374889541}
   enableApsNoise: 1
-  apsNoiseSigma: 0.03
+  apsNoiseSigma: 0.05
 --- !u!4 &173769190 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400000, guid: 780611a67e8e941a2b3aa96e5915a793,
@@ -1004,7 +1004,7 @@ MonoBehaviour:
   apsBeaconObject: {fileID: 663678797}
   apsReceiverObject: {fileID: 374889541}
   enableApsNoise: 1
-  apsNoiseSigma: 0.03
+  apsNoiseSigma: 0.05
 --- !u!1001 &206626810
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1326,7 +1326,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 374889541}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -0.5}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 202800058}
@@ -1334,7 +1334,7 @@ Transform:
   - {fileID: 1639128900}
   - {fileID: 162350108}
   m_Father: {fileID: 420561426}
-  m_RootOrder: 3
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &388865748
 GameObject:
@@ -1588,16 +1588,16 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 420561424}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -4.821, y: -2.838, z: -7.852}
+  m_LocalPosition: {x: -15.528, y: -2.758, z: 0.26}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 507051600}
-  - {fileID: 1160336587}
   - {fileID: 724607433}
   - {fileID: 374889542}
   - {fileID: 1300158239}
   - {fileID: 1972955301}
   - {fileID: 845490733}
+  - {fileID: 1160336587}
   m_Father: {fileID: 0}
   m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1706,10 +1706,10 @@ MonoBehaviour:
   imu_rigidbody: {fileID: 420561429}
   enableImuNoise: 1
   enableImuBias: 1
-  accelNoiseSigma: 0.003924
-  gyroNoiseSigma: 0.00020568902
-  accelBiasRandomWalkSigma: 0.004905
-  gyroBiasRandomWalkSigma: 0.0000014544411
+  accelNoiseSigma: 0.001
+  gyroNoiseSigma: 0.00004
+  accelBiasRandomWalkSigma: 0.001
+  gyroBiasRandomWalkSigma: 0.00004
   accelBiasSigma: 0.0001
   gyroBiasSigma: 0.0001
 --- !u!114 &420561433
@@ -1988,7 +1988,7 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: 10b5ccbdac90e255bb7f980cf090c865,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 10b5ccbdac90e255bb7f980cf090c865,
         type: 3}
@@ -3482,7 +3482,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 420561426}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &724607434
 MonoBehaviour:
@@ -4461,7 +4461,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 420561426}
-  m_RootOrder: 6
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!23 &845490734
 MeshRenderer:
@@ -5994,7 +5994,7 @@ Transform:
   - {fileID: 637407396}
   - {fileID: 843407243}
   m_Father: {fileID: 420561426}
-  m_RootOrder: 1
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1173449970
 PrefabInstance:
@@ -6285,7 +6285,7 @@ MonoBehaviour:
   apsBeaconObject: {fileID: 952967118}
   apsReceiverObject: {fileID: 374889541}
   enableApsNoise: 1
-  apsNoiseSigma: 0.03
+  apsNoiseSigma: 0.05
 --- !u!4 &1207165785
 Transform:
   m_ObjectHideFlags: 0
@@ -6639,7 +6639,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 420561426}
-  m_RootOrder: 4
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1353332170
 GameObject:
@@ -8074,7 +8074,7 @@ MonoBehaviour:
   apsBeaconObject: {fileID: 1893126160}
   apsReceiverObject: {fileID: 374889541}
   enableApsNoise: 1
-  apsNoiseSigma: 0.03
+  apsNoiseSigma: 0.05
 --- !u!1001 &1659894200
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -9400,7 +9400,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1893126160}
   m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: -2.086, y: -0.452, z: -3}
+  m_LocalPosition: {x: -2.086, y: -0.452, z: -5}
   m_LocalScale: {x: 0.05, y: 0.05, z: 0.05}
   m_Children: []
   m_Father: {fileID: 589318189}
@@ -9563,7 +9563,7 @@ PrefabInstance:
     - target: {fileID: 4653121137522870166, guid: 59265c06d324f395682cb16b67f1d258,
         type: 3}
       propertyPath: m_RootOrder
-      value: 5
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 4653121137522870166, guid: 59265c06d324f395682cb16b67f1d258,
         type: 3}

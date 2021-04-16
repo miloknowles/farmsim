@@ -29,3 +29,8 @@ cp ~/resources/CurrentLayout-default.dwlt Library/
 ### LCM Crashes Editor / Makes Simulation Hang in Play Mode
 
 Check `~/.config/unity3d/Editor.log` for the crash.
+
+### Transforms show up in the wrong place!
+
+If child objects aren't showing up in the right place, make sure the Unity editor is set to **Pivot** and **Local** in the top left toolbar.
+For example, a child object at **[0, 0, 0]** might not be at the origin of the parent object - this will fix that.
