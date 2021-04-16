@@ -4,6 +4,7 @@ using UnityEngine;
 
 namespace Simulator {
 
+// https://bluerobotics.com/store/sensors-sonars-cameras/sensors/bar30-sensor-r1/
 public struct DepthMeasurement
 {
   public DepthMeasurement(long timestamp, float depth)
@@ -22,7 +23,7 @@ public class DepthSensor : MonoBehaviour
   public GameObject depthSensorObject;
 
   public bool enableDepthNoise = true;
-  public float noiseSigma = 0.05f;
+  public float noiseSigma = 0.02f;
 
   // Call Read() and then access this to get data.
   public DepthMeasurement data = new DepthMeasurement(0, 0);

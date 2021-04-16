@@ -598,6 +598,53 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 135840030}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &162350107
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 162350108}
+  - component: {fileID: 162350109}
+  m_Layer: 0
+  m_Name: RangeSensorD
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &162350108
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 162350107}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 374889542}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &162350109
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 162350107}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a094bd3cd7578f666afe00d2b0c9e5a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  apsBeaconObject: {fileID: 1353332170}
+  apsReceiverObject: {fileID: 374889541}
+  enableApsNoise: 1
+  apsNoiseSigma: 0.03
 --- !u!4 &173769190 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400000, guid: 780611a67e8e941a2b3aa96e5915a793,
@@ -956,8 +1003,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   apsBeaconObject: {fileID: 663678797}
   apsReceiverObject: {fileID: 374889541}
-  enableApsNoise: 0
-  apsNoiseSigma: 0.1
+  enableApsNoise: 1
+  apsNoiseSigma: 0.03
 --- !u!1001 &206626810
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1285,6 +1332,7 @@ Transform:
   - {fileID: 202800058}
   - {fileID: 1207165785}
   - {fileID: 1639128900}
+  - {fileID: 162350108}
   m_Father: {fileID: 420561426}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1571,15 +1619,17 @@ MonoBehaviour:
   publishRange: 1
   publishDepth: 1
   publishStereo: 1
+  rangePublishRate: 6
   imu_rigidbody: {fileID: 420561429}
   imu_sensor: {fileID: 420561432}
   range_sensor_A: {fileID: 202800059}
   range_sensor_B: {fileID: 1207165784}
   range_sensor_C: {fileID: 1639128901}
+  range_sensor_D: {fileID: 0}
   depth_sensor: {fileID: 420561434}
   stereo_rig: {fileID: 420561435}
   simulatorIOMode: 1
-  disableImageOutput: 0
+  disableImageOutput: 1
   outputDatasetName: default_dataset/mav0/
   outputDatasetRoot: /home/milo/datasets/Unity3D/farmsim/
 --- !u!114 &420561428
@@ -1693,8 +1743,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   depthSensorObject: {fileID: 1300158238}
-  enableDepthNoise: 0
-  noiseSigma: 0.1
+  enableDepthNoise: 1
+  noiseSigma: 0.02
 --- !u!114 &420561435
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3329,7 +3379,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 663678797}
   m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: 0.007, y: 0.467, z: 0.154}
+  m_LocalPosition: {x: -0.005, y: 0.454, z: -0}
   m_LocalScale: {x: 0.05, y: 0.05, z: 0.05}
   m_Children: []
   m_Father: {fileID: 589318189}
@@ -4973,7 +5023,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 952967118}
   m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: -2.139, y: 0.46, z: 0.132}
+  m_LocalPosition: {x: -2.076, y: -0.457, z: -0}
   m_LocalScale: {x: 0.05, y: 0.05, z: 0.05}
   m_Children: []
   m_Father: {fileID: 589318189}
@@ -6234,8 +6284,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   apsBeaconObject: {fileID: 952967118}
   apsReceiverObject: {fileID: 374889541}
-  enableApsNoise: 0
-  apsNoiseSigma: 0.1
+  enableApsNoise: 1
+  apsNoiseSigma: 0.03
 --- !u!4 &1207165785
 Transform:
   m_ObjectHideFlags: 0
@@ -6591,6 +6641,101 @@ Transform:
   m_Father: {fileID: 420561426}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1353332170
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1353332171}
+  - component: {fileID: 1353332174}
+  - component: {fileID: 1353332173}
+  - component: {fileID: 1353332172}
+  m_Layer: 0
+  m_Name: ZBL-APS-Beacon-D
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1353332171
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1353332170}
+  m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071068}
+  m_LocalPosition: {x: -0.04, y: -0.452, z: 0}
+  m_LocalScale: {x: 0.05, y: 0.05, z: 0.05}
+  m_Children: []
+  m_Father: {fileID: 589318189}
+  m_RootOrder: 5
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &1353332172
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1353332170}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!23 &1353332173
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1353332170}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 1a1fea063a56041b9a2c9d7379b278a4, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &1353332174
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1353332170}
+  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1 &1370602153
 GameObject:
   m_ObjectHideFlags: 0
@@ -7928,8 +8073,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   apsBeaconObject: {fileID: 1893126160}
   apsReceiverObject: {fileID: 374889541}
-  enableApsNoise: 0
-  apsNoiseSigma: 0.1
+  enableApsNoise: 1
+  apsNoiseSigma: 0.03
 --- !u!1001 &1659894200
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -9255,7 +9400,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1893126160}
   m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: -1.114, y: -0.524, z: 0.132}
+  m_LocalPosition: {x: -2.086, y: -0.452, z: -3}
   m_LocalScale: {x: 0.05, y: 0.05, z: 0.05}
   m_Children: []
   m_Father: {fileID: 589318189}

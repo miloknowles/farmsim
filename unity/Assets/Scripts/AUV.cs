@@ -31,11 +31,13 @@ public class AUV : MonoBehaviour {
   public bool publishRange = true;
   public bool publishDepth = true;
   public bool publishStereo = true;
+  public float rangePublishRate = 10;
   public Rigidbody imu_rigidbody;
   public ImuSensor imu_sensor;
   public RangeSensor range_sensor_A;
   public RangeSensor range_sensor_B;
   public RangeSensor range_sensor_C;
+  public RangeSensor range_sensor_D;
   public DepthSensor depth_sensor;
   public StereoRig stereo_rig;
 
@@ -50,6 +52,8 @@ public class AUV : MonoBehaviour {
   private string imuSubfolder = "imu0";
   private string apsSubfolderA = "aps0";
   private string apsSubfolderB = "aps1";
+  private string apsSubfolderC = "aps2";
+  private string apsSubfolderD = "aps3";
   private string depthSubfolder = "depth0";
   private string depthImageSubfolder = "depth_image0";
 
@@ -135,38 +139,56 @@ public class AUV : MonoBehaviour {
     vehicle.range_measurement_t msg0 = new vehicle.range_measurement_t();
     vehicle.range_measurement_t msg1 = new vehicle.range_measurement_t();
     vehicle.range_measurement_t msg2 = new vehicle.range_measurement_t();
+    vehicle.range_measurement_t msg3 = new vehicle.range_measurement_t();
     msg0.header = new vehicle.header_t();
     msg1.header = new vehicle.header_t();
     msg2.header = new vehicle.header_t();
+    msg3.header = new vehicle.header_t();
     msg0.point = new vehicle.vector3_t();
     msg1.point = new vehicle.vector3_t();
     msg2.point = new vehicle.vector3_t();
+    msg3.point = new vehicle.vector3_t();
+
+    float range_wait_time = 1.0f / this.rangePublishRate;
 
     while (true) {
-      yield return new WaitForSeconds(0.3f);
+      yield return new WaitForSeconds(range_wait_time);
 
-      this.range_sensor_A.Read();
-      this.range_sensor_B.Read();
-      this.range_sensor_C.Read();
-      RangeMeasurement data0 = this.range_sensor_A.data;
-      RangeMeasurement data1 = this.range_sensor_B.data;
-      RangeMeasurement data2 = this.range_sensor_C.data;
+      if (this.range_sensor_A) {
+        this.range_sensor_A.Read();
+        RangeMeasurement data0 = this.range_sensor_A.data;
+        LCMUtils.pack_header_t(data0.timestamp, seq, "aps_receiver", ref msg0.header);
+        LCMUtils.pack_vector3_t(data0.world_t_beacon, ref msg0.point);
+        msg0.range = data0.range;
+        this.lcmHandle.Publish(SimulationParams.CHANNEL_AUV_RANGE_ALL, msg0);
+      }
 
-      LCMUtils.pack_header_t(data0.timestamp, seq, "aps_receiver", ref msg0.header);
-      LCMUtils.pack_vector3_t(data0.world_t_beacon, ref msg0.point);
-      msg0.range = data0.range;
+      if (this.range_sensor_B) {
+        this.range_sensor_B.Read();
+        RangeMeasurement data1 = this.range_sensor_B.data;
+        LCMUtils.pack_header_t(data1.timestamp, seq, "aps_receiver", ref msg1.header);
+        LCMUtils.pack_vector3_t(data1.world_t_beacon, ref msg1.point);
+        msg1.range = data1.range;
+        this.lcmHandle.Publish(SimulationParams.CHANNEL_AUV_RANGE_ALL, msg1);
+      }
 
-      LCMUtils.pack_header_t(data1.timestamp, seq, "aps_receiver", ref msg1.header);
-      LCMUtils.pack_vector3_t(data1.world_t_beacon, ref msg1.point);
-      msg1.range = data1.range;
+      if (this.range_sensor_C) {
+        this.range_sensor_C.Read();
+        RangeMeasurement data2 = this.range_sensor_C.data;
+        LCMUtils.pack_header_t(data2.timestamp, seq, "aps_receiver", ref msg2.header);
+        LCMUtils.pack_vector3_t(data2.world_t_beacon, ref msg2.point);
+        msg2.range = data2.range;
+        this.lcmHandle.Publish(SimulationParams.CHANNEL_AUV_RANGE_ALL, msg2);
+      }
 
-      LCMUtils.pack_header_t(data2.timestamp, seq, "aps_receiver", ref msg2.header);
-      LCMUtils.pack_vector3_t(data2.world_t_beacon, ref msg2.point);
-      msg2.range = data2.range;
-
-      this.lcmHandle.Publish(SimulationParams.CHANNEL_AUV_RANGE_ALL, msg0);
-      this.lcmHandle.Publish(SimulationParams.CHANNEL_AUV_RANGE_ALL, msg1);
-      this.lcmHandle.Publish(SimulationParams.CHANNEL_AUV_RANGE_ALL, msg2);
+      if (this.range_sensor_D) {
+        this.range_sensor_D.Read();
+        RangeMeasurement data3 = this.range_sensor_D.data;
+        LCMUtils.pack_header_t(data3.timestamp, seq, "aps_receiver", ref msg3.header);
+        LCMUtils.pack_vector3_t(data3.world_t_beacon, ref msg3.point);
+        msg3.range = data3.range;
+        this.lcmHandle.Publish(SimulationParams.CHANNEL_AUV_RANGE_ALL, msg3);
+      }
 
       ++seq;
     }
@@ -321,10 +343,12 @@ public class AUV : MonoBehaviour {
     string csv_A = Path.Combine(aps_folder_A, "data.csv");
     string csv_B = Path.Combine(aps_folder_B, "data.csv");
 
+    float range_wait_time = 1.0f / this.rangePublishRate;
+
     while (true) {
       // ping_time = max_range / speed_of_sound = 100m / 343 m/s = 0.29 sec
       // Therefore can run at most 3ish Hz at 100m max range.
-      yield return new WaitForSeconds(0.3f);
+      yield return new WaitForSeconds(range_wait_time);
       this.range_sensor_A.Read();
       this.range_sensor_B.Read();
       RangeMeasurement data_A = this.range_sensor_A.data;
