@@ -644,7 +644,7 @@ MonoBehaviour:
   apsBeaconObject: {fileID: 1353332170}
   apsReceiverObject: {fileID: 374889541}
   enableApsNoise: 1
-  apsNoiseSigma: 0.05
+  apsNoiseSigma: 0.02
 --- !u!4 &173769190 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400000, guid: 780611a67e8e941a2b3aa96e5915a793,
@@ -1004,7 +1004,7 @@ MonoBehaviour:
   apsBeaconObject: {fileID: 663678797}
   apsReceiverObject: {fileID: 374889541}
   enableApsNoise: 1
-  apsNoiseSigma: 0.05
+  apsNoiseSigma: 0.02
 --- !u!1001 &206626810
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1623,7 +1623,7 @@ MonoBehaviour:
   imu_rigidbody: {fileID: 420561429}
   imu_sensor: {fileID: 420561432}
   range_sensor_A: {fileID: 202800059}
-  range_sensor_B: {fileID: 1207165784}
+  range_sensor_B: {fileID: 0}
   range_sensor_C: {fileID: 1639128901}
   range_sensor_D: {fileID: 0}
   depth_sensor: {fileID: 420561434}
@@ -1706,10 +1706,10 @@ MonoBehaviour:
   imu_rigidbody: {fileID: 420561429}
   enableImuNoise: 1
   enableImuBias: 1
-  accelNoiseSigma: 0.001
-  gyroNoiseSigma: 0.00004
-  accelBiasRandomWalkSigma: 0.001
-  gyroBiasRandomWalkSigma: 0.00004
+  accelNoiseSigma: 0.0005
+  gyroNoiseSigma: 0.00001
+  accelBiasRandomWalkSigma: 0.0005
+  gyroBiasRandomWalkSigma: 0.00001
   accelBiasSigma: 0.0001
   gyroBiasSigma: 0.0001
 --- !u!114 &420561433
@@ -6285,7 +6285,7 @@ MonoBehaviour:
   apsBeaconObject: {fileID: 952967118}
   apsReceiverObject: {fileID: 374889541}
   enableApsNoise: 1
-  apsNoiseSigma: 0.05
+  apsNoiseSigma: 0.02
 --- !u!4 &1207165785
 Transform:
   m_ObjectHideFlags: 0
@@ -8074,7 +8074,7 @@ MonoBehaviour:
   apsBeaconObject: {fileID: 1893126160}
   apsReceiverObject: {fileID: 374889541}
   enableApsNoise: 1
-  apsNoiseSigma: 0.05
+  apsNoiseSigma: 0.02
 --- !u!1001 &1659894200
 PrefabInstance:
   m_ObjectHideFlags: 0
