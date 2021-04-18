@@ -4216,6 +4216,11 @@ PrefabInstance:
       propertyPath: m_TargetDisplay
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 4653121137522870165, guid: 59265c06d324f395682cb16b67f1d258,
+        type: 3}
+      propertyPath: m_GateFitMode
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 4653121137522870166, guid: 59265c06d324f395682cb16b67f1d258,
         type: 3}
       propertyPath: m_LocalPosition.x

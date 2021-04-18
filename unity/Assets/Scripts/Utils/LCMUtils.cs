@@ -66,7 +66,7 @@ public class LCMUtils {
     msg.encoding = "jpg";
 
     // This seems to use a "BGR" channel ordering like OpenCV.
-    msg.data = ImageConversion.EncodeToJPG(im, 60);
+    msg.data = ImageConversion.EncodeToJPG(im, 90);
     msg.size = msg.data.Length;
   }
 }

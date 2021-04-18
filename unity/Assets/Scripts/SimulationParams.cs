@@ -13,8 +13,8 @@ public class SimulationParams : MonoBehaviour {
   public static float CAMERA_PUBLISH_HZ = 10.0f;
 
   // Camera configuration.
-  public static int AUV_CAMERA_WIDTH = 752;
-  public static int AUV_CAMERA_HEIGHT = 480;
+  public static int AUV_CAMERA_WIDTH = 672;
+  public static int AUV_CAMERA_HEIGHT = 376;
 
   // LCM channels.
   public static string CHANNEL_AUV_IMU = "sim/auv/imu";
