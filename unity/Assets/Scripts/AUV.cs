@@ -249,6 +249,8 @@ public class AUV : MonoBehaviour {
 
       this.lcmHandle.Publish(SimulationParams.CHANNEL_AUV_STEREO, msg);
 
+      // SharedImagePublisher.PublishStereoImage(SimulationParams.CHANNEL_AUV_STEREO, ref msg, 10);
+
       ++seq;
     }
   }
