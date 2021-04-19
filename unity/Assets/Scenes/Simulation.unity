@@ -644,7 +644,7 @@ MonoBehaviour:
   apsBeaconObject: {fileID: 1353332170}
   apsReceiverObject: {fileID: 374889541}
   enableApsNoise: 1
-  apsNoiseSigma: 0.02
+  apsNoiseSigma: 0.01
 --- !u!4 &173769190 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400000, guid: 780611a67e8e941a2b3aa96e5915a793,
@@ -729,61 +729,6 @@ PrefabInstance:
       propertyPath: m_TargetDisplay
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 4653121137522870165, guid: 59265c06d324f395682cb16b67f1d258,
-        type: 3}
-      propertyPath: m_FOVAxisMode
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4653121137522870165, guid: 59265c06d324f395682cb16b67f1d258,
-        type: 3}
-      propertyPath: m_projectionMatrixMode
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 4653121137522870165, guid: 59265c06d324f395682cb16b67f1d258,
-        type: 3}
-      propertyPath: m_GateFitMode
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 4653121137522870165, guid: 59265c06d324f395682cb16b67f1d258,
-        type: 3}
-      propertyPath: m_Depth
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4653121137522870165, guid: 59265c06d324f395682cb16b67f1d258,
-        type: 3}
-      propertyPath: m_FocalLength
-      value: 2.494153
-      objectReference: {fileID: 0}
-    - target: {fileID: 4653121137522870165, guid: 59265c06d324f395682cb16b67f1d258,
-        type: 3}
-      propertyPath: field of view
-      value: 60.000004
-      objectReference: {fileID: 0}
-    - target: {fileID: 4653121137522870165, guid: 59265c06d324f395682cb16b67f1d258,
-        type: 3}
-      propertyPath: m_CullingMask.m_Bits
-      value: 4294967295
-      objectReference: {fileID: 0}
-    - target: {fileID: 4653121137522870165, guid: 59265c06d324f395682cb16b67f1d258,
-        type: 3}
-      propertyPath: far clip plane
-      value: 100
-      objectReference: {fileID: 0}
-    - target: {fileID: 4653121137522870165, guid: 59265c06d324f395682cb16b67f1d258,
-        type: 3}
-      propertyPath: m_RenderingPath
-      value: -1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4653121137522870165, guid: 59265c06d324f395682cb16b67f1d258,
-        type: 3}
-      propertyPath: m_AllowMSAA
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4653121137522870165, guid: 59265c06d324f395682cb16b67f1d258,
-        type: 3}
-      propertyPath: m_HDR
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 4653121137522870166, guid: 59265c06d324f395682cb16b67f1d258,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -839,36 +784,16 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 4653121137522870167, guid: 59265c06d324f395682cb16b67f1d258,
-        type: 3}
-      propertyPath: _fogColor.r
-      value: 0.22745097
-      objectReference: {fileID: 0}
-    - target: {fileID: 4653121137522870167, guid: 59265c06d324f395682cb16b67f1d258,
-        type: 3}
-      propertyPath: _fogColor.g
-      value: 0.73333335
-      objectReference: {fileID: 0}
-    - target: {fileID: 4653121137522870167, guid: 59265c06d324f395682cb16b67f1d258,
-        type: 3}
-      propertyPath: _fogColor.b
-      value: 0.70391375
-      objectReference: {fileID: 0}
-    - target: {fileID: 4653121137522870167, guid: 59265c06d324f395682cb16b67f1d258,
-        type: 3}
-      propertyPath: _fogColor.a
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4653121137522870167, guid: 59265c06d324f395682cb16b67f1d258,
-        type: 3}
-      propertyPath: _depthDistance
-      value: 20
-      objectReference: {fileID: 0}
-    - target: {fileID: 4653121137522870167, guid: 59265c06d324f395682cb16b67f1d258,
+    - target: {fileID: 6742186861490759073, guid: 59265c06d324f395682cb16b67f1d258,
         type: 3}
       propertyPath: m_Enabled
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 6742186861490759073, guid: 59265c06d324f395682cb16b67f1d258,
+        type: 3}
+      propertyPath: shader
+      value: 
+      objectReference: {fileID: 4800000, guid: daf9781cad112c75d0008dfa8d76c639, type: 3}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 59265c06d324f395682cb16b67f1d258, type: 3}
 --- !u!20 &178838056 stripped
@@ -1004,7 +929,7 @@ MonoBehaviour:
   apsBeaconObject: {fileID: 663678797}
   apsReceiverObject: {fileID: 374889541}
   enableApsNoise: 1
-  apsNoiseSigma: 0.02
+  apsNoiseSigma: 0.01
 --- !u!1001 &206626810
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1629,7 +1554,7 @@ MonoBehaviour:
   depth_sensor: {fileID: 420561434}
   stereo_rig: {fileID: 420561435}
   simulatorIOMode: 1
-  disableImageOutput: 1
+  disableImageOutput: 0
   outputDatasetName: default_dataset/mav0/
   outputDatasetRoot: /home/milo/datasets/Unity3D/farmsim/
 --- !u!114 &420561428
@@ -3090,9 +3015,9 @@ Camera:
   m_projectionMatrixMode: 2
   m_GateFitMode: 2
   m_FOVAxisMode: 0
-  m_SensorSize: {x: 4.51, y: 2.88}
+  m_SensorSize: {x: 5.376, y: 3.008}
   m_LensShift: {x: 0, y: 0}
-  m_FocalLength: 2.494153
+  m_FocalLength: 1.5046085
   m_NormalizedViewPortRect:
     serializedVersion: 2
     x: 0
@@ -3101,7 +3026,7 @@ Camera:
     height: 1
   near clip plane: 0.1
   far clip plane: 100
-  field of view: 60.000004
+  field of view: 89.97682
   orthographic: 0
   orthographic size: 5
   m_Depth: 0
@@ -4303,33 +4228,13 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4653121137522870165, guid: 59265c06d324f395682cb16b67f1d258,
         type: 3}
-      propertyPath: m_projectionMatrixMode
+      propertyPath: m_GateFitMode
       value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 4653121137522870165, guid: 59265c06d324f395682cb16b67f1d258,
-        type: 3}
-      propertyPath: m_CullingMask.m_Bits
-      value: 4294967295
-      objectReference: {fileID: 0}
-    - target: {fileID: 4653121137522870165, guid: 59265c06d324f395682cb16b67f1d258,
-        type: 3}
-      propertyPath: far clip plane
-      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 4653121137522870165, guid: 59265c06d324f395682cb16b67f1d258,
         type: 3}
       propertyPath: m_HDR
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4653121137522870165, guid: 59265c06d324f395682cb16b67f1d258,
-        type: 3}
-      propertyPath: m_AllowMSAA
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4653121137522870165, guid: 59265c06d324f395682cb16b67f1d258,
-        type: 3}
-      propertyPath: m_RenderingPath
-      value: -1
       objectReference: {fileID: 0}
     - target: {fileID: 4653121137522870166, guid: 59265c06d324f395682cb16b67f1d258,
         type: 3}
@@ -4385,36 +4290,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4653121137522870167, guid: 59265c06d324f395682cb16b67f1d258,
-        type: 3}
-      propertyPath: _fogColor.r
-      value: 0.22745097
-      objectReference: {fileID: 0}
-    - target: {fileID: 4653121137522870167, guid: 59265c06d324f395682cb16b67f1d258,
-        type: 3}
-      propertyPath: _fogColor.g
-      value: 0.73333335
-      objectReference: {fileID: 0}
-    - target: {fileID: 4653121137522870167, guid: 59265c06d324f395682cb16b67f1d258,
-        type: 3}
-      propertyPath: _fogColor.b
-      value: 0.70391375
-      objectReference: {fileID: 0}
-    - target: {fileID: 4653121137522870167, guid: 59265c06d324f395682cb16b67f1d258,
-        type: 3}
-      propertyPath: _fogColor.a
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4653121137522870167, guid: 59265c06d324f395682cb16b67f1d258,
-        type: 3}
-      propertyPath: _depthDistance
-      value: 20
-      objectReference: {fileID: 0}
-    - target: {fileID: 4653121137522870167, guid: 59265c06d324f395682cb16b67f1d258,
-        type: 3}
-      propertyPath: m_Enabled
-      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 59265c06d324f395682cb16b67f1d258, type: 3}
@@ -6285,7 +6160,7 @@ MonoBehaviour:
   apsBeaconObject: {fileID: 952967118}
   apsReceiverObject: {fileID: 374889541}
   enableApsNoise: 1
-  apsNoiseSigma: 0.02
+  apsNoiseSigma: 0.01
 --- !u!4 &1207165785
 Transform:
   m_ObjectHideFlags: 0
@@ -8074,7 +7949,7 @@ MonoBehaviour:
   apsBeaconObject: {fileID: 1893126160}
   apsReceiverObject: {fileID: 374889541}
   enableApsNoise: 1
-  apsNoiseSigma: 0.02
+  apsNoiseSigma: 0.01
 --- !u!1001 &1659894200
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -9513,7 +9388,7 @@ PrefabInstance:
     - target: {fileID: 4653121137522870165, guid: 59265c06d324f395682cb16b67f1d258,
         type: 3}
       propertyPath: field of view
-      value: 60.000004
+      value: 62.18082
       objectReference: {fileID: 0}
     - target: {fileID: 4653121137522870165, guid: 59265c06d324f395682cb16b67f1d258,
         type: 3}
@@ -9610,7 +9485,13 @@ PrefabInstance:
       propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    - target: {fileID: 6742186861490759073, guid: 59265c06d324f395682cb16b67f1d258,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents:
+    - {fileID: 6742186861490759073, guid: 59265c06d324f395682cb16b67f1d258, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 59265c06d324f395682cb16b67f1d258, type: 3}
 --- !u!4 &1972955301 stripped
 Transform:

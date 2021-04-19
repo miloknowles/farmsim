@@ -237,6 +237,11 @@ public class AUV : MonoBehaviour {
     msg.img_left = new vehicle.image_t();
     msg.img_right = new vehicle.image_t();
 
+    MmfImagePublisher mmf_pub = new MmfImagePublisher(
+        SimulationParams.CHANNEL_AUV_STEREO_SHMEM,
+        SimulationParams.AUV_CAMERA_HEIGHT,
+        SimulationParams.AUV_CAMERA_WIDTH, 3);
+
     while (true) {
       // yield return new WaitForSeconds(1.0f / SimulationParams.CAMERA_PUBLISH_HZ);
       yield return new WaitForEndOfFrame();
@@ -244,10 +249,11 @@ public class AUV : MonoBehaviour {
       this.stereo_rig.CaptureStereoPair(ref leftImage, ref rightImage);
 
       LCMUtils.pack_header_t(Timestamp.UnityNanoseconds(), seq, "stereo_cam", ref msg.header);
-      LCMUtils.pack_image_t(ref leftImage, ref msg.img_left);
-      LCMUtils.pack_image_t(ref rightImage, ref msg.img_right);
+      // LCMUtils.pack_image_t(ref leftImage, ref msg.img_left);
+      // LCMUtils.pack_image_t(ref rightImage, ref msg.img_right);
 
-      this.lcmHandle.Publish(SimulationParams.CHANNEL_AUV_STEREO, msg);
+      // this.lcmHandle.Publish(SimulationParams.CHANNEL_AUV_STEREO, msg);
+      mmf_pub.PublishStereo(ref msg.header, ref leftImage, ref rightImage);
 
       ++seq;
     }
