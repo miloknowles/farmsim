@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 4653121137522870165}
   - component: {fileID: 4653121137522870167}
   - component: {fileID: 4653121137522870164}
+  - component: {fileID: 6742186861490759073}
   m_Layer: 0
   m_Name: UnderwaterCamera
   m_TagString: Untagged
@@ -69,8 +70,8 @@ Camera:
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 3
   m_TargetEye: 3
-  m_HDR: 1
-  m_AllowMSAA: 1
+  m_HDR: 0
+  m_AllowMSAA: 0
   m_AllowDynamicResolution: 0
   m_ForceIntoRT: 0
   m_OcclusionCulling: 1
@@ -112,3 +113,18 @@ MonoBehaviour:
   _noiseFrequency: 15
   _noiseSpeed: 10
   _depthDistance: 100
+--- !u!114 &6742186861490759073
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4653121137522870155}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 243a781cad112c75d0008dfa8d76c639, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  shader: {fileID: 4800000, guid: daf9781cad112c75d0008dfa8d76c639, type: 3}
+  textureRamp: {fileID: 0}
+  rampOffset: 0

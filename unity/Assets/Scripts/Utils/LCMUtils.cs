@@ -69,6 +69,22 @@ public class LCMUtils {
     msg.data = ImageConversion.EncodeToJPG(im, 90);
     msg.size = msg.data.Length;
   }
+
+  // Packs a Unity Texture2D into an LCM image_t type.
+  // NOTE(milo): This doesn't work! According to docs, the JPG/PNG encoding functions only work for
+  // RGB color textures. Might be an option once shmem messaging is available.
+  public static void mono8_pack_image_t(ref Texture2D im, ref image_t msg)
+  {
+    msg.height = im.height;
+    msg.width = im.width;
+    msg.channels = 1;
+    msg.format = "mono8";
+    msg.encoding = "jpg";
+
+    // This seems to use a "BGR" channel ordering like OpenCV.
+    msg.data = ImageConversion.EncodeToJPG(im, 90);
+    msg.size = msg.data.Length;
+  }
 }
 
 }
