@@ -237,7 +237,7 @@ public class AUV : MonoBehaviour {
     msg.img_left = new vehicle.image_t();
     msg.img_right = new vehicle.image_t();
 
-    SharedImagePublisher shmem_pub = new SharedImagePublisher(
+    MmfImagePublisher mmf_pub = new MmfImagePublisher(
         SimulationParams.CHANNEL_AUV_STEREO_SHMEM,
         SimulationParams.AUV_CAMERA_HEIGHT,
         SimulationParams.AUV_CAMERA_WIDTH, 3);
@@ -253,8 +253,7 @@ public class AUV : MonoBehaviour {
       // LCMUtils.pack_image_t(ref rightImage, ref msg.img_right);
 
       // this.lcmHandle.Publish(SimulationParams.CHANNEL_AUV_STEREO, msg);
-      // SharedImagePublisher.PublishStereoImage(SimulationParams.CHANNEL_AUV_STEREO, ref msg, 1);
-      shmem_pub.PublishStereo(ref msg.header, ref leftImage, ref rightImage);
+      mmf_pub.PublishStereo(ref msg.header, ref leftImage, ref rightImage);
 
       ++seq;
     }
