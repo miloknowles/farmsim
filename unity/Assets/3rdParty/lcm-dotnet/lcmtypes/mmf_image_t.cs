@@ -17,8 +17,8 @@ namespace vehicle
         public int channels;
         public String format;
         public String encoding;
-        public String mmf_name;
-        public int byte_offset;
+        public String mm_filename;
+        public int offset;
         public int size;
  
         public mmf_image_t()
@@ -26,7 +26,7 @@ namespace vehicle
         }
  
         public static readonly ulong LCM_FINGERPRINT;
-        public static readonly ulong LCM_FINGERPRINT_BASE = 0x9512ce98e0d0f4b5L;
+        public static readonly ulong LCM_FINGERPRINT_BASE = 0x181a7f190b187052L;
  
         static mmf_image_t()
         {
@@ -64,9 +64,9 @@ namespace vehicle
  
             __strbuf = System.Text.Encoding.GetEncoding("US-ASCII").GetBytes(this.encoding); outs.Write(__strbuf.Length+1); outs.Write(__strbuf, 0, __strbuf.Length); outs.Write((byte) 0); 
  
-            __strbuf = System.Text.Encoding.GetEncoding("US-ASCII").GetBytes(this.mmf_name); outs.Write(__strbuf.Length+1); outs.Write(__strbuf, 0, __strbuf.Length); outs.Write((byte) 0); 
+            __strbuf = System.Text.Encoding.GetEncoding("US-ASCII").GetBytes(this.mm_filename); outs.Write(__strbuf.Length+1); outs.Write(__strbuf, 0, __strbuf.Length); outs.Write((byte) 0); 
  
-            outs.Write(this.byte_offset); 
+            outs.Write(this.offset); 
  
             outs.Write(this.size); 
  
@@ -104,9 +104,9 @@ namespace vehicle
  
             __strbuf = new byte[ins.ReadInt32()-1]; ins.ReadFully(__strbuf); ins.ReadByte(); this.encoding = System.Text.Encoding.GetEncoding("US-ASCII").GetString(__strbuf);
  
-            __strbuf = new byte[ins.ReadInt32()-1]; ins.ReadFully(__strbuf); ins.ReadByte(); this.mmf_name = System.Text.Encoding.GetEncoding("US-ASCII").GetString(__strbuf);
+            __strbuf = new byte[ins.ReadInt32()-1]; ins.ReadFully(__strbuf); ins.ReadByte(); this.mm_filename = System.Text.Encoding.GetEncoding("US-ASCII").GetString(__strbuf);
  
-            this.byte_offset = ins.ReadInt32();
+            this.offset = ins.ReadInt32();
  
             this.size = ins.ReadInt32();
  
@@ -125,9 +125,9 @@ namespace vehicle
  
             outobj.encoding = this.encoding;
  
-            outobj.mmf_name = this.mmf_name;
+            outobj.mm_filename = this.mm_filename;
  
-            outobj.byte_offset = this.byte_offset;
+            outobj.offset = this.offset;
  
             outobj.size = this.size;
  

@@ -63,8 +63,8 @@ public class MmfImagePublisher {
     this.msg = new mmf_stereo_image_t();
     this.msg.img_left = new mmf_image_t();
     this.msg.img_right = new mmf_image_t();
-    this.msg.img_left.mmf_name = this.mmf_filename;
-    this.msg.img_right.mmf_name = this.mmf_filename;
+    this.msg.img_left.mm_filename = this.mmf_filename;
+    this.msg.img_right.mm_filename = this.mmf_filename;
     this.msg.img_left.width = this.img_width;
     this.msg.img_right.width = this.img_width;
     this.msg.img_left.height = this.img_height;
@@ -140,13 +140,13 @@ public class MmfImagePublisher {
     // this.publish_mutex.WaitOne(this.mutex_timeout_ms);
 
     // Left image
-    this.msg.img_left.byte_offset = this.WriteToMmf(ref this.lbuf);
+    this.msg.img_left.offset = this.WriteToMmf(ref this.lbuf);
     this.msg.img_left.size = this.lbuf.Length;
 
     this.start_byte += this.lbuf.Length;
 
     // Right image
-    this.msg.img_right.byte_offset = this.WriteToMmf(ref this.rbuf);
+    this.msg.img_right.offset = this.WriteToMmf(ref this.rbuf);
     this.msg.img_right.size = this.rbuf.Length;
 
     this.start_byte += this.rbuf.Length;
