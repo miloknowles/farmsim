@@ -31,6 +31,7 @@ public class AUV : MonoBehaviour {
   public bool publishRange = true;
   public bool publishDepth = true;
   public bool publishStereo = true;
+  public bool publishMag = true;
   public float rangePublishRate = 10;
   public Rigidbody imu_rigidbody;
   public ImuSensor imu_sensor;
@@ -40,6 +41,7 @@ public class AUV : MonoBehaviour {
   public RangeSensor range_sensor_D;
   public DepthSensor depth_sensor;
   public StereoRig stereo_rig;
+  public Magnetometer magnetometer;
 
   public Simulator.IOMode simulatorIOMode = Simulator.IOMode.NONE;
   public bool disableImageOutput = false;
@@ -56,6 +58,7 @@ public class AUV : MonoBehaviour {
   private string apsSubfolderD = "aps3";
   private string depthSubfolder = "depth0";
   private string depthImageSubfolder = "depth_image0";
+  private string magSubfolder = "mag0";
 
   // http://lcm-proj.github.io/tut_dotnet.html
   // NOTE(milo): Don't initialize this here! It will crash the Unity editor.
@@ -86,6 +89,7 @@ public class AUV : MonoBehaviour {
       StartCoroutine(SaveImuDataset());
       StartCoroutine(SaveApsDataset());
       StartCoroutine(SaveDepthDataset());
+      // TODO(milo): Save magnetometer data.
     }
   }
 
@@ -97,6 +101,10 @@ public class AUV : MonoBehaviour {
     imu_msg.linear_acc = new vehicle.vector3_t();
     imu_msg.angular_vel = new vehicle.vector3_t();
 
+    vehicle.mag_measurement_t mag_msg = new vehicle.mag_measurement_t();
+    mag_msg.header = new vehicle.header_t();
+    mag_msg.bM = new vehicle.vector3_t();
+
     while (true) {
       yield return new WaitForFixedUpdate();
 
@@ -107,6 +115,13 @@ public class AUV : MonoBehaviour {
       LCMUtils.pack_vector3_t(data.imu_w_rh, ref imu_msg.angular_vel);
 
       this.lcmHandle.Publish(SimulationParams.CHANNEL_AUV_IMU, imu_msg);
+
+      this.magnetometer.Read();
+      MagMeasurement mag = this.magnetometer.data;
+      LCMUtils.pack_header_t(data.timestamp, seq, "mag0", ref mag_msg.header);
+      LCMUtils.pack_vector3_t(mag.bM, ref mag_msg.bM);
+
+      this.lcmHandle.Publish(SimulationParams.CHANNEL_AUV_MAG, mag_msg);
 
       ++seq;
     }

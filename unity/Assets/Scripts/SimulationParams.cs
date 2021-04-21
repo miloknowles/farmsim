@@ -18,6 +18,7 @@ public class SimulationParams : MonoBehaviour {
 
   // LCM channels.
   public static string CHANNEL_AUV_IMU = "sim/auv/imu";
+  public static string CHANNEL_AUV_MAG = "sim/auv/mag";
   public static string CHANNEL_AUV_DEPTH = "sim/auv/depth";
   public static string CHANNEL_AUV_STEREO = "sim/auv/stereo";
   public static string CHANNEL_AUV_STEREO_SHMEM = "sim/auv/stereo_shm";
