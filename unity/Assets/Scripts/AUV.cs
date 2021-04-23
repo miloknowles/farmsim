@@ -19,29 +19,35 @@ public enum IOMode
 
 
 public class AUV : MonoBehaviour {
-  DateTime camStart = DateTime.Now;
-
-  // Cameras attached to the vehicle.
-  public Camera camera_forward_left;
-  public DepthCamera depthCameraLeft;
-
-  // Attach sensors here.
-  // TODO(milo): Eventually add ability to drop messages.
   public bool publishImu = true;
   public bool publishRange = true;
   public bool publishDepth = true;
   public bool publishStereo = true;
-  public float rangePublishRate = 10;
-  public Rigidbody imu_rigidbody;
-  public ImuSensor imu_sensor;
-  public RangeSensor range_sensor_A;
-  public RangeSensor range_sensor_B;
-  public RangeSensor range_sensor_C;
-  public RangeSensor range_sensor_D;
-  public DepthSensor depth_sensor;
-  public StereoRig stereo_rig;
+  public bool publishMag = true;
 
-  public Simulator.IOMode simulatorIOMode = Simulator.IOMode.NONE;
+  //=============================== IMU SENSOR =================================
+  public ImuSensor imuSensor;
+
+  //============================== RANGE SENSOR ================================
+  public RangeSensor rangeSensorA;
+  public RangeSensor rangeSensorB;
+  public RangeSensor rangeSensorC;
+  public RangeSensor rangeSensorD;
+  public float rangePublishRate = 10;
+
+  //============================== DEPTH & RANGE ===============================
+  public DepthSensor depthSensor;
+  public float depthPublishRate = 50;
+  public MagSensor magSensor;
+  public float magPublishRate = 50;
+
+  //================================= CAMERAS ==================================
+  public DepthCamera depthCameraLeft;
+  public StereoRig stereoRig;
+  public float imagePublishRate = 20;
+
+  //================================ DATA SAVING ===============================
+  public Simulator.IOMode inputOutputMode = Simulator.IOMode.NONE;
   public bool disableImageOutput = false;
   public string outputDatasetName = "default_dataset";
 
@@ -56,6 +62,7 @@ public class AUV : MonoBehaviour {
   private string apsSubfolderD = "aps3";
   private string depthSubfolder = "depth0";
   private string depthImageSubfolder = "depth_image0";
+  private string magSubfolder = "mag0";
 
   // http://lcm-proj.github.io/tut_dotnet.html
   // NOTE(milo): Don't initialize this here! It will crash the Unity editor.
@@ -71,7 +78,7 @@ public class AUV : MonoBehaviour {
       Debug.Break();
     }
 
-    if (this.simulatorIOMode == Simulator.IOMode.LCM) {
+    if (this.inputOutputMode == Simulator.IOMode.LCM) {
       if (!this.disableImageOutput) {
         StartCoroutine(PublishStereoImages());
       }
@@ -79,13 +86,15 @@ public class AUV : MonoBehaviour {
       StartCoroutine(PublishDepth());
       StartCoroutine(PublishRange());
       StartCoroutine(PublishPose());
-    } else if (this.simulatorIOMode == Simulator.IOMode.DATASET) {
+      StartCoroutine(PublishMag());
+    } else if (this.inputOutputMode == Simulator.IOMode.DATASET) {
       if (!this.disableImageOutput) {
         StartCoroutine(SaveStereoImageDataset());
       }
       StartCoroutine(SaveImuDataset());
       StartCoroutine(SaveApsDataset());
       StartCoroutine(SaveDepthDataset());
+      // TODO(milo): Save magnetometer data.
     }
   }
 
@@ -98,16 +107,36 @@ public class AUV : MonoBehaviour {
     imu_msg.angular_vel = new vehicle.vector3_t();
 
     while (true) {
-      yield return new WaitForFixedUpdate();
+      yield return new WaitForFixedUpdate();  // Happens at physics rate.
 
-      ImuMeasurement data = this.imu_sensor.data;
+      ImuMeasurement data = this.imuSensor.data;
 
       LCMUtils.pack_header_t(data.timestamp, seq, "imu0", ref imu_msg.header);
       LCMUtils.pack_vector3_t(data.imu_a_rh, ref imu_msg.linear_acc);
       LCMUtils.pack_vector3_t(data.imu_w_rh, ref imu_msg.angular_vel);
 
       this.lcmHandle.Publish(SimulationParams.CHANNEL_AUV_IMU, imu_msg);
+      ++seq;
+    }
+  }
 
+  IEnumerator PublishMag()
+  {
+    long seq = 0;
+
+    vehicle.mag_measurement_t mag_msg = new vehicle.mag_measurement_t();
+    mag_msg.header = new vehicle.header_t();
+    mag_msg.field = new vehicle.vector3_t();
+
+    while (true) {
+      yield return new WaitForSeconds(1.0f / this.magPublishRate);
+
+      this.magSensor.Read();
+      MagMeasurement mag = this.magSensor.data;
+      LCMUtils.pack_header_t(mag.timestamp, seq, "mag0", ref mag_msg.header);
+      LCMUtils.pack_vector3_t(mag.field, ref mag_msg.field);
+
+      this.lcmHandle.Publish(SimulationParams.CHANNEL_AUV_MAG, mag_msg);
       ++seq;
     }
   }
@@ -119,10 +148,10 @@ public class AUV : MonoBehaviour {
     depth_msg.header = new vehicle.header_t();
 
     while (true) {
-      yield return new WaitForEndOfFrame();
+      yield return new WaitForSeconds(1.0f / this.depthPublishRate);
 
-      this.depth_sensor.Read();
-      DepthMeasurement data = this.depth_sensor.data;
+      this.depthSensor.Read();
+      DepthMeasurement data = this.depthSensor.data;
 
       LCMUtils.pack_header_t(data.timestamp, seq, "depth0", ref depth_msg.header);
       depth_msg.depth = data.depth;
@@ -154,40 +183,44 @@ public class AUV : MonoBehaviour {
     while (true) {
       yield return new WaitForSeconds(range_wait_time);
 
-      if (this.range_sensor_A) {
-        this.range_sensor_A.Read();
-        RangeMeasurement data0 = this.range_sensor_A.data;
-        LCMUtils.pack_header_t(data0.timestamp, seq, "aps_receiver", ref msg0.header);
+      if (this.rangeSensorA) {
+        this.rangeSensorA.Read();
+        RangeMeasurement data0 = this.rangeSensorA.data;
+        LCMUtils.pack_header_t(data0.timestamp, seq, "aps0", ref msg0.header);
         LCMUtils.pack_vector3_t(data0.world_t_beacon, ref msg0.point);
         msg0.range = data0.range;
         this.lcmHandle.Publish(SimulationParams.CHANNEL_AUV_RANGE_ALL, msg0);
+        Debug.Log("range A");
       }
 
-      if (this.range_sensor_B) {
-        this.range_sensor_B.Read();
-        RangeMeasurement data1 = this.range_sensor_B.data;
-        LCMUtils.pack_header_t(data1.timestamp, seq, "aps_receiver", ref msg1.header);
+      if (this.rangeSensorB) {
+        this.rangeSensorB.Read();
+        RangeMeasurement data1 = this.rangeSensorB.data;
+        LCMUtils.pack_header_t(data1.timestamp, seq, "aps1", ref msg1.header);
         LCMUtils.pack_vector3_t(data1.world_t_beacon, ref msg1.point);
         msg1.range = data1.range;
         this.lcmHandle.Publish(SimulationParams.CHANNEL_AUV_RANGE_ALL, msg1);
+        Debug.Log("range B");
       }
 
-      if (this.range_sensor_C) {
-        this.range_sensor_C.Read();
-        RangeMeasurement data2 = this.range_sensor_C.data;
-        LCMUtils.pack_header_t(data2.timestamp, seq, "aps_receiver", ref msg2.header);
+      if (this.rangeSensorC) {
+        this.rangeSensorC.Read();
+        RangeMeasurement data2 = this.rangeSensorC.data;
+        LCMUtils.pack_header_t(data2.timestamp, seq, "aps2", ref msg2.header);
         LCMUtils.pack_vector3_t(data2.world_t_beacon, ref msg2.point);
         msg2.range = data2.range;
         this.lcmHandle.Publish(SimulationParams.CHANNEL_AUV_RANGE_ALL, msg2);
+        Debug.Log("range C");
       }
 
-      if (this.range_sensor_D) {
-        this.range_sensor_D.Read();
-        RangeMeasurement data3 = this.range_sensor_D.data;
-        LCMUtils.pack_header_t(data3.timestamp, seq, "aps_receiver", ref msg3.header);
+      if (this.rangeSensorD) {
+        this.rangeSensorD.Read();
+        RangeMeasurement data3 = this.rangeSensorD.data;
+        LCMUtils.pack_header_t(data3.timestamp, seq, "aps2", ref msg3.header);
         LCMUtils.pack_vector3_t(data3.world_t_beacon, ref msg3.point);
         msg3.range = data3.range;
         this.lcmHandle.Publish(SimulationParams.CHANNEL_AUV_RANGE_ALL, msg3);
+        Debug.Log("range D");
       }
 
       ++seq;
@@ -207,9 +240,9 @@ public class AUV : MonoBehaviour {
     Vector3 world_t_body = Vector3.zero;
 
     while (true) {
-      yield return new WaitForEndOfFrame();
+      yield return new WaitForEndOfFrame(); // Sync with camera publish rate.
 
-      Transform world_T_body = this.imu_rigidbody.transform;
+      Transform world_T_body = this.imuSensor.imu_rigidbody.transform;
 
       TransformUtils.ToRightHandedTransform(world_T_body, ref world_t_body, ref world_q_body);
 
@@ -243,15 +276,13 @@ public class AUV : MonoBehaviour {
         SimulationParams.AUV_CAMERA_WIDTH, 3);
 
     while (true) {
-      // yield return new WaitForSeconds(1.0f / SimulationParams.CAMERA_PUBLISH_HZ);
       yield return new WaitForEndOfFrame();
 
-      this.stereo_rig.CaptureStereoPair(ref leftImage, ref rightImage);
+      this.stereoRig.CaptureStereoPair(ref leftImage, ref rightImage);
 
       LCMUtils.pack_header_t(Timestamp.UnityNanoseconds(), seq, "stereo_cam", ref msg.header);
       // LCMUtils.pack_image_t(ref leftImage, ref msg.img_left);
       // LCMUtils.pack_image_t(ref rightImage, ref msg.img_right);
-
       // this.lcmHandle.Publish(SimulationParams.CHANNEL_AUV_STEREO, msg);
       mmf_pub.PublishStereo(ref msg.header, ref leftImage, ref rightImage);
 
@@ -277,7 +308,7 @@ public class AUV : MonoBehaviour {
       yield return new WaitForFixedUpdate();
 
       // Don't need to call Read() because sensor is updated during FixedUpdate().
-      ImuMeasurement data = this.imu_sensor.data;
+      ImuMeasurement data = this.imuSensor.data;
 
       // We use the EuRoC MAV format:
       // timestamp [ns],w_RS_S_x [rad s^-1],w_RS_S_y [rad s^-1],w_RS_S_z [rad s^-1],a_RS_S_x [m s^-2],a_RS_S_y [m s^-2],a_RS_S_z [m s^-2]
@@ -312,10 +343,10 @@ public class AUV : MonoBehaviour {
 
     // NOTE(milo): Maximum number of frames to save. Avoids using up all disk space by accident.
     while (true) {
-      yield return new WaitForFixedUpdate();
+      yield return new WaitForSeconds(1.0f / this.depthPublishRate);
 
-      this.depth_sensor.Read();
-      DepthMeasurement data = this.depth_sensor.data;
+      this.depthSensor.Read();
+      DepthMeasurement data = this.depthSensor.data;
 
       // timestamp [ns], depth [m]
       List<string> line = new List<string>{
@@ -355,10 +386,10 @@ public class AUV : MonoBehaviour {
       // ping_time = max_range / speed_of_sound = 100m / 343 m/s = 0.29 sec
       // Therefore can run at most 3ish Hz at 100m max range.
       yield return new WaitForSeconds(range_wait_time);
-      this.range_sensor_A.Read();
-      this.range_sensor_B.Read();
-      RangeMeasurement data_A = this.range_sensor_A.data;
-      RangeMeasurement data_B = this.range_sensor_B.data;
+      this.rangeSensorA.Read();
+      this.rangeSensorB.Read();
+      RangeMeasurement data_A = this.rangeSensorA.data;
+      RangeMeasurement data_B = this.rangeSensorB.data;
 
       // timestamp [ns], range [m], world_t_beacon.x [m], world_t_beacon.y [m], world_t_beacon.z [m],
       List<string> line_A = new List<string>{
@@ -426,7 +457,7 @@ public class AUV : MonoBehaviour {
       File.AppendAllLines(Path.Combine(dataset_folder, "timestamps.txt"), new string[] { nsec });
 
       //==================================== LEFT CAMERA POSE ======================================
-      Transform T_world_cam = this.camera_forward_left.transform;
+      Transform T_world_cam = this.stereoRig.leftCamera.transform;
 
       TransformUtils.ToRightHandedTransform(T_world_cam, ref t_world_cam, ref q_world_cam);
 
@@ -445,7 +476,7 @@ public class AUV : MonoBehaviour {
       File.AppendAllText(Path.Combine(dataset_folder, "cam0_poses.txt"), string.Join(",", pose_line));
 
       //======================================== BODY POSE =========================================
-      Transform T_world_body = this.imu_rigidbody.transform;
+      Transform T_world_body = this.imuSensor.imu_rigidbody.transform;
 
       TransformUtils.ToRightHandedTransform(T_world_body, ref t_world_body, ref q_world_body);
 
@@ -463,7 +494,7 @@ public class AUV : MonoBehaviour {
 
       File.AppendAllText(Path.Combine(dataset_folder, "imu0_poses.txt"), string.Join(",", pose_line));
 
-      this.stereo_rig.CaptureStereoPair(ref leftImage, ref rightImage);
+      this.stereoRig.CaptureStereoPair(ref leftImage, ref rightImage);
       this.depthCameraLeft.Capture(ref leftDepthImage);
 
       leftPng = leftImage.EncodeToPNG();

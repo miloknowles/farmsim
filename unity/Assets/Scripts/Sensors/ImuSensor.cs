@@ -37,6 +37,8 @@ public class ImuSensor : MonoBehaviour
 
   private Vector3 accelBias = Vector3.zero;
   private Vector3 gyroBias = Vector3.zero;
+  private Vector3 accelNoiseSigmaVec;
+  private Vector3 gyroNoiseSigmaVec;
 
   // Used to calculate accleration with finite-differencing.
   private Vector3 prev_world_v_imu;
@@ -53,6 +55,9 @@ public class ImuSensor : MonoBehaviour
     if (this.gyroBiasSigma > 0 && this.enableImuBias) {
       this.gyroBias += Gaussian.Sample3D(Vector3.zero, new Vector3(this.gyroBiasSigma, this.gyroBiasSigma, this.gyroBiasSigma));
     }
+
+    this.accelNoiseSigmaVec = new Vector3(this.accelNoiseSigma, this.accelNoiseSigma, this.accelNoiseSigma);
+    this.gyroNoiseSigmaVec = new Vector3(this.gyroNoiseSigma, this.gyroNoiseSigma, this.gyroNoiseSigma);
 
     Debug.Log($"** [ImuSensor] Accelerometer bias (m/s^2): {this.accelBias.x} {this.accelBias.y} {this.accelBias.z}");
     Debug.Log($"** [ImuSensor] Gyroscope bias: (rad/s): {this.gyroBias.x} {this.gyroBias.y} {this.gyroBias.z}");
@@ -80,11 +85,11 @@ public class ImuSensor : MonoBehaviour
 
     // Optionally add zero-mean noise.
     if (this.accelNoiseSigma > 0 && this.enableImuNoise) {
-      data.imu_a_rh += Gaussian.Sample3D(Vector3.zero, new Vector3(this.accelNoiseSigma, this.accelNoiseSigma, this.accelNoiseSigma));
+      data.imu_a_rh += Gaussian.Sample3D(Vector3.zero, this.accelNoiseSigmaVec);
     }
 
     if (this.gyroNoiseSigma > 0 && this.enableImuNoise) {
-      data.imu_w_rh += Gaussian.Sample3D(Vector3.zero, new Vector3(this.gyroNoiseSigma, this.gyroNoiseSigma, this.gyroNoiseSigma));
+      data.imu_w_rh += Gaussian.Sample3D(Vector3.zero, this.accelNoiseSigmaVec);
     }
 
     // Add bias. If enableImuBias is OFF, this will just add a zero vector.
