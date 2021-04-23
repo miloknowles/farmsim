@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 8861945017722106567}
   - component: {fileID: 3019424201629127802}
   m_Layer: 8
-  m_Name: Macroalgae_Kelp01
+  m_Name: Kelp1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -83,7 +83,7 @@ MeshRenderer:
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
   m_StitchLightmapSeams: 1
-  m_SelectedEditorRenderState: 0
+  m_SelectedEditorRenderState: 3
   m_MinimumChartSize: 4
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89

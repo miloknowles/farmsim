@@ -1507,8 +1507,8 @@ GameObject:
   - component: {fileID: 420561432}
   - component: {fileID: 420561434}
   - component: {fileID: 420561435}
-  - component: {fileID: 420561436}
   - component: {fileID: 420561433}
+  - component: {fileID: 420561436}
   m_Layer: 0
   m_Name: TridentAUV
   m_TagString: Untagged
@@ -1571,25 +1571,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dd84921c8fa71f54b9c28723f8468aff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  camera_forward_left: {fileID: 178838056}
-  depthCameraLeft: {fileID: 637407397}
   publishImu: 1
   publishRange: 1
   publishDepth: 1
   publishStereo: 1
   publishMag: 1
+  imuSensor: {fileID: 420561432}
+  rangeSensorA: {fileID: 202800059}
+  rangeSensorB: {fileID: 1207165784}
+  rangeSensorC: {fileID: 0}
+  rangeSensorD: {fileID: 0}
   rangePublishRate: 6
-  imu_rigidbody: {fileID: 420561429}
-  imu_sensor: {fileID: 420561432}
-  range_sensor_A: {fileID: 202800059}
-  range_sensor_B: {fileID: 0}
-  range_sensor_C: {fileID: 1639128901}
-  range_sensor_D: {fileID: 0}
-  depth_sensor: {fileID: 420561434}
-  stereo_rig: {fileID: 420561435}
-  magnetometer: {fileID: 420561436}
-  simulatorIOMode: 1
-  disableImageOutput: 0
+  depthSensor: {fileID: 420561434}
+  depthPublishRate: 50
+  magSensor: {fileID: 420561436}
+  magPublishRate: 50
+  depthCameraLeft: {fileID: 637407397}
+  stereoRig: {fileID: 420561435}
+  imagePublishRate: 20
+  inputOutputMode: 1
+  disableImageOutput: 1
   outputDatasetName: default_dataset/mav0/
   outputDatasetRoot: /home/milo/datasets/Unity3D/farmsim/
 --- !u!114 &420561428
@@ -1728,14 +1729,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 420561424}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9536f85539a3cafa2a7cde2ea0924b15, type: 3}
+  m_Script: {fileID: 11500000, guid: 48cb58c6f653c23828488568a3b030b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   body: {fileID: 1943956869}
-  enableNoise: 1
-  enableBias: 1
+  enableNoise: 0
+  enableBias: 0
+  biasVector: {x: 0, y: 0, z: 0}
   noiseSigma: 0.001
-  biasSigma: 0.001
   fieldDirection: {x: 0, y: 0, z: 1}
   fieldStrength: 50
 --- !u!1 &466405589
@@ -9375,7 +9376,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1893126160}
   m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: -2.086, y: -0.452, z: -5}
+  m_LocalPosition: {x: -2.086, y: -0.452, z: -3.512}
   m_LocalScale: {x: 0.05, y: 0.05, z: 0.05}
   m_Children: []
   m_Father: {fileID: 589318189}

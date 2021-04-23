@@ -20,8 +20,8 @@ public class MmfImagePublisher {
   private long mmf_size_bytes;
   private string mmf_filename;
 
-  private int mutex_timeout_ms = 1;
-  private Mutex publish_mutex;
+  // private int mutex_timeout_ms = 1;
+  // private Mutex publish_mutex;
   private MemoryMappedFile mmf;
   private MemoryMappedViewStream stream;
   private BinaryWriter writer;
@@ -41,7 +41,7 @@ public class MmfImagePublisher {
     // Through JPG encoding, we can fit 10-30 images in that buffer.
     this.mmf_size_bytes = 2 * img_height * img_width * img_channels;
 
-    GetMutexByName(this.channel_name + "/mutex", out this.publish_mutex);
+    // GetMutexByName(this.channel_name + "/mutex", out this.publish_mutex);
     this.mmf_filename = GetMmfFilenameSafe(
         SimulationParams.SYSTEM_SHM_FOLDER,
         ConvertChannelToFilename(channel_name));

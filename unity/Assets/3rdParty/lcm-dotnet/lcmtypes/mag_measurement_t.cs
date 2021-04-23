@@ -13,14 +13,14 @@ namespace vehicle
     public sealed class mag_measurement_t : LCM.LCM.LCMEncodable
     {
         public vehicle.header_t header;
-        public vehicle.vector3_t bM;
+        public vehicle.vector3_t field;
  
         public mag_measurement_t()
         {
         }
  
         public static readonly ulong LCM_FINGERPRINT;
-        public static readonly ulong LCM_FINGERPRINT_BASE = 0x88ce1ef00f3317c3L;
+        public static readonly ulong LCM_FINGERPRINT_BASE = 0xf0123734288238c2L;
  
         static mag_measurement_t()
         {
@@ -51,7 +51,7 @@ namespace vehicle
         {
             this.header._encodeRecursive(outs); 
  
-            this.bM._encodeRecursive(outs); 
+            this.field._encodeRecursive(outs); 
  
         }
  
@@ -78,7 +78,7 @@ namespace vehicle
         {
             this.header = vehicle.header_t._decodeRecursiveFactory(ins);
  
-            this.bM = vehicle.vector3_t._decodeRecursiveFactory(ins);
+            this.field = vehicle.vector3_t._decodeRecursiveFactory(ins);
  
         }
  
@@ -87,7 +87,7 @@ namespace vehicle
             vehicle.mag_measurement_t outobj = new vehicle.mag_measurement_t();
             outobj.header = this.header.Copy();
  
-            outobj.bM = this.bM.Copy();
+            outobj.field = this.field.Copy();
  
             return outobj;
         }
