@@ -130,9 +130,8 @@ public class AUV : MonoBehaviour {
     mag_msg.field = new vehicle.vector3_t();
 
     while (true) {
-      yield return new WaitForSeconds(rate.WaitTime());
-
       rate.Tic();
+      yield return new WaitForSeconds(rate.WaitTime());
 
       this.magSensor.Read();
       MagMeasurement mag = this.magSensor.data;
@@ -155,9 +154,8 @@ public class AUV : MonoBehaviour {
     RateLimiter rate = new RateLimiter(this.depthPublishRate);
 
     while (true) {
-      yield return new WaitForSeconds(rate.WaitTime());
-
       rate.Tic();
+      yield return new WaitForSeconds(rate.WaitTime());
 
       this.depthSensor.Read();
       DepthMeasurement data = this.depthSensor.data;
@@ -191,9 +189,8 @@ public class AUV : MonoBehaviour {
     RateLimiter rate = new RateLimiter(this.rangePublishRate);
 
     while (true) {
-      yield return new WaitForSeconds(rate.WaitTime());
-
       rate.Tic();
+      yield return new WaitForSeconds(rate.WaitTime());
 
       if (this.rangeSensorA) {
         this.rangeSensorA.Read();
@@ -251,8 +248,8 @@ public class AUV : MonoBehaviour {
     RateLimiter rate = new RateLimiter(this.imagePublishRate);
 
     while (true) {
-      yield return new WaitForSeconds(rate.WaitTime()); // Sync with images.
       rate.Tic();
+      yield return new WaitForSeconds(rate.WaitTime()); // Sync with images.
       yield return new WaitForEndOfFrame();
 
       Transform world_T_body = this.imuSensor.imu_rigidbody.transform;
@@ -292,9 +289,8 @@ public class AUV : MonoBehaviour {
     RateLimiter rate = new RateLimiter(this.imagePublishRate);
 
     while (true) {
-      yield return new WaitForSeconds(rate.WaitTime());
-
       rate.Tic();
+      yield return new WaitForSeconds(rate.WaitTime());
       yield return new WaitForEndOfFrame();
 
       this.stereoRig.CaptureStereoPair(ref leftImage, ref rightImage);

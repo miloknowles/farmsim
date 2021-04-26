@@ -10,8 +10,9 @@ namespace Simulator {
 public class RateLimiter {
   private float nominalInterval;  // How much time between loop executions.
   private float ticTime = 0.0f;      // Last loop start time.
-  public float avgLoopTime = 0.0f;  // Moving avg of the loop time.
-  private float alpha = 0.6f;  // Controls the moving avg smoothing (high = more smooth).
+  private float lastWaitTime = 0.0f;
+  private float avgLoopTime = 0.0f;  // Moving avg of the loop time.
+  private float alpha = 0.9f;  // Controls the moving avg smoothing (high = more smooth).
 
   public RateLimiter(float nominalHz)
   {
@@ -19,6 +20,7 @@ public class RateLimiter {
   }
 
   // Mark the start of a loop iteration.
+  // IMPORTANT: Call this *before* WaitForSeconds();
   public void Tic()
   {
     this.ticTime = (float)Timestamp.UnitySeconds();
@@ -27,7 +29,7 @@ public class RateLimiter {
   // Mark the end of a loop iteration.
   public void Toc()
   {
-    float thisLoopTime = (float)Timestamp.UnitySeconds() - this.ticTime;
+    float thisLoopTime = (float)Timestamp.UnitySeconds() - this.ticTime - this.lastWaitTime;
 
     if (this.avgLoopTime <= 0.0f) {
       this.avgLoopTime = thisLoopTime;  // Handle first measurement.
@@ -40,7 +42,8 @@ public class RateLimiter {
   public float WaitTime()
   {
     // Wait at least a tiny amount of time.
-    return Mathf.Max(0.01f, this.nominalInterval - this.avgLoopTime);
+    this.lastWaitTime = 0.98f * Mathf.Max(0.01f, this.nominalInterval - this.avgLoopTime);
+    return this.lastWaitTime;
   }
 }
 
