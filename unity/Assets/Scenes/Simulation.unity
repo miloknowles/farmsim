@@ -1323,6 +1323,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ghostObject: {fileID: 202981311}
   axesObject: {fileID: 949759516}
+  showGhost: 0
+  showAxes: 1
+  poseHistoryLength: 20
 --- !u!4 &388865750
 Transform:
   m_ObjectHideFlags: 0
@@ -1590,7 +1593,7 @@ MonoBehaviour:
   stereoRig: {fileID: 420561435}
   imagePublishRate: 20
   inputOutputMode: 1
-  disableImageOutput: 0
+  disableImageOutput: 1
   outputDatasetName: default_dataset/mav0/
   outputDatasetRoot: /home/milo/datasets/Unity3D/farmsim/
 --- !u!114 &420561428
@@ -1668,7 +1671,7 @@ MonoBehaviour:
   enableImuNoise: 1
   enableImuBias: 1
   accelNoiseSigma: 0.0001
-  gyroNoiseSigma: 0.000001
+  gyroNoiseSigma: 0.00001
   accelBiasRandomWalkSigma: 0.0001
   gyroBiasRandomWalkSigma: 0.000001
   accelBiasSigma: 0.00001
