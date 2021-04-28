@@ -1579,18 +1579,18 @@ MonoBehaviour:
   imuSensor: {fileID: 420561432}
   rangeSensorA: {fileID: 202800059}
   rangeSensorB: {fileID: 1207165784}
-  rangeSensorC: {fileID: 0}
+  rangeSensorC: {fileID: 1639128901}
   rangeSensorD: {fileID: 0}
   rangePublishRate: 6
   depthSensor: {fileID: 420561434}
-  depthPublishRate: 50
+  depthPublishRate: 20
   magSensor: {fileID: 420561436}
-  magPublishRate: 50
+  magPublishRate: 20
   depthCameraLeft: {fileID: 637407397}
   stereoRig: {fileID: 420561435}
   imagePublishRate: 20
   inputOutputMode: 1
-  disableImageOutput: 1
+  disableImageOutput: 0
   outputDatasetName: default_dataset/mav0/
   outputDatasetRoot: /home/milo/datasets/Unity3D/farmsim/
 --- !u!114 &420561428
@@ -1705,7 +1705,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   depthSensorObject: {fileID: 1300158238}
   enableDepthNoise: 1
-  noiseSigma: 0.02
+  noiseSigma: 0.05
 --- !u!114 &420561435
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1733,10 +1733,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   body: {fileID: 1943956869}
-  enableNoise: 0
+  enableNoise: 1
   enableBias: 0
   biasVector: {x: 0, y: 0, z: 0}
-  noiseSigma: 0.001
+  noiseSigma: 0.1
   fieldDirection: {x: 0, y: 0, z: 1}
   fieldStrength: 50
 --- !u!1 &466405589
@@ -3359,8 +3359,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 663678797}
   m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: -0.005, y: 0.454, z: -0}
-  m_LocalScale: {x: 0.05, y: 0.05, z: 0.05}
+  m_LocalPosition: {x: -0.029, y: 0.454, z: 0.142}
+  m_LocalScale: {x: 0.01, y: 0.01, z: 0.01}
   m_Children: []
   m_Father: {fileID: 589318189}
   m_RootOrder: 2
@@ -4968,8 +4968,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 952967118}
   m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: -2.076, y: -0.457, z: -0}
-  m_LocalScale: {x: 0.05, y: 0.05, z: 0.05}
+  m_LocalPosition: {x: -2.085, y: -0.457, z: 0.132}
+  m_LocalScale: {x: 0.01, y: 0.01, z: 0.01}
   m_Children: []
   m_Father: {fileID: 589318189}
   m_RootOrder: 3
@@ -6613,8 +6613,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1353332170}
   m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: -0.04, y: -0.452, z: 0}
-  m_LocalScale: {x: 0.05, y: 0.05, z: 0.05}
+  m_LocalPosition: {x: -0.01, y: -0.452, z: 0.123}
+  m_LocalScale: {x: 0.01, y: 0.01, z: 0.01}
   m_Children: []
   m_Father: {fileID: 589318189}
   m_RootOrder: 5
@@ -9376,8 +9376,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1893126160}
   m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: -2.086, y: -0.452, z: -3.512}
-  m_LocalScale: {x: 0.05, y: 0.05, z: 0.05}
+  m_LocalPosition: {x: -2.086, y: 0.474, z: 0.11}
+  m_LocalScale: {x: 0.01, y: 0.01, z: 0.01}
   m_Children: []
   m_Father: {fileID: 589318189}
   m_RootOrder: 4
@@ -9485,6 +9485,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: FollowCamera
+      objectReference: {fileID: 0}
+    - target: {fileID: 4653121137522870164, guid: 59265c06d324f395682cb16b67f1d258,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4653121137522870165, guid: 59265c06d324f395682cb16b67f1d258,
         type: 3}
@@ -9614,7 +9619,7 @@ PrefabInstance:
     - target: {fileID: 4653121137522870167, guid: 59265c06d324f395682cb16b67f1d258,
         type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6742186861490759073, guid: 59265c06d324f395682cb16b67f1d258,
         type: 3}
