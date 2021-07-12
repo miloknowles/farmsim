@@ -22,7 +22,7 @@ public class PursuitController : MonoBehaviour
   private float maxForwardVelocity = 5.0f;
   private float goalPositionTol = 0.2f;
   private float distVelocityGain = 1.5f;
-  private float maxThrust = 30.0f;
+  private float maxThrust = 50.0f;
 
   // Derivative control.
   private float dGainPitch = 0.01f;

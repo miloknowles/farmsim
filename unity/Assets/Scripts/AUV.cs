@@ -33,18 +33,18 @@ public class AUV : MonoBehaviour {
   public RangeSensor rangeSensorB;
   public RangeSensor rangeSensorC;
   public RangeSensor rangeSensorD;
-  public float rangePublishRate = 10;
+  public float rangePublishRate = 10f;
 
   //============================== DEPTH & RANGE ===============================
   public DepthSensor depthSensor;
-  public float depthPublishRate = 50;
+  public float depthPublishRate = 50f;
   public MagSensor magSensor;
-  public float magPublishRate = 50;
+  public float magPublishRate = 50f;
 
   //================================= CAMERAS ==================================
   public DepthCamera depthCameraLeft;
   public StereoRig stereoRig;
-  public float imagePublishRate = 20;
+  public float imagePublishRate = 20f;
 
   //================================ DATA SAVING ===============================
   public Simulator.IOMode inputOutputMode = Simulator.IOMode.NONE;
@@ -123,13 +123,15 @@ public class AUV : MonoBehaviour {
   IEnumerator PublishMag()
   {
     long seq = 0;
+    RateLimiter rate = new RateLimiter(this.magPublishRate);
 
     vehicle.mag_measurement_t mag_msg = new vehicle.mag_measurement_t();
     mag_msg.header = new vehicle.header_t();
     mag_msg.field = new vehicle.vector3_t();
 
     while (true) {
-      yield return new WaitForSeconds(1.0f / this.magPublishRate);
+      rate.Tic();
+      yield return new WaitForSeconds(rate.WaitTime());
 
       this.magSensor.Read();
       MagMeasurement mag = this.magSensor.data;
@@ -137,6 +139,8 @@ public class AUV : MonoBehaviour {
       LCMUtils.pack_vector3_t(mag.field, ref mag_msg.field);
 
       this.lcmHandle.Publish(SimulationParams.CHANNEL_AUV_MAG, mag_msg);
+
+      rate.Toc();
       ++seq;
     }
   }
@@ -147,8 +151,11 @@ public class AUV : MonoBehaviour {
     vehicle.depth_measurement_t depth_msg = new vehicle.depth_measurement_t();
     depth_msg.header = new vehicle.header_t();
 
+    RateLimiter rate = new RateLimiter(this.depthPublishRate);
+
     while (true) {
-      yield return new WaitForSeconds(1.0f / this.depthPublishRate);
+      rate.Tic();
+      yield return new WaitForSeconds(rate.WaitTime());
 
       this.depthSensor.Read();
       DepthMeasurement data = this.depthSensor.data;
@@ -158,6 +165,7 @@ public class AUV : MonoBehaviour {
 
       this.lcmHandle.Publish(SimulationParams.CHANNEL_AUV_DEPTH, depth_msg);
 
+      rate.Toc();
       ++seq;
     }
   }
@@ -178,10 +186,11 @@ public class AUV : MonoBehaviour {
     msg2.point = new vehicle.vector3_t();
     msg3.point = new vehicle.vector3_t();
 
-    float range_wait_time = 1.0f / this.rangePublishRate;
+    RateLimiter rate = new RateLimiter(this.rangePublishRate);
 
     while (true) {
-      yield return new WaitForSeconds(range_wait_time);
+      rate.Tic();
+      yield return new WaitForSeconds(rate.WaitTime());
 
       if (this.rangeSensorA) {
         this.rangeSensorA.Read();
@@ -190,7 +199,6 @@ public class AUV : MonoBehaviour {
         LCMUtils.pack_vector3_t(data0.world_t_beacon, ref msg0.point);
         msg0.range = data0.range;
         this.lcmHandle.Publish(SimulationParams.CHANNEL_AUV_RANGE_ALL, msg0);
-        Debug.Log("range A");
       }
 
       if (this.rangeSensorB) {
@@ -200,7 +208,6 @@ public class AUV : MonoBehaviour {
         LCMUtils.pack_vector3_t(data1.world_t_beacon, ref msg1.point);
         msg1.range = data1.range;
         this.lcmHandle.Publish(SimulationParams.CHANNEL_AUV_RANGE_ALL, msg1);
-        Debug.Log("range B");
       }
 
       if (this.rangeSensorC) {
@@ -210,7 +217,6 @@ public class AUV : MonoBehaviour {
         LCMUtils.pack_vector3_t(data2.world_t_beacon, ref msg2.point);
         msg2.range = data2.range;
         this.lcmHandle.Publish(SimulationParams.CHANNEL_AUV_RANGE_ALL, msg2);
-        Debug.Log("range C");
       }
 
       if (this.rangeSensorD) {
@@ -220,9 +226,9 @@ public class AUV : MonoBehaviour {
         LCMUtils.pack_vector3_t(data3.world_t_beacon, ref msg3.point);
         msg3.range = data3.range;
         this.lcmHandle.Publish(SimulationParams.CHANNEL_AUV_RANGE_ALL, msg3);
-        Debug.Log("range D");
       }
 
+      rate.Toc();
       ++seq;
     }
   }
@@ -239,8 +245,12 @@ public class AUV : MonoBehaviour {
     Quaternion world_q_body = Quaternion.identity;
     Vector3 world_t_body = Vector3.zero;
 
+    RateLimiter rate = new RateLimiter(this.imagePublishRate);
+
     while (true) {
-      yield return new WaitForEndOfFrame(); // Sync with camera publish rate.
+      rate.Tic();
+      yield return new WaitForSeconds(rate.WaitTime()); // Sync with images.
+      yield return new WaitForEndOfFrame();
 
       Transform world_T_body = this.imuSensor.imu_rigidbody.transform;
 
@@ -252,6 +262,7 @@ public class AUV : MonoBehaviour {
       this.lcmHandle.Publish(SimulationParams.CHANNEL_AUV_WORLD_P_IMU, msg);
       this.lcmHandle.Publish(SimulationParams.CHANNEL_AUV_WORLD_P_IMU_INITIAL, msg);
 
+      rate.Toc();
       ++seq;
     }
   }
@@ -275,7 +286,11 @@ public class AUV : MonoBehaviour {
         SimulationParams.AUV_CAMERA_HEIGHT,
         SimulationParams.AUV_CAMERA_WIDTH, 3);
 
+    RateLimiter rate = new RateLimiter(this.imagePublishRate);
+
     while (true) {
+      rate.Tic();
+      yield return new WaitForSeconds(rate.WaitTime());
       yield return new WaitForEndOfFrame();
 
       this.stereoRig.CaptureStereoPair(ref leftImage, ref rightImage);
@@ -286,6 +301,7 @@ public class AUV : MonoBehaviour {
       // this.lcmHandle.Publish(SimulationParams.CHANNEL_AUV_STEREO, msg);
       mmf_pub.PublishStereo(ref msg.header, ref leftImage, ref rightImage);
 
+      rate.Toc();
       ++seq;
     }
   }
