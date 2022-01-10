@@ -1,6 +1,6 @@
 # FarmSim
 
-A simulated aquaculture farm in Unity3D.
+A simulated oyster/seaweed aquaculture farm in Unity3D. I developed this simulator to test out Blue Meadow's robotic perception software.
 
 ![Banner image](/resources/images/banner2.png?raw=true)
 
