@@ -1,6 +1,0 @@
-/build
-/devel
-.catkin_workspace
-ros/logs/
-.vscode/*.json
-*.pyc

@@ -1,8 +1,0 @@
-#goal definition
-float32 yaw_setpoint
----
-#result definition
-float32 yaw_final
----
-#feedback
-float32 yaw_error
